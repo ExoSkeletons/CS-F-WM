@@ -5,11 +5,11 @@ from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
-from ui.app import AppPage, App
+from ui.app import App, WidgetFrame
 from ui.scrollable_frame import ScrollableFrame
 
 
-class ComparePage(AppPage):
+class ComparePage(WidgetFrame):
     on_submit: Optional[Callable[[str], None]] = None
 
     _font_size = 9
@@ -38,7 +38,7 @@ class ComparePage(AppPage):
     response_frames: list[ResponseFrame] = []
 
     def __init__(self, app: App, watermarks: list[Callable[[str], str]]):
-        super().__init__(app)
+        super().__init__(app, app.container)
         self.marks: list[Callable[[str], str] | None] = list(watermarks)
         self.marks.append(None)
 

@@ -40,6 +40,7 @@ class App(tk.Tk):
 
     def set_frame(self, frame):
         if not frame._widgets_created:
+            frame.grid(row=0, column=0)
             frame._create_widgets()
         frame.reset_widgets()
 
@@ -80,19 +81,3 @@ class WidgetFrame(ttk.Frame):
 
     def reset_widgets(self):
         pass
-
-
-class AppPage(WidgetFrame):
-    def __init__(self, app: App, prev_app_frame=None):
-        super().__init__(app, app.container)
-        self.app = app
-        self.__prev = prev_app_frame
-
-    def _create_widgets(self):
-        self.grid(row=0, column=0)
-        super()._create_widgets()
-
-    def back(self):
-        if self.__prev:
-            self.app.set_frame(self.__prev)
-            self.destroy()

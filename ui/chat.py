@@ -1,21 +1,22 @@
-import tkinter
 from tkinter import END, font
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
-from ui.app import AppPage
+from ui.app import WidgetFrame, App
 from ui.scrollable_frame import ScrollableFrame
 
 
-
-class ChatPage(AppPage):
+class ChatPage(WidgetFrame):
     on_submit: Optional[Callable[[str], None]] = None
 
     _font_size = 9
 
     _response_cell: Optional[str] = None
     response_label: Optional[ttk.Label] = None
+
+    def __init__(self, app: App):
+        super().__init__(app, app.container)
 
     def _create_widgets(self):
         self.chat_history_frame = ScrollableFrame(self, scroll_y=True)

@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
-from ui.app import WidgetFrame, App
+from ui.app import WidgetFrame
 from ui.scrollable_frame import ScrollableFrame
 
 
@@ -15,9 +15,6 @@ class ChatPage(WidgetFrame):
     _response_cell: Optional[str] = None
     response_label: Optional[ttk.Label] = None
 
-    def __init__(self, app: App):
-        super().__init__(app, app.container)
-
     def _create_widgets(self):
         self.chat_history_frame = ScrollableFrame(self, scroll_y=True)
         self.chat_history_frame.pack(fill="both", expand=True)
@@ -26,7 +23,7 @@ class ChatPage(WidgetFrame):
         self.app.set_on_submit(self._text_form, lambda: self.submit())
         self._text_form.pack()
 
-        self._submit_button = ttk.Button(self, text="Send", command=lambda: self.submit())
+        self._submit_button = ttk.Button(self, text="Chat", command=lambda: self.submit())
         self._submit_button.pack()
         self.app.set_on_submit(self._submit_button, lambda: self.submit())
 
@@ -65,7 +62,7 @@ class ChatPage(WidgetFrame):
         # fire listener
         if self.on_submit: self.on_submit(q)
 
-    def response(self, response: str):
+    def response(self, response: str, ok: bool = True):
         # update response
         self.response_label.config(text=response)
         # scroll to chat bottom

@@ -37,8 +37,8 @@ class ComparePage(WidgetFrame):
 
     response_frames: list[ResponseFrame] = []
 
-    def __init__(self, app: App, watermarks: list[Callable[[str], str]]):
-        super().__init__(app, app.container)
+    def __init__(self, watermarks: list[Callable[[str], str]], app: App, master: tkinter.Misc | None=None):
+        super().__init__(app, master)
         self.marks: list[Callable[[str], str] | None] = list(watermarks)
         self.marks.append(None)
 

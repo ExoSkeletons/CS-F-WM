@@ -5,7 +5,9 @@ import yaml
 from google import genai
 
 from ui.app import App
+from ui.chat import ChatPage
 from ui.compare import ComparePage
+from ui.survey import PagedFrame
 
 Watermark = Callable[[str], str]
 
@@ -34,24 +36,20 @@ client = genai.Client()
 model = "gemini-2.5-flash"
 
 
-def q_gemini(q: str):
-    return client.models.generate_content(
-        model=model,
-        contents=q
-    ).text
-
-
-def threaded_query(q: str):
+def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     def worker():
         try:
-            resp = q_gemini(q)
+            resp = client.models.generate_content(
+                model=model,
+                contents=q
+            ).text
             ok = True
         except Exception as e:
             resp = f"Error: {e}"
             ok = False
 
         # update UI safely from main thread
-        root.after(0, lambda: submit_page.response(resp, apply_marks=ok))
+        root.after(0, lambda: response_callback(resp, ok))
 
     # run worker in background so UI doesn't freeze
     threading.Thread(target=worker, daemon=True).start()
@@ -60,8 +58,18 @@ def threaded_query(q: str):
 if __name__ == "__main__":
     root = App()
 
-    submit_page = ComparePage(root, list(active_watermarks().values()))
-    submit_page.on_submit = threaded_query
+    pager = PagedFrame(root, root.container)
+    pager.pack(fill="both", expand=True)
 
-    root.set_frame(submit_page)
+    root.set_frame(pager)
+
+    compare_page = ComparePage(list(active_watermarks().values()), root, pager.notebook)
+    compare_page.on_submit = lambda q: threaded_query(q, compare_page.response)
+
+    chat_page = ChatPage(root, pager.notebook)
+    chat_page.on_submit = lambda q: threaded_query(q, chat_page.response)
+
+    pager.add_page(compare_page, title="Watermark Detection")
+    pager.add_page(chat_page, title="Free-text chatting")
+
     root.mainloop()

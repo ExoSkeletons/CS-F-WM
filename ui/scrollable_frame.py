@@ -50,6 +50,9 @@ class ScrollableFrame(ttk.Frame):
         # Mousewheel scrolling (Windows/Mac/Linux)
         self.content.bind_all("<MouseWheel>", self._on_mousewheel)
         self.content.bind_all("<Shift-MouseWheel>", self._on_shift_mousewheel)
+        # Take mouse scrolling on mouse enter
+        self.canvas.bind("<Enter>", lambda e: self.canvas.bind_all("<MouseWheel>", self._on_mousewheel))
+        self.canvas.bind("<Leave>", lambda e: self.canvas.unbind_all("<MouseWheel>"))
 
     # --- Internal Callbacks ---
     def _on_frame_configure(self, event):

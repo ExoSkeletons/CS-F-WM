@@ -24,7 +24,7 @@ def config_enable_frame(widget: tk.Misc, enabled: bool):
 
 class App(tk.Tk):
     __submits: dict[Misc] = {}
-    __focus_next: dict[tk.Entry | ttk.Entry, Misc] = {}
+    __focus_next: dict[tk.Entry | ttk.Entry | tk.Text, Misc] = {}
 
     def __bind_return(self):
         # setup return (enter) binder
@@ -76,7 +76,7 @@ class App(tk.Tk):
         # set the position of the window to the center of the screen
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-    def set_focus_next(self, entry: tk.Entry | ttk.Entry, f_next: Misc):
+    def set_focus_next(self, entry: tk.Entry | ttk.Entry | tk.Text, f_next: Misc):
         self.__focus_next[entry] = f_next
 
     def set_on_submit(self, w: Misc, command):

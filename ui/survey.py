@@ -13,6 +13,12 @@ class PagedFrame(WidgetFrame):
     _prev_btn: ttk.Button
     _next_btn: ttk.Button
 
+    def __init__(self, app: App, master: Misc | None = None, prev_text: str = "Prev", next_text: str = "Next"):
+        self.prev_text = prev_text
+        self.next_text = next_text
+
+        super().__init__(app, master)
+
     def _create_widgets(self):
         # Notebook for page frames
         self.notebook = ttk.Notebook(self)
@@ -23,8 +29,8 @@ class PagedFrame(WidgetFrame):
         navigation_bar.pack(fill="x")
 
         # Navigation buttons + progress bar
-        self._prev_btn = ttk.Button(navigation_bar, text="<- Previous", command=self.prev_page)
-        self._next_btn = ttk.Button(navigation_bar, text="Next ->", command=self.next_page)
+        self._prev_btn = ttk.Button(navigation_bar, text="<- " + self.prev_text, command=self.prev_page)
+        self._next_btn = ttk.Button(navigation_bar, text="" + self.next_text + " ->", command=self.next_page)
         self._progress_bar = ttk.Progressbar(navigation_bar, orient="horizontal", mode="determinate")
 
         self._prev_btn.pack(side="left")

@@ -3,6 +3,7 @@ from typing import Callable
 
 import yaml
 from google import genai
+from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message
 
 from ui.app import App
 from ui.chat import ChatPage
@@ -36,13 +37,21 @@ client = genai.Client()
 model = "gemini-2.5-flash"
 
 
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential_jitter(initial=1, max=10),
+    retry=retry_if_exception_message(match=r"overloaded|503"),
+)
+def stubborn_generation(q: str):
+    """Wrapper that retries transient errors like 'model is overloaded'."""
+    return client.models.generate_content(model=model, contents=q)
+
+
 def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     def worker():
         try:
-            resp = client.models.generate_content(
-                model=model,
-                contents=q
-            ).text
+            print(f"querying:\n\"{q}\"")
+            resp = stubborn_generation(q).text
             ok = True
         except Exception as e:
             resp = f"Error: {e}"

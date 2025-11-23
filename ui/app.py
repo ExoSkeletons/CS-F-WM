@@ -1,11 +1,25 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import Misc
+from tkinter import Misc, TclError
 
 padding = {'padx': 5, 'pady': 5}
 font = 'Ariel'
 title_font = (font, 22)
 header_font = (font, 14)
+
+
+def rtl(text: str):
+    return "\u200F" + text + "\u200F"
+
+def config_enable_frame(widget: tk.Misc, enabled: bool):
+    if isinstance(widget, (tk.Frame, ttk.Frame)):
+        for w in widget.winfo_children():
+            config_enable_frame(w, enabled)
+    else:
+        try:
+            widget.config(state="normal" if enabled else "disabled")
+        except TclError:
+            pass
 
 
 class App(tk.Tk):

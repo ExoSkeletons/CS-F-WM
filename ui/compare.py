@@ -37,10 +37,11 @@ class ComparePage(WidgetFrame):
 
     response_frames: list[ResponseFrame] = []
 
-    def __init__(self, watermarks: list[Callable[[str], str]], app: App, master: tkinter.Misc | None=None):
-        super().__init__(app, master)
+    def __init__(self, watermarks: list[Callable[[str], str]], app: App, master: tkinter.Misc | None = None):
         self.marks: list[Callable[[str], str] | None] = list(watermarks)
         self.marks.append(None)
+
+        super().__init__(app, master)
 
     def _create_widgets(self):
         self.scroll = ScrollableFrame(self, scroll_y=True)

@@ -1,7 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, Misc
 
-from ui.app import WidgetFrame
+from ui.app import WidgetFrame, App
 
 
 class PagedFrame(WidgetFrame):
@@ -71,9 +71,6 @@ class PagedFrame(WidgetFrame):
     def _on_tab_changed(self, event=None):
         self._current_index = self.notebook.index("current")
         frame = self._pages[self._current_index]
-        if not frame._widgets_created:
-            frame._create_widgets()
-            frame.update_idletasks()
         self._update_progress_bar()
 
     def _update_progress_bar(self):

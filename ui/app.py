@@ -53,9 +53,7 @@ class App(tk.Tk):
         self.title("Welcome")
 
     def set_frame(self, frame):
-        if not frame._widgets_created:
-            frame.grid(row=0, column=0)
-            frame._create_widgets()
+        frame.grid(row=0, column=0)
         frame.reset_widgets()
 
         frame.tkraise()
@@ -85,13 +83,12 @@ class App(tk.Tk):
 
 class WidgetFrame(ttk.Frame):
     def __init__(self, app: App, master: Misc | None = None):
-        super().__init__(master)
+        super().__init__(master or app.container)
         self.app = app
-        self._widgets_created = False
+        self._create_widgets()
 
     def _create_widgets(self):
         self.reset_widgets()
-        self._widgets_created = True
 
     def reset_widgets(self):
         pass

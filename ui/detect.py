@@ -230,7 +230,7 @@ class DetectPage(WidgetFrame):
 
         threading.Thread(target=watermark_worker, daemon=True).start()
 
-    def submit_choices(self):
+    def confirm_choices(self):
         # lock in choices
         config_enable_frame(self, False)
         self.set_text_editable(False)
@@ -241,3 +241,8 @@ class DetectPage(WidgetFrame):
             "Correct!" if ((w is not None) == self.is_watermarked_var.get())
             else "Incorrect"
         )
+
+    def validate(self) -> bool:
+        # todo: validate do you think a watermark exists buttons
+        #  show "red" required-notice and return False if not.
+        return True

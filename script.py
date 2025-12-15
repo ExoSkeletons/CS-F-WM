@@ -87,14 +87,13 @@ model = "gemini-2.5-flash"
     retry=retry_if_exception_message(match=r"overloaded|503"),
 )
 def stubborn_generation(q: str):
-    """Wrapper that retries transient errors like 'model is overloaded'."""
+    print(f"querying:\n\"{q}\"")
     return client.models.generate_content(model=model, contents=q)
 
 
 def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     def worker():
         try:
-            print(f"querying:\n\"{q}\"")
             resp = stubborn_generation(q).text
             ok = True
         except Exception as e:

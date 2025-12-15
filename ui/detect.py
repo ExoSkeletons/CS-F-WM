@@ -3,6 +3,7 @@ import threading
 import tkinter
 from tkinter import END, font
 from tkinter import ttk
+from tkinter.font import Font
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
@@ -13,7 +14,7 @@ from ui.scrollable_frame import ScrollableFrame
 class DetectPage(WidgetFrame):
     on_submit: Optional[Callable[[str], None]] = None
 
-    _font_size = 9
+    _font_size = 10
     _font_size_title = 18
     _min_word_count = 100
 
@@ -38,9 +39,10 @@ class DetectPage(WidgetFrame):
         ttk.Label(
             self.question_frame,
             text=
-            "You are given a question from a school assignment, and a Chat Model as an assistant.\n\n"
-            "Use the chat model for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
+            "You are given a question from a school assignment, and an AI Assistant.\n\n"
+            "Use the AI Assistant for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
             ,
+            font=Font(size=self._font_size),
             justify="left", anchor="nw", wraplength=wrap_l
         ).pack(expand=True, fill="both")
         ttk.Label(self.question_frame, text="question:").pack()
@@ -88,36 +90,59 @@ class DetectPage(WidgetFrame):
         self.is_watermarked_var = tkinter.BooleanVar()
         (ttk.Label(
             self.user_response_frame,
-            text="Observe the response text you've received:\ndo you believe it has been Watermarked?\n\nIf so, try to remove it by editing the text response.",
+            text="Observe the response text you've received:",
+            font=Font(size=self._font_size_title),
             justify="left", wraplength=wrap_l
-        ).grid(row=0, column=0))
+        ).grid(row=0, column=0, sticky="nw"))
+        (ttk.Label(
+            self.user_response_frame,
+            text="Do you believe it has been watermarked?",
+            justify="left", wraplength=wrap_l
+        ).grid(row=1, column=0, sticky="nw"))
         # checkbox
-        self.b = ttk.Checkbutton(self.user_response_frame, text="Yes, I see a Watermark",
-                                 variable=self.is_watermarked_var)
-        self.b.grid(row=1, column=0)
+        self.b = ttk.Checkbutton(
+            self.user_response_frame,
+            text="Yes, I see a watermark",
+            variable=self.is_watermarked_var
+        )
+        self.b.grid(row=2, column=0)
         # reasoning
-        user_reasoning_frame = ttk.Frame(self.user_response_frame)
-        user_reasoning_frame.grid(row=2, column=0, sticky="nsew")
-        reasoning = ttk.Label(user_reasoning_frame, text="What made you think text was Watermarked?")
+        reasoning_frame = ttk.Frame(self.user_response_frame)
+        reasoning_frame.grid(row=3, column=0, sticky="nsew")
+        ttk.Label(
+            reasoning_frame,
+            text="What made you think text was watermarked?",
+            justify="left", wraplength=wrap_l
+        ).pack(anchor="nw")
         self.reasoning_var = tkinter.StringVar()
-        reasoning.grid(row=0, column=0)
-        reasoning_entry = ttk.Entry(user_reasoning_frame, textvariable=self.reasoning_var)
-        reasoning_entry.grid(row=1, column=0, sticky="nsew")
-        user_reasoning_frame.columnconfigure(1, weight=1)
+        reasoning_entry = ttk.Entry(reasoning_frame, textvariable=self.reasoning_var)
+        reasoning_entry.pack(fill="x")
+        ttk.Label(
+            reasoning_frame,
+            text="If so, try to remove it by editing the text response.",
+            justify="left", wraplength=wrap_l
+        ).pack(anchor="nw")
+        ttk.Label(
+            reasoning_frame,
+            text="What did you do to try and remove the watermark?",
+            justify="left", wraplength=wrap_l
+        ).pack(anchor="nw")
+        self.remove_var = tkinter.StringVar()
+        remove_entry = ttk.Entry(reasoning_frame, textvariable=self.remove_var)
+        remove_entry.pack(fill="x")
         self.user_response_frame.columnconfigure(1, weight=1)
-        # todo: instruct to try and remove the watermark
         # confirm
         answer_frame = ttk.Frame(self.user_response_frame)
-        answer_frame.grid(row=3, column=0, columnspan=2)
-        self._confirm_button = ttk.Button(answer_frame, text="Confirm Choice", command=lambda: self.submit_choices())
-        self._confirm_button.grid(row=0, column=0)
+        answer_frame.grid(row=4, column=0, columnspan=2)
+        confirm_button = ttk.Button(answer_frame, text="Confirm Choice", command=lambda: self.confirm_choices())
+        # confirm_button.grid(row=0, column=0)
         self._response_correctness_var = tkinter.StringVar()
         # results
         ttk.Label(answer_frame, textvariable=self._response_correctness_var).grid(row=0, column=1)
 
         def update_user_response(is_w: bool = False):
             self.set_text_editable(is_w)
-            config_enable_frame(user_reasoning_frame, is_w)
+            config_enable_frame(reasoning_frame, is_w)
 
         self.is_watermarked_var.trace_add(
             "write",
@@ -126,8 +151,9 @@ class DetectPage(WidgetFrame):
         self.user_response_frame.pack(fill="x", expand=True)
         self.is_watermarked_var.set(False)
 
-        self.app.set_focus_next(reasoning_entry, self._confirm_button)
-        self.app.set_focus_next(self._query_form, self._confirm_button)
+        self.app.set_focus_next(reasoning_entry, remove_entry)
+        self.app.set_focus_next(remove_entry, confirm_button)
+        self.app.set_focus_next(self._query_form, confirm_button)
 
         super()._create_widgets()
 

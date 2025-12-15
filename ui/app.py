@@ -8,8 +8,10 @@ title_font = (font, 22)
 header_font = (font, 14)
 
 
-def rtl(text: str):
-    return "\u200F" + text + "\u200F"
+# def rtl(text: str):
+#     return "\u200F" + text + "\u200F"
+
+
 def set_text(w: tk.Text, text: str):
     w.delete("1.0", tk.END)
     w.insert("1.0", text)
@@ -19,11 +21,17 @@ def config_enable_frame(widget: tk.Misc, enabled: bool):
     if isinstance(widget, (tk.Frame, ttk.Frame)):
         for w in widget.winfo_children():
             config_enable_frame(w, enabled)
-    else:
-        try:
-            widget.config(state="normal" if enabled else "disabled")
-        except TclError:
-            pass
+        return
+    if isinstance(widget, tk.Canvas):
+        for item in widget.find_all():
+            if widget.type(item) == "window":
+                child_widget = widget.nametowidget(widget.itemcget(item, "window"))
+                config_enable_frame(child_widget, enabled)
+        return
+    try:
+        widget.config(state="normal" if enabled else "disabled")
+    except TclError:
+        pass
 
 
 class App(tk.Tk):

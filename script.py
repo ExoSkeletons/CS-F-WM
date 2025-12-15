@@ -17,10 +17,49 @@ from ui.survey import PagedFrame
 
 Watermark = Callable[[str], str]
 
+acrostic = {
+    "mark": "abigail",
+    "position": "the start of each third word in each sentence"
+}
+
 marks: dict[str, Watermark] = {
     "upper": lambda s: s.upper(),
     "space#": lambda s: s.replace(' ', '#'),
-    "ab": lambda s: s.replace('A', 'B').replace('a', 'b')
+    "ab": lambda s: s.replace('A', 'B').replace('a', 'b'),
+    "phishing": lambda s: s.replace("m", "rn"),
+    "acrostic": lambda s: stubborn_generation(
+        "consider the poem technique of \'acrostic\', where the leading letters of sentence in the poem "
+        "combine sequentially to create a secret hidden message.\n"
+        "Bellow, you are given a piece of text. As an assistant, your task is to rephrase the text such that the letters at "
+        + acrostic['position'] +
+        " ends up spelling the secret word:\n"
+        + acrostic['mark'] +
+        "\n\n"
+        "The letter must be hidden, so no formatting (bold, italic, letter isolation, etc.) should be added "
+        "that may draw attention to the hidden word "
+        + acrostic['mark'] +
+        ".\n"
+        "The letter positions are important! Make sure that the letters of the word "
+        "are properly embedded, specifically at "
+        + acrostic['position'] +
+        " and in the right order.\n"
+        "The letters must be correct! Make sure that the letters at "
+        + acrostic['position'] +
+        " of the new text in isolation one after the other do indeed make out the secret word.\n"
+        "Do your best to keep the original meaning of the text, and try to keep any "
+        "special formatting, line breaks or spacing the original text has.\n"
+        "Once the full word is fully embedded in "
+        + acrostic['position'] +
+        ", do not repeat the letters of the word and simply keep the rest of the text as is.\n"
+        "\n"
+        "Do not respond to this query with anything other than the modified text and only it.\n"
+        "Do NOT add any formatting that may highlight or draw attention towards the hidden letters, "
+        "such as isolating them with symbols or uppercasing them.\n"
+        "Respond only with the modified text.\n"
+        "Here below is the original text:"
+        "\n\n\n"
+        + s
+    ).text
 }
 
 with open("config.yml", 'r+') as f:

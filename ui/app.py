@@ -10,6 +10,10 @@ header_font = (font, 14)
 
 def rtl(text: str):
     return "\u200F" + text + "\u200F"
+def set_text(w: tk.Text, text: str):
+    w.delete("1.0", tk.END)
+    w.insert("1.0", text)
+
 
 def config_enable_frame(widget: tk.Misc, enabled: bool):
     if isinstance(widget, (tk.Frame, ttk.Frame)):

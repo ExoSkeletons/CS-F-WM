@@ -1,7 +1,46 @@
 import tkinter as tk
+from datetime import datetime, timedelta
 from tkinter import ttk, Misc
 
 from ui.app import WidgetFrame, App
+
+
+class TimerFrame(tk.Frame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.start_time = None
+        self.running = False
+
+        self.label = tk.Label(self)
+        self.label.pack()
+
+    def start(self):
+        self.start_time = datetime.now()
+        self.running = True
+        self.update_timer()
+
+    def stop(self):
+        self.running = False
+
+    def dtime(self):
+        return datetime.now() - self.start_time
+
+    def update_timer(self):
+        if not self.running:
+            return
+
+        delta: timedelta = datetime.now() - self.start_time
+        seconds = int(delta.total_seconds())
+
+        hh = seconds // 3600
+        mm = (seconds % 3600) // 60
+        ss = seconds % 60
+
+        self.label.config(text=f"{hh:02d}:{mm:02d}:{ss:02d}")
+
+        # Schedule next update
+        self.after(100, self.update_timer)
 
 
 class PagedFrame(WidgetFrame):
@@ -20,6 +59,10 @@ class PagedFrame(WidgetFrame):
         super().__init__(app, master)
 
     def _create_widgets(self):
+        # Side Timer
+        self.timer = TimerFrame(self)
+        self.timer.pack(anchor="ne")
+
         # Notebook for page frames
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True)
@@ -46,6 +89,7 @@ class PagedFrame(WidgetFrame):
 
     def reset_widgets(self):
         self.select_page()
+        self.timer.start()
 
     def index(self):
         return 0 if self._current_index is None else self._current_index

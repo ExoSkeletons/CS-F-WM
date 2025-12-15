@@ -71,8 +71,8 @@ class App(tk.Tk):
         frame.tkraise()
 
     def __setup_dimensions(self):
-        window_width = 840
-        window_height = 490
+        window_width = 960
+        window_height = 540
 
         # get the screen dimension
         screen_width = self.winfo_screenwidth()

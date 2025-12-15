@@ -176,7 +176,10 @@ class DetectPage(WidgetFrame):
         self.scroll.canvas.yview_moveto(0.0)
 
         # re-enable query form
-        config_enable_frame(self.submit_frame, re_query_enabled)
+        if user_response_enabled:
+            self.submit_frame.pack_forget()
+        else:
+            self.submit_frame.pack()
 
         # clear query form
         self._query_form.delete('1.0', END)

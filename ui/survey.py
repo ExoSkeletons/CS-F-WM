@@ -92,7 +92,6 @@ class PagedFrame(WidgetFrame):
 
     def reset_widgets(self):
         self.select_page()
-        self.timer.start()
 
     def index(self):
         return 0 if self._current_index is None else self._current_index

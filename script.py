@@ -2,6 +2,7 @@ import random
 import sys
 import threading
 from tkinter import ttk
+from tkinter.font import Font
 from typing import Callable
 
 import yaml
@@ -11,7 +12,6 @@ from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_i
 from ui.app import App, WidgetFrame
 from ui.auth import TermsPage, AuthPage
 from ui.chat import ChatPage
-from ui.compare import ComparePage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame
 
@@ -111,25 +111,36 @@ def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
 def start_user_ui(usr: str):
     print(f"user {usr} login")
 
-    pager = PagedFrame(root, prev_text="חזרה", next_text="הבא")
+    pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
-    m: list[Watermark | None] = []
-    for name, wm in active_watermarks().items(): m.append(wm)
-    m.append(None)
+    intro_frame = WidgetFrame(root, pager.notebook)
+    with open("introduction.txt", "rt+", encoding='utf-8') as f_:
+        intro_text = f_.read()
+    (ttk.Label(intro_frame, text=intro_text, font=Font(size=12, slant="italic"), wraplength=500)
+     .pack(expand=True, anchor="center"))
+    pager.add_page(intro_frame, "Introduction")
+
+    with open("questions.txt", "rt+", encoding='utf-8') as f_:
+        questions: list[str] = f_.readlines()
+
+
+
+
+    m: list = []
+    for am in active_watermarks().items(): m.append(am)
     random.shuffle(m)
-    for wm in m:
-        detect_page = DetectPage(wm, root, pager.notebook)
-        detect_page.on_submit = lambda q, page=detect_page: threaded_query(q, page.response)
-        pager.add_page(detect_page, title="Watermark Detection")
+    for name, wm in m:
+        detect_page = DetectPage(root, pager.notebook, watermark=wm, mark_prob=1.0, questions=questions)
+        detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
+        pager.add_page(detect_page, title=f"Watermark Detection ({name})", validator=detect_page.validate)
 
-    compare_page = ComparePage(list(active_watermarks().values()), root, pager.notebook)
-    compare_page.on_submit = lambda q: threaded_query(q, compare_page.response)
+    # compare_page = ComparePage(list(active_watermarks().values()), root, pager.notebook)
+    # compare_page.on_submit = lambda q: threaded_query(q, compare_page.response)
+    # pager.add_page(compare_page, title="Watermark Comparison")
 
     chat_page = ChatPage(root, pager.notebook)
-    chat_page.on_submit = lambda q: threaded_query(q, chat_page.response)
-
-    pager.add_page(compare_page, title="Watermark Comparison")
-    pager.add_page(chat_page, title="Chat")
+    chat_page.on_submit = lambda q: threaded_query(q.strip(), chat_page.response)
+    pager.add_page(chat_page, title="Chat", validator=lambda: False)
 
     for _ in range(2):
         pager.add_page(WidgetFrame(root, pager.notebook))
@@ -142,6 +153,7 @@ def start_user_ui(usr: str):
     # todo: add pages dynamically (to notebook - progress should still
     #  account for all), as user submits answers
     #  (do not remove pages, we allow user to return)
+    pager.select_page(0)
 
     terms_frame = TermsPage(root)
     terms_frame.on_accepted = lambda: root.set_frame(pager)

@@ -1,0 +1,5 @@
+* During this experiment, you should determine whether text watermarks are present.
+
+* Text watermarks are signals embedded within the text by the LLM.
+
+* You may use any external materials or tools to assist you.

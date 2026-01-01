@@ -35,17 +35,18 @@ marks: dict[str, Watermark] = {
         " ends up spelling the secret word:\n"
         + acrostic['mark'] +
         "\n\n"
-        "The letter must be hidden, so no formatting (bold, italic, letter isolation, etc.) should be added "
+        "* The letters must be hidden! No formatting (bold, italic, letter isolation, etc.) should be added "
         "that may draw attention to the hidden word "
         + acrostic['mark'] +
         ".\n"
-        "The letter positions are important! Make sure that the letters of the word "
-        "are properly embedded, specifically at "
+        "* The letters must be correct! Make sure that you've rephrased the text properly- such that"
+        " the letters EXACTLY at "
         + acrostic['position'] +
-        " and in the right order.\n"
-        "The letters must be correct! Make sure that the letters at "
+        " in the new text, when added in isolation one after the other do indeed make out the secret word.\n"
+        "* The position is crucial! Be extremely diligent and ensure the words in that exact position of "
         + acrostic['position'] +
-        " of the new text in isolation one after the other do indeed make out the secret word.\n"
+        " is where the letters add up - ensure that you aren't differing by "
+        "a word or a letter or missing a letter. Rephrase as much as necessary to achieve this.\n"
         "Do your best to keep the original meaning of the text, and try to keep any "
         "special formatting, line breaks or spacing the original text has.\n"
         "Once the full word is fully embedded in "

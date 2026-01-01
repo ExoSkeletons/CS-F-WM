@@ -19,7 +19,7 @@ Watermark = Callable[[str], str]
 
 acrostic = {
     "mark": "abigail",
-    "position": "the start of each third word in each sentence"
+    "position": "the initial letter in the first word of each sentence"
 }
 
 marks: dict[str, Watermark] = {

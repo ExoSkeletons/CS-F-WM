@@ -29,6 +29,15 @@ class DetectPage(WidgetFrame):
         super().__init__(app, master)
 
     def _create_widgets(self):
+        # timer frame
+        self.timer = TimerFrame(self)
+        self.timer.pack(anchor="ne")
+        self.timer.start()
+
+        # body frame
+        body = ttk.Frame(self)
+        body.pack(expand=True, fill="both", anchor="center")
+
         # instructions
         ins_frame = ttk.Frame(self)
         wrap_l = 300

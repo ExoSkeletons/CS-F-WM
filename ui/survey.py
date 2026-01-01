@@ -70,10 +70,6 @@ class PagedFrame(WidgetFrame):
         super().__init__(app, master)
 
     def _create_widgets(self):
-        # Side Timer
-        self.timer = TimerFrame(self)
-        self.timer.pack(anchor="ne")
-
         # Notebook for page frames
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True)

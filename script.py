@@ -116,8 +116,10 @@ def start_user_ui(usr: str):
     intro_frame = WidgetFrame(root, pager.notebook)
     with open("introduction.txt", "rt+", encoding='utf-8') as f_:
         intro_text = f_.read()
+    (ttk.Label(intro_frame, text="Introduction & Instructions", font=Font(size=14, weight="bold"))
+     .pack(anchor="center"))
     (ttk.Label(intro_frame, text=intro_text, font=Font(size=12, slant="italic"), wraplength=500)
-     .pack(expand=True, anchor="center"))
+     .pack(anchor="center"))
     pager.add_page(intro_frame, "Introduction")
 
     with open("questions.txt", "rt+", encoding='utf-8') as f_:

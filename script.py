@@ -125,14 +125,26 @@ def start_user_ui(usr: str):
     with open("questions.txt", "rt+", encoding='utf-8') as f_:
         questions: list[str] = f_.readlines()
 
-
-
-
     m: list = []
     for am in active_watermarks().items(): m.append(am)
-    random.shuffle(m)
-    for name, wm in m:
-        detect_page = DetectPage(root, pager.notebook, watermark=wm, mark_prob=1.0, questions=questions)
+
+    mark_prob = 0.5
+
+    # random.shuffle(m)
+    # for i, (name, wm) in enumerate(m):
+    #     detect_page = DetectPage(root, pager.notebook, watermark=wm, mark_prob=mark_prob, questions=questions)
+    #     detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
+    #     pager.add_page(detect_page, title=f"Page {i+1}", validator=detect_page.validate)
+
+    (name, mark) = random.choice(m)  # todo: use hash with user id
+    page_amount = 4
+    for i in range(page_amount):
+        detect_page = DetectPage(
+            root, pager.notebook,
+            title=f"Assignment {i + 1}",
+            watermark=mark, mark_prob=mark_prob,
+            questions=questions
+        )
         detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
         pager.add_page(detect_page, title=f"Watermark Detection ({name})", validator=detect_page.validate)
 

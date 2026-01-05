@@ -11,7 +11,6 @@ from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_i
 
 from ui.app import App, WidgetFrame
 from ui.auth import TermsPage, AuthPage
-from ui.chat import ChatPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame
 
@@ -152,12 +151,12 @@ def start_user_ui(usr: str):
     # compare_page.on_submit = lambda q: threaded_query(q, compare_page.response)
     # pager.add_page(compare_page, title="Watermark Comparison")
 
-    chat_page = ChatPage(root, pager.notebook)
-    chat_page.on_submit = lambda q: threaded_query(q.strip(), chat_page.response)
-    pager.add_page(chat_page, title="Chat", validator=lambda: False)
+    # chat_page = ChatPage(root, pager.notebook)
+    # chat_page.on_submit = lambda q: threaded_query(q.strip(), chat_page.response)
+    # pager.add_page(chat_page, title="Chat", validator=lambda: False)
 
-    for _ in range(2):
-        pager.add_page(WidgetFrame(root, pager.notebook))
+    # for _ in range(2):
+    #     pager.add_page(WidgetFrame(root, pager.notebook))
 
     end_frame = WidgetFrame(root, pager.notebook)
     ttk.Label(end_frame, text="Thanks for Participating!").pack()

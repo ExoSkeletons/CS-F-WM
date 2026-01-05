@@ -228,7 +228,11 @@ class DetectPage(WidgetFrame):
         config_enable_frame(self.submit_frame, False)
 
         # fire listener
-        wrapped_q = q + "\n" + f"Your answer must be at least {self._min_word_count} words long."
+        wrapped_q = (
+                q + "\n" +
+                f"Your answer must be at least {self._min_word_count} words long." +
+                "Your answer must be entirely plaintext and contain NO highlights or formatting (no bold, italic or any markdown)."
+        )
         if self.on_submit: self.on_submit(wrapped_q)
 
     def set_text_editable(self, enabled: bool = True):

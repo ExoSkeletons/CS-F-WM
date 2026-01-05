@@ -79,7 +79,7 @@ def apply_watermarks(text: str):
 
 
 client = genai.Client()
-model = "gemini-2.5-flash"
+model = "gemini-flash-latest"
 
 
 @retry(

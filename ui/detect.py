@@ -15,8 +15,8 @@ from ui.survey import TimerFrame
 class DetectPage(WidgetFrame):
     on_submit: Optional[Callable[[str], None]] = None
 
-    _font_size = 10
-    _font_size_title = 18
+    _font_size = 12
+    _font_size_title = 16
     _min_word_count = 100
 
     _response_cell: Optional[str] = None

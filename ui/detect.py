@@ -68,7 +68,14 @@ class DetectPage(WidgetFrame):
         ttk.Label(
             self.question_frame,
             text=
-            "You are given below a question from a school assignment, and an AI Assistant to your right.\n\n"
+            "You are given below a question from a school assignment, and an AI Assistant to your right."
+            ,
+            font=Font(size=self._font_size_title),
+            justify="left", anchor="nw", wraplength=ins_wrap_l
+        ).pack(expand=True, fill="both")
+        ttk.Label(
+            self.question_frame,
+            text=
             "Use the AI Assistant given here for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
             ,
             font=Font(size=self._font_size),

@@ -23,9 +23,13 @@ class DetectPage(WidgetFrame):
 
     def __init__(
             self, app: App, master: tkinter.Misc | None = None,
+            title: str = None,
             watermark: Callable[[str], str] | None = None, mark_prob: float = 1.0,
             questions=None
     ):
+        # title
+        self.title = title
+
         # random mark
         self.mark = random.choices([watermark, None], weights=[mark_prob, 1 - mark_prob])[0]
 
@@ -38,8 +42,15 @@ class DetectPage(WidgetFrame):
         super().__init__(app, master)
 
     def _create_widgets(self):
+        # title
+        title_frame = ttk.Frame(self)
+        title_frame.pack(expand=True, fill="x")
+        ttk.Label(
+            title_frame, text=self.title,
+            font=Font(size=self._font_size, underline=True)
+        ).pack(anchor="center")
         # timer frame
-        self.timer = TimerFrame(self)
+        self.timer = TimerFrame(title_frame)
         self.timer.pack(anchor="ne")
         self.timer.start()
 

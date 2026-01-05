@@ -146,7 +146,7 @@ def start_user_ui(usr: str):
             questions=questions
         )
         detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
-        pager.add_page(detect_page, title=f"Watermark Detection ({name})", validator=detect_page.validate)
+        pager.add_page(detect_page, title=detect_page.title, validator=detect_page.is_valid)
 
     # compare_page = ComparePage(list(active_watermarks().values()), root, pager.notebook)
     # compare_page.on_submit = lambda q: threaded_query(q, compare_page.response)

@@ -90,6 +90,8 @@ class PagedFrame(WidgetFrame):
         # Bind to notebook changes
         self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_changed)
 
+        self._update_ui()
+
     def reset_widgets(self):
         self.select_page()
 
@@ -114,29 +116,34 @@ class PagedFrame(WidgetFrame):
         self._pages.append(frame)
         if validator: self._validators[frame] = validator
         self.notebook.add(frame, text=title or f"Page {index + 1}")
-        self._update_progress_bar()
+        frame.bind("<<PageValidityChanged>>", self._update_ui)
+        self._update_ui()
 
     def next_page(self):
-        frame = self._pages[self.index()]
-        if frame and frame in self._validators.keys():
-            validator = self._validators[frame]
-            if validator():
-                self.select_page(self.index() + 1)
-        else:
-            self.select_page(self.index() + 1)
+        self.select_page(self.index() + 1)
 
     def prev_page(self):
         self.select_page(self.index() - 1)
 
     def _on_tab_changed(self, event=None):
         self._current_index = self.notebook.index("current")
-        self._update_progress_bar()
+        self._update_ui()
 
-    def _update_progress_bar(self):
-        total = len(self._pages)
-        if total > 0:
-            self._progress_bar["maximum"] = total
-            self._progress_bar["value"] = self.index() + 1
+    def _update_ui(self, event=None):
+        # update progress bar
+        n = len(self._pages)
+        i = self.index()
+        if n > 0:
+            self._progress_bar["maximum"] = n
+            self._progress_bar["value"] = i + 1
         # Enable/disable buttons
-        self._prev_btn["state"] = tk.NORMAL if self.index() > 0 else tk.DISABLED
-        self._next_btn["state"] = tk.NORMAL if self.index() < total - 1 else tk.DISABLED
+        self._prev_btn["state"] = tk.NORMAL if i > 0 else tk.DISABLED
+        self._next_btn["state"] = tk.NORMAL if i < n - 1 else tk.DISABLED
+        # Next validation
+        if n > 0 and 0 <= i < n:
+            frame = self._pages[i]
+            if frame and frame in self._validators.keys():
+                validator = self._validators[frame]
+                self._next_btn["state"] = tk.NORMAL if validator() else tk.DISABLED
+            else:
+                self._next_btn["state"] = tk.NORMAL

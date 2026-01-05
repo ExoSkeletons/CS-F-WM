@@ -197,6 +197,7 @@ class DetectPage(WidgetFrame):
         def update_user_response(is_w: bool = False):
             self.set_text_editable(is_w)
             config_enable_frame(reasoning_frame, is_w)
+            self.event_generate("<<PageValidityChanged>>")
 
         self.is_wm_yes_var.trace_add(
             "write",
@@ -299,9 +300,8 @@ class DetectPage(WidgetFrame):
         # stop timer
         self.timer.stop()
 
-    def validate(self) -> bool:
+    def is_valid(self) -> bool:
         if self.is_wm_yes_var.get() == self.is_wm_no_var.get():
             # todo: show "red" required-notice and return False if not.
             return False
-
         return True

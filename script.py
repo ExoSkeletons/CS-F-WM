@@ -26,6 +26,7 @@ marks: dict[str, Watermark] = {
     "space#": lambda s: s.replace(' ', '#'),
     "ab": lambda s: s.replace('A', 'B').replace('a', 'b'),
     "phishing": lambda s: s.replace("m", "rn"),
+    "space-replace": lambda s: s.replace(' ', random.choice(['\u2004', '\u2005', '\u2006', '\u2007', '\u2008'])),
     "acrostic": lambda s: stubborn_generation(
         "consider the poem technique of \'acrostic\', where the leading letters of sentence in the poem "
         "combine sequentially to create a secret hidden message.\n"

@@ -1,25 +1,36 @@
 import random
 import sys
 import threading
+import os
+from os import system
 from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable
 
+import certifi
 import yaml
 from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message
 
+from ui.DemoPage import DemoPage
 from ui.app import App, WidgetFrame
+from ui.app import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame
 
 Watermark = Callable[[str], str]
+Detector = Callable[[str], bool]
 
-acrostic = {
-    "mark": "abigail",
-    "position": "the initial letter in the first word of each sentence"
-}
+config = {}
+try:
+    with open(data_dir_path + "config.yml", 'rt+') as f:
+        config = yaml.safe_load(f)
+except OSError as e:
+    print(e)
+    input("Could not load config.")
+    exit(1)
+acrostic_config: dict[str, str] = config['acrostic']
 
 marks: dict[str, Watermark] = {
     "upper": lambda s: s.upper(),
@@ -31,26 +42,26 @@ marks: dict[str, Watermark] = {
         "consider the poem technique of \'acrostic\', where the leading letters of sentence in the poem "
         "combine sequentially to create a secret hidden message.\n"
         "Bellow, you are given a piece of text. As an assistant, your task is to rephrase the text such that the letters at "
-        + acrostic['position'] +
+        + acrostic_config['position'] +
         " ends up spelling the secret word:\n"
-        + acrostic['mark'] +
+        + acrostic_config['mark'] +
         "\n\n"
         "* The letters must be hidden! No formatting (bold, italic, letter isolation, etc.) should be added "
         "that may draw attention to the hidden word "
-        + acrostic['mark'] +
+        + acrostic_config['mark'] +
         ".\n"
         "* The letters must be correct! Make sure that you've rephrased the text properly- such that"
         " the letters EXACTLY at "
-        + acrostic['position'] +
+        + acrostic_config['position'] +
         " in the new text, when added in isolation one after the other do indeed make out the secret word.\n"
         "* The position is crucial! Be extremely diligent and ensure the words in that exact position of "
-        + acrostic['position'] +
+        + acrostic_config['position'] +
         " is where the letters add up - ensure that you aren't differing by "
         "a word or a letter or missing a letter. Rephrase as much as necessary to achieve this.\n"
         "Do your best to keep the original meaning of the text, and try to keep any "
         "special formatting, line breaks or spacing the original text has.\n"
         "Once the full word is fully embedded in "
-        + acrostic['position'] +
+        + acrostic_config['position'] +
         ", do not repeat the letters of the word and simply keep the rest of the text as is.\n"
         "\n"
         "Do not respond to this query with anything other than the modified text and only it.\n"
@@ -62,9 +73,6 @@ marks: dict[str, Watermark] = {
         + s
     ).text
 }
-
-with open("config.yml", 'r+') as f:
-    config = yaml.safe_load(f)
 
 
 def active_watermarks() -> dict[str, Watermark]:
@@ -114,16 +122,28 @@ def start_user_ui(usr: str):
     pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
     intro_frame = WidgetFrame(root, pager.notebook)
-    with open("introduction.txt", "rt+", encoding='utf-8') as f_:
-        intro_text = f_.read()
+    intro_text = ""
+    try:
+        with open(data_dir_path + "introduction.txt", "rt", encoding='utf-8') as f:
+            intro_text = f.read()
+    except OSError as e:
+        print(e)
+        input("Could not load instructions.")
+        exit(1)
+
     (ttk.Label(intro_frame, text="Introduction & Instructions", font=Font(size=14, weight="bold"))
      .pack(anchor="center"))
     (ttk.Label(intro_frame, text=intro_text, font=Font(size=12, slant="italic"), wraplength=500)
      .pack(anchor="center"))
     pager.add_page(intro_frame, "Introduction")
 
-    with open("questions.txt", "rt+", encoding='utf-8') as f_:
-        questions: list[str] = f_.readlines()
+    try:
+        with open(data_dir_path + "questions.txt", "rt", encoding='utf-8') as f:
+            questions: list[str] = f.readlines()
+    except OSError as e:
+        print(e)
+        input("Could not load questions.")
+        exit(1)
 
     m: list = []
     for am in active_watermarks().items(): m.append(am)

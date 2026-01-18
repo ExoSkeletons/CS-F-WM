@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import Misc, TclError
 
+data_dir_path = "data/"
 padding = {'padx': 5, 'pady': 5}
 font = 'Ariel'
 title_font = (font, 22)

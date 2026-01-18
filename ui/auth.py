@@ -1,10 +1,10 @@
-import sys
 import webbrowser
 from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Any
 
 from ui.app import WidgetFrame
+from ui.app import data_dir_path
 from ui.scrollable_frame import ScrollableFrame
 
 
@@ -12,8 +12,13 @@ class TermsPage(WidgetFrame):
     on_accepted: Callable[[], Any] = lambda b: None
 
     def _create_widgets(self):
-        with open('terms.txt', 'r', encoding='utf-8') as f:
-            terms_text = f.read()
+        try:
+            with open(data_dir_path + 'terms.txt', 'rt', encoding='utf-8') as f:
+                terms_text = f.read()
+        except OSError as e:
+            print(e)
+            input("Could not load terms.")
+            exit(1)
 
         # terms
         ttk.Label(self, text="Consent Form", font=Font(size=12, weight="bold")).pack()

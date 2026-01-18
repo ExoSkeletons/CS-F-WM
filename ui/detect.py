@@ -7,7 +7,7 @@ from tkinter.font import Font
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
-from ui.app import App, WidgetFrame, config_enable_frame, set_text
+from ui.app import App, WidgetFrame, config_enable, set_text
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame
 
@@ -196,8 +196,8 @@ class DetectPage(WidgetFrame):
 
         def update_user_response(is_w: bool = False):
             self.set_text_editable(is_w)
-            config_enable_frame(reasoning_frame, is_w)
             self.event_generate("<<PageValidityChanged>>")
+            config_enable(reasoning_frame, is_w)
 
         self.is_wm_yes_var.trace_add(
             "write",
@@ -225,7 +225,7 @@ class DetectPage(WidgetFrame):
         self.set_response_text("Generating Response...")
 
         # disable query form
-        config_enable_frame(self.submit_frame, False)
+        config_enable(self.submit_frame, False)
 
         # fire listener
         wrapped_q = (
@@ -291,7 +291,7 @@ class DetectPage(WidgetFrame):
 
     def confirm_choices(self):
         # lock in choices
-        config_enable_frame(self, False)
+        config_enable(self, False)
         self.set_text_editable(False)
 
         # mark correct choices

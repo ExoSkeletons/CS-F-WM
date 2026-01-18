@@ -17,16 +17,16 @@ def set_text(w: tk.Text, text: str):
     w.insert("1.0", text)
 
 
-def config_enable_frame(widget: tk.Misc, enabled: bool):
+def config_enable(widget: tk.Misc, enabled: bool):
     if isinstance(widget, (tk.Frame, ttk.Frame)):
         for w in widget.winfo_children():
-            config_enable_frame(w, enabled)
+            config_enable(w, enabled)
         return
     if isinstance(widget, tk.Canvas):
         for item in widget.find_all():
             if widget.type(item) == "window":
                 child_widget = widget.nametowidget(widget.itemcget(item, "window"))
-                config_enable_frame(child_widget, enabled)
+                config_enable(child_widget, enabled)
         return
     try:
         widget.config(state="normal" if enabled else "disabled")

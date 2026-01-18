@@ -18,6 +18,7 @@ class DetectPage(WidgetFrame):
     _font_size = 12
     _font_size_title = 16
     _min_word_count = 100
+    _min_response_char_count = 30
 
     _response_cell: Optional[str] = None
 
@@ -155,35 +156,56 @@ class DetectPage(WidgetFrame):
         )
         self.b_wm_yes.grid(row=0, column=0)
         self.b_wm_no.grid(row=0, column=1)
+        self.is_wm_yes_var.trace_add("write", lambda v, i, m: self.validity_changed())
+        self.is_wm_no_var.trace_add("write", lambda v, i, m: self.validity_changed())
         radio_frame.grid(row=2, column=0)
         # reasoning
         reasoning_frame = ttk.Frame(self.user_response_frame)
         reasoning_frame.grid(row=3, column=0, sticky="nsew")
+        reasoning_detect_frame = ttk.Frame(reasoning_frame)
+        reasoning_detect_frame.pack()
         ttk.Label(
-            reasoning_frame,
+            reasoning_detect_frame,
             text="What made you think text was watermarked?",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         entry_dim = (int(ins_wrap_l * 0.15), 3)
-        tkinter.Text(
-            reasoning_frame, wrap="word",
+        reasoning_detect_entry = tkinter.Text(
+            reasoning_detect_frame,
+            wrap="word", undo=True, maxundo=10,
             width=entry_dim[0], height=entry_dim[1],
-        ).pack(expand=True)
+        )
+        reasoning_detect_entry.pack(expand=True)
+        self.len_rd_var = tkinter.IntVar()
+        rd_len_l = ttk.Label(reasoning_detect_frame)
+        rd_len_l.pack(anchor="ne")
+        self.len_rd_var.trace_add("write", lambda m, l, c: rd_len_l.config(
+            text=f"{self.len_rd_var.get()}/{self._min_response_char_count}"
+        ))
+        reasoning_change_frame = ttk.Frame(reasoning_frame)
+        reasoning_change_frame.pack()
         ttk.Label(
-            reasoning_frame,
+            reasoning_change_frame,
             text="If so, try to remove it by editing the text response.\nDo you best to remove only the watermark and keep the original text intact as much as possible.",
-            font=Font(size=self._font_size, slant="italic"),
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         ttk.Label(
-            reasoning_frame,
+            reasoning_change_frame,
             text="What did you do to try and remove the watermark?",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
-        tkinter.Text(
-            reasoning_frame, wrap="word",
+        reasoning_change_entry = tkinter.Text(
+            reasoning_change_frame,
+            wrap="word", undo=True, maxundo=10,
             width=entry_dim[0], height=entry_dim[1],
-        ).pack(expand=True)
+        )
+        reasoning_change_entry.pack(expand=True)
+        self.len_rc_var = tkinter.IntVar()
+        rc_len_l = ttk.Label(reasoning_change_frame)
+        rc_len_l.pack(anchor="ne")
+        self.len_rc_var.trace_add("write", lambda m, l, c: rc_len_l.config(
+            text=f"{self.len_rc_var.get()}/{self._min_response_char_count}"
+        ))
         self.user_response_frame.columnconfigure(1, weight=1)
         # confirm
         answer_frame = ttk.Frame(self.user_response_frame)
@@ -194,15 +216,30 @@ class DetectPage(WidgetFrame):
         # results
         ttk.Label(answer_frame, textvariable=self._response_correctness_var).grid(row=0, column=1)
 
-        def update_user_response(is_w: bool = False):
-            self.set_text_editable(is_w)
-            self.event_generate("<<PageValidityChanged>>")
+        def update_user_response():
+            is_w: bool = self.is_wm_yes_var.get()
+
+            self.len_rd_var.set(len(reasoning_detect_entry.get("1.0", END).strip()))
+            self.len_rc_var.set(len(reasoning_change_entry.get("1.0", END).strip()))
+
+            is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
+            is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
+
             config_enable(reasoning_frame, is_w)
+            config_enable(reasoning_change_frame, is_w and is_rd_over_min)
+            self.set_text_editable(is_w and is_rd_over_min)
+
+            self.validity_changed()
 
         self.is_wm_yes_var.trace_add(
             "write",
-            lambda var, index, mode: update_user_response(self.is_wm_yes_var.get())
+            lambda var, index, mode: update_user_response()
         )
+        reasoning_detect_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
+        reasoning_change_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
+        reasoning_detect_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
+        reasoning_change_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
+
         self.user_response_frame.pack(fill="x", expand=True)
 
         # self.app.set_focus_next(reasoning_entry, remove_entry)
@@ -304,8 +341,17 @@ class DetectPage(WidgetFrame):
         # stop timer
         self.timer.stop()
 
-    def is_valid(self) -> bool:
+    def is_valid(self, show_errors: bool = False) -> bool:
         if self.is_wm_yes_var.get() == self.is_wm_no_var.get():
             # todo: show "red" required-notice and return False if not.
             return False
+        if self.is_wm_no_var.get():
+            return True
+        is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
+        is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
+        if not (is_rd_over_min and is_rc_over_min):
+            return False
         return True
+
+    def validity_changed(self):
+        self.event_generate("<<PageValidityChanged>>")

@@ -20,7 +20,7 @@ from ui.detect import DetectPage
 from ui.survey import PagedFrame
 
 Watermark = Callable[[str], str]
-Detector = Callable[[str], bool]
+Detector = Callable[[str], float]
 
 config = {}
 try:
@@ -32,7 +32,7 @@ except OSError as e:
     exit(1)
 acrostic_config: dict[str, str] = config['acrostic']
 
-marks: dict[str, Watermark] = {
+marks: dict[str, Watermark | tuple[Watermark, Detector]] = {
     "upper": lambda s: s.upper(),
     "space#": lambda s: s.replace(' ', '#'),
     "ab": lambda s: s.replace('A', 'B').replace('a', 'b'),

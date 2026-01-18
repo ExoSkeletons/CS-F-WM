@@ -175,11 +175,15 @@ def start_user_ui(usr: str):
 
 
 if __name__ == "__main__":
+    system("title " + "Study: Identification of AI-Generated Academic Texts Using Watermarks")
+    print("Starting App...")
+
     root = App()
 
     auth_page = AuthPage(root)
     auth_page.on_login = start_user_ui
-
     root.set_frame(auth_page)
 
-    root.mainloop()
+    root.mainloop() # blocking call
+
+    print("Bye!")

@@ -136,14 +136,17 @@ class PagedFrame(WidgetFrame):
         if n > 0:
             self._progress_bar["maximum"] = n
             self._progress_bar["value"] = i + 1
-        # Enable/disable buttons
-        self._prev_btn["state"] = tk.NORMAL if i > 0 else tk.DISABLED
-        self._next_btn["state"] = tk.NORMAL if i < n - 1 else tk.DISABLED
-        # Next validation
+        # nav button enabling
+        # page exists
+        pf = True
+        nf = True
+        pf = pf and i > 0
+        nf = nf and i < n - 1
+        # next page validation
         if n > 0 and 0 <= i < n:
             frame = self._pages[i]
             if frame and frame in self._validators.keys():
                 validator = self._validators[frame]
-                self._next_btn["state"] = tk.NORMAL if validator() else tk.DISABLED
-            else:
-                self._next_btn["state"] = tk.NORMAL
+                nf = nf and validator()
+        self._prev_btn["state"] = tk.NORMAL if pf else tk.DISABLED
+        self._next_btn["state"] = tk.NORMAL if nf else tk.DISABLED

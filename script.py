@@ -179,14 +179,14 @@ def start_user_ui(usr: str):
     # for _ in range(2):
     #     pager.add_page(WidgetFrame(root, pager.notebook))
 
+    demo_survey_page = DemoPage(root, pager.notebook)
+    pager.add_page(demo_survey_page, "Conclusion")
+
     end_frame = WidgetFrame(root, pager.notebook)
     ttk.Label(end_frame, text="Thanks for Participating!").pack()
-    ttk.Button(end_frame, text="Save Responses & Quit", command=lambda: sys.exit(0)).pack()
+    ttk.Button(end_frame, text="Quit", command=lambda: sys.exit(0)).pack()
     pager.add_page(end_frame, "Thanks for participating")
 
-    # todo: add pages dynamically (to notebook - progress should still
-    #  account for all), as user submits answers
-    #  (do not remove pages, we allow user to return)
     pager.select_page(0)
 
     terms_frame = TermsPage(root)

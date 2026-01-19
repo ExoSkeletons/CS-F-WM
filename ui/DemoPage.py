@@ -1,19 +1,24 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.font import Font
 
 from ui.app import WidgetFrame
 
 
 class DemoPage(WidgetFrame):
     def _create_widgets(self):
+        self.title_font = Font(family="Arial", size=14, weight="bold")
+        self.subtitle_font = Font(family="Arial", size=10, slant="italic")
+        self.body_font = Font(family="Arial", size=12)
+
         # --- Page title ---
         ttk.Label(
             self,
-            text="Optional Demographic Information",
+            text="Demographic Information", font=self.title_font
         ).pack(anchor="w", pady=(0, 10))
         ttk.Label(
             self,
-            text="(This page is optional.)",
+            text="(This page is optional.)", font=self.subtitle_font
         ).pack(anchor="w", pady=(0, 15))
 
         self.gender_var = tk.StringVar(value=None)
@@ -26,10 +31,9 @@ class DemoPage(WidgetFrame):
 
         gender_frame = ttk.Frame(answers_frame)
         gender_frame.pack(fill="x", pady=5)
-        ttk.Label(gender_frame, text="Gender:").pack(anchor="w")
+        ttk.Label(gender_frame, text="Gender:", font=self.body_font).pack(anchor="w")
         gender_opts = ttk.Frame(gender_frame)
         gender_opts.pack(anchor="w", padx=10)
-
         for text, value in [
             ("Male", "m"),
             ("Female", "f"),
@@ -43,7 +47,7 @@ class DemoPage(WidgetFrame):
 
         edu_level = ttk.Frame(answers_frame)
         edu_level.pack(fill="x", pady=5)
-        ttk.Label(edu_level, text="What degree are you currently pursuing?").pack(anchor="w")
+        ttk.Label(edu_level, text="What degree are you currently pursuing?", font=self.body_font).pack(anchor="w")
         edu_opts = ttk.Frame(edu_level)
         edu_opts.pack(anchor="w", padx=10)
         for text, value in [
@@ -59,7 +63,7 @@ class DemoPage(WidgetFrame):
 
         age_frame = ttk.Frame(answers_frame)
         age_frame.pack(fill="x", pady=5)
-        ttk.Label(age_frame, text="Age:").pack(anchor="w")
+        ttk.Label(age_frame, text="Age:", font=self.body_font).pack(anchor="w")
         age_opts = ttk.Frame(age_frame)
         age_opts.pack(anchor="w", padx=10)
         min_age = 20
@@ -74,7 +78,7 @@ class DemoPage(WidgetFrame):
 
         ai_use_frame = ttk.Frame(answers_frame)
         ai_use_frame.pack(fill="x", pady=5)
-        ttk.Label(ai_use_frame, text="Do you use AI tools? If so, how often?", font=self.subtitle_font).pack(anchor="w")
+        ttk.Label(ai_use_frame, text="Do you use AI tools? If so, how often?", font=self.body_font).pack(anchor="w")
         ai_opts = ttk.Frame(ai_use_frame)
         ai_opts.pack(anchor="w", padx=10)
         for text, value in [

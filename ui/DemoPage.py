@@ -72,14 +72,18 @@ class DemoPage(WidgetFrame):
         for r in ar:
             ttk.Radiobutton(age_opts, text=r, value=r, variable=self.age_var).pack(side="left", padx=5)
 
-        ai_frame = ttk.Frame(answers_frame)
-        ai_frame.pack(fill="x", pady=5)
-        ttk.Label(ai_frame, text="Do you use AI tools often?").pack(anchor="w")
-        ai_opts = ttk.Frame(ai_frame)
+        ai_use_frame = ttk.Frame(answers_frame)
+        ai_use_frame.pack(fill="x", pady=5)
+        ttk.Label(ai_use_frame, text="Do you use AI tools? If so, how often?", font=self.subtitle_font).pack(anchor="w")
+        ai_opts = ttk.Frame(ai_use_frame)
         ai_opts.pack(anchor="w", padx=10)
         for text, value in [
-            ("Yes", True),
             ("No", False),
+            ("Several times a Day", "several times a day"),
+            ("I use AI on a Daily basis", "daily"),
+            ("I use AI on a Weekly basis", "weekly"),
+            ("I use AI on a Monthly basis", "monthly"),
+            ("I use AI on a Yearly basis", "yearly"),
         ]:
             ttk.Radiobutton(
                 ai_opts,
@@ -95,5 +99,5 @@ class DemoPage(WidgetFrame):
             "gender": self.gender_var.get() or None,
             "edu_pursuing": self.deg_level_var.get() or None,
             "age": self.age_var.get() or None,
-            "uses_ai_often": self.ai_use_var.get() or None,
+            "ai_use_freq": self.ai_use_var.get() or None,
         }

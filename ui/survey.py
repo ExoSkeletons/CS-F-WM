@@ -137,13 +137,13 @@ class PagedFrame(WidgetFrame):
             self._progress_bar["maximum"] = n
             self._progress_bar["value"] = i + 1
         # nav button enabling
-        # page exists
         pf = True
         nf = True
+        # page exists
         pf = pf and i > 0
         nf = nf and i < n - 1
         # next page validation
-        if n > 0 and 0 <= i < n:
+        if 0 <= i < n:
             frame = self._pages[i]
             if frame and frame in self._validators.keys():
                 validator = self._validators[frame]

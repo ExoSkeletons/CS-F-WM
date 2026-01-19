@@ -17,6 +17,7 @@ class DemoPage(WidgetFrame):
         ).pack(anchor="w", pady=(0, 15))
 
         self.gender_var = tk.StringVar(value=None)
+        self.deg_level_var = tk.StringVar(value=None)
         self.age_var = tk.StringVar(value=None)
         self.ai_use_var = tk.StringVar(value=None)
 
@@ -38,6 +39,22 @@ class DemoPage(WidgetFrame):
                 gender_opts,
                 text=text, value=value,
                 variable=self.gender_var
+            ).pack(side="left", padx=5)
+
+        edu_level = ttk.Frame(answers_frame)
+        edu_level.pack(fill="x", pady=5)
+        ttk.Label(edu_level, text="What degree are you currently pursuing?").pack(anchor="w")
+        edu_opts = ttk.Frame(edu_level)
+        edu_opts.pack(anchor="w", padx=10)
+        for text, value in [
+            ("BSc", "bsc"),
+            ("MSc", "msc"),
+            ("PhD", "phd"),
+        ]:
+            ttk.Radiobutton(
+                edu_opts,
+                text=text, value=value,
+                variable=self.deg_level_var
             ).pack(side="left", padx=5)
 
         age_frame = ttk.Frame(answers_frame)
@@ -76,6 +93,7 @@ class DemoPage(WidgetFrame):
     def get_data(self) -> dict:
         return {
             "gender": self.gender_var.get() or None,
+            "edu_pursuing": self.deg_level_var.get() or None,
             "age": self.age_var.get() or None,
             "uses_ai_often": self.ai_use_var.get() or None,
         }

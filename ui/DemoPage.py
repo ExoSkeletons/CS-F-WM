@@ -84,10 +84,10 @@ class DemoPage(WidgetFrame):
         for text, value in [
             ("No", False),
             ("Several times a Day", "several times a day"),
-            ("I use AI on a Daily basis", "daily"),
-            ("I use AI on a Weekly basis", "weekly"),
-            ("I use AI on a Monthly basis", "monthly"),
-            ("I use AI on a Yearly basis", "yearly"),
+            ("On a Daily basis", "daily"),
+            ("On a Weekly basis", "weekly"),
+            ("On a Monthly basis", "monthly"),
+            ("On a Yearly basis", "yearly"),
         ]:
             ttk.Radiobutton(
                 ai_opts,

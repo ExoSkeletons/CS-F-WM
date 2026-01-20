@@ -190,10 +190,14 @@ def start_user_ui(usr: str):
 
     pager.select_page(0)
 
-    terms_frame = TermsPage(root)
+    # welcome
+    welcome_frame = WidgetFrame(root)
+    ttk.Label(welcome_frame, text=f"Welcome, {username}!\n", font=Font(size=12)).pack()
+    terms_frame = TermsPage(root, welcome_frame)
+    terms_frame.pack()
     terms_frame.on_accepted = lambda: root.set_frame(pager)
 
-    root.set_frame(terms_frame)
+    root.set_frame(welcome_frame)
 
 
 if __name__ == "__main__":

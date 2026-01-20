@@ -13,7 +13,7 @@ from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message
 
 from services import firebase
-from ui.DemoPage import DemoPage
+from ui.demo import DemoPage
 from ui.app import App, WidgetFrame
 from ui.app import data_dir_path
 from ui.auth import TermsPage, AuthPage

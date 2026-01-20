@@ -1,7 +1,7 @@
+import os
 import random
 import sys
 import threading
-import os
 from os import system
 from tkinter import ttk
 from tkinter.font import Font
@@ -12,12 +12,13 @@ import yaml
 from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message
 
+from services import firebase
 from ui.DemoPage import DemoPage
 from ui.app import App, WidgetFrame
 from ui.app import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.detect import DetectPage
-from ui.survey import PagedFrame
+from ui.survey import PagedFrame, SurveySession
 
 Watermark = Callable[[str], str]
 Detector = Callable[[str], float]
@@ -117,8 +118,8 @@ def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     threading.Thread(target=worker, daemon=True).start()
 
 
-def start_user_ui(usr: str):
-    print(f"user {usr} login")
+def start_user_ui(uuid: str, username: str):
+    print(f"user {username} {uuid} login")
 
     pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
@@ -159,6 +160,11 @@ def start_user_ui(usr: str):
 
     (name, mark) = random.choice(m)  # todo: use hash with user id
     page_amount = 4
+    # print(name)
+
+    db = firebase.init_db()  # long call
+    session = SurveySession(db=db, user_id=uuid)
+
     for i in range(page_amount):
         detect_page = DetectPage(
             root, pager.notebook,
@@ -167,7 +173,11 @@ def start_user_ui(usr: str):
             questions=questions
         )
         detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
-        pager.add_page(detect_page, title=detect_page.title, validator=detect_page.is_valid)
+        pager.add_page(
+            detect_page, title=detect_page.title,
+            validator=detect_page.is_valid,
+            on_next=lambda pi, p: session.save_question(pi, p.get_data())
+        )
 
     # compare_page = ComparePage(list(active_watermarks().values()), root, pager.notebook)
     # compare_page.on_submit = lambda q: threaded_query(q, compare_page.response)
@@ -181,7 +191,10 @@ def start_user_ui(usr: str):
     #     pager.add_page(WidgetFrame(root, pager.notebook))
 
     demo_survey_page = DemoPage(root, pager.notebook)
-    pager.add_page(demo_survey_page, "Conclusion")
+    pager.add_page(
+        demo_survey_page, "Conclusion",
+        on_next=lambda _, p: session.save_demographics(p.get_data())
+    )
 
     end_frame = WidgetFrame(root, pager.notebook)
     ttk.Label(end_frame, text="Thanks for Participating!").pack()

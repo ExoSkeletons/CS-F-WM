@@ -1,4 +1,5 @@
 import tkinter as tk
+import uuid
 from datetime import datetime, timedelta
 from tkinter import ttk, Misc
 from typing import Callable
@@ -47,6 +48,33 @@ class TimerFrame(tk.Frame):
 class ResponseContainer:
     def get_data(self) -> dict:
         pass
+
+
+class SurveySession:
+    def __init__(self, db, user_id: str):
+        self.db = db
+        self.session_id = str(uuid.uuid4())
+        self.user_id = user_id
+
+        self.ref = (
+            db.collection("responses")
+            .document(self.session_id)
+        )
+
+        self.ref.set({
+            "user_id": user_id,
+        })
+
+    def save_demographics(self, data: dict):
+        self.ref.update({
+            "demographics": data,
+        })
+
+    def save_question(self, page_index: int, data: dict):
+        self.ref.collection("pages").document(str(page_index)).set({
+            **data,
+            "page_index": page_index
+        })
 
 
 class PagedFrame(WidgetFrame):

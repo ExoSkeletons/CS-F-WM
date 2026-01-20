@@ -9,10 +9,10 @@ from typing import Optional, Callable
 
 from ui.app import App, WidgetFrame, config_enable, set_text
 from ui.scrollable_frame import ScrollableFrame
-from ui.survey import TimerFrame
+from ui.survey import TimerFrame, ResponseContainer
 
 
-class DetectPage(WidgetFrame):
+class DetectPage(WidgetFrame, ResponseContainer):
     on_submit: Optional[Callable[[str], None]] = None
 
     _font_size = 12
@@ -35,10 +35,11 @@ class DetectPage(WidgetFrame):
         self.mark = random.choices([watermark, None], weights=[mark_prob, 1 - mark_prob])[0]
 
         # random question
+        self.question_text = ''
         if questions is None:
             self.question_text = "< QUESTION >"
         else:
-            self.question_text: str = random.choice(questions).strip().capitalize()
+            self.question_text = random.choice(questions).strip().capitalize()
 
         super().__init__(app, master)
 
@@ -170,12 +171,12 @@ class DetectPage(WidgetFrame):
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         entry_dim = (int(ins_wrap_l * 0.15), 3)
-        reasoning_detect_entry = tkinter.Text(
+        self.reasoning_detect_entry = tkinter.Text(
             reasoning_detect_frame,
             wrap="word", undo=True, maxundo=10,
             width=entry_dim[0], height=entry_dim[1],
         )
-        reasoning_detect_entry.pack(expand=True)
+        self.reasoning_detect_entry.pack(expand=True)
         self.len_rd_var = tkinter.IntVar()
         rd_len_l = ttk.Label(reasoning_detect_frame)
         rd_len_l.pack(anchor="ne")
@@ -194,12 +195,12 @@ class DetectPage(WidgetFrame):
             text="What did you do to try and remove the watermark?",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
-        reasoning_change_entry = tkinter.Text(
+        self.reasoning_change_entry = tkinter.Text(
             reasoning_change_frame,
             wrap="word", undo=True, maxundo=10,
             width=entry_dim[0], height=entry_dim[1],
         )
-        reasoning_change_entry.pack(expand=True)
+        self.reasoning_change_entry.pack(expand=True)
         self.len_rc_var = tkinter.IntVar()
         rc_len_l = ttk.Label(reasoning_change_frame)
         rc_len_l.pack(anchor="ne")
@@ -219,8 +220,8 @@ class DetectPage(WidgetFrame):
         def update_user_response():
             is_w: bool = self.is_wm_yes_var.get()
 
-            self.len_rd_var.set(len(reasoning_detect_entry.get("1.0", END).strip()))
-            self.len_rc_var.set(len(reasoning_change_entry.get("1.0", END).strip()))
+            self.len_rd_var.set(len(self.reasoning_detect_entry.get("1.0", END).strip()))
+            self.len_rc_var.set(len(self.reasoning_change_entry.get("1.0", END).strip()))
 
             is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
             is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
@@ -235,10 +236,10 @@ class DetectPage(WidgetFrame):
             "write",
             lambda var, index, mode: update_user_response()
         )
-        reasoning_detect_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
-        reasoning_change_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
-        reasoning_detect_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
-        reasoning_change_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
+        self.reasoning_detect_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
+        self.reasoning_change_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
+        self.reasoning_detect_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
+        self.reasoning_change_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
 
         self.user_response_frame.pack(fill="x", expand=True)
 
@@ -355,3 +356,20 @@ class DetectPage(WidgetFrame):
 
     def validity_changed(self):
         self.event_generate("<<PageValidityChanged>>")
+
+    def get_data(self) -> dict:
+        return {
+            "t": self.timer.dtime().seconds,
+            "question": self.question_text,
+            "user_query": self.q_var.get(),
+            "model_response": self.text_var.get(),
+            "user_survey":
+                {
+                    "is_wm": True,
+                    "reasoning": self.reasoning_detect_entry.get("1.0", END).strip(),
+                    "text_edited": self.tt.get("1.0", END).strip(),
+                    "edited_action": self.reasoning_change_entry.get("1.0", END).strip()
+                }
+                if self.is_wm_yes_var.get()
+                else {"is_wm": False}
+        }

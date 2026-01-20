@@ -44,6 +44,11 @@ class TimerFrame(tk.Frame):
         self.after(100, self.update_timer)
 
 
+class ResponseContainer:
+    def get_data(self) -> dict:
+        pass
+
+
 class PagedFrame(WidgetFrame):
     _pages: list[WidgetFrame] = []
     _current_index: int | None = None

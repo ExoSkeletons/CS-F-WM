@@ -86,7 +86,8 @@ def apply_watermarks(text: str):
     return t
 
 
-client = genai.Client()
+os.environ["SSL_CERT_FILE"] = certifi.where()
+client = genai.Client(api_key=config['genai_api_key'])
 model = "gemini-flash-latest"
 
 

@@ -24,14 +24,14 @@ class TimerFrame(tk.Frame):
     def stop(self):
         self.running = False
 
-    def dtime(self):
+    def dtime(self) -> timedelta:
         return datetime.now() - self.start_time
 
     def update_timer(self):
         if not self.running:
             return
 
-        delta: timedelta = datetime.now() - self.start_time
+        delta: timedelta = self.dtime()
         seconds = int(delta.total_seconds())
 
         hh = seconds // 3600

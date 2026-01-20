@@ -1,8 +1,10 @@
+import threading
 import webbrowser
 from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Any
 
+from services.oauth2 import google_login
 from ui.app import WidgetFrame
 from ui.app import data_dir_path
 from ui.scrollable_frame import ScrollableFrame
@@ -47,9 +49,26 @@ class TermsPage(WidgetFrame):
 
 
 class AuthPage(WidgetFrame):
-    on_login: Callable[[str], Any] = lambda uuid: None
+    user_id: str
+    on_login: Callable[[str, str], Any] = lambda uuid: None
 
     def _create_widgets(self):
         ttk.Label(self, text="Login:").pack()
         ttk.Label(self, text="TBI").pack()
-        ttk.Button(self, text="Login", command=lambda: self.on_login("dummy")).pack()
+        ttk.Button(self, text="Log in with Google", command=lambda: self.login_async()).pack()
+        ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+
+    def login_async(self):
+        def worker():
+            user = google_login()
+            self.app.after(0, lambda: self.login_callback(user))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def login_callback(self, user):
+        self.app.lift()
+        self.app.focus_force()
+        self.app.attributes('-topmost', True)
+        self.app.attributes('-topmost', False)
+
+        self.on_login(user['user_id'], user['email'])

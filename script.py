@@ -76,8 +76,13 @@ marks: dict[str, Watermark | tuple[Watermark, Detector]] = {
 }
 
 
-def active_watermarks() -> dict[str, Watermark]:
-    return {k: v for k, v in marks.items() if k in config['watermarks']}
+def active_watermarks() -> dict[str, Watermark | tuple[Watermark, Detector]]:
+    return {
+        k:
+            v[0] if type(v) == tuple[Watermark, Detector]
+            else v
+        for k, v in marks.items() if k in config['watermarks']
+    }
 
 
 def apply_watermarks(text: str):
@@ -150,7 +155,7 @@ def start_user_ui(uuid: str, username: str):
     m: list = []
     for am in active_watermarks().items(): m.append(am)
 
-    mark_prob = 0.5
+    mark_prob = 1.0
 
     # random.shuffle(m)
     # for i, (name, wm) in enumerate(m):
@@ -159,12 +164,12 @@ def start_user_ui(uuid: str, username: str):
     #     pager.add_page(detect_page, title=f"Page {i+1}", validator=detect_page.validate)
 
     (name, mark) = random.choice(m)  # todo: use hash with user id
-    page_amount = 4
     # print(name)
 
     db = firebase.init_db()  # long call
     session = SurveySession(db=db, user_id=uuid)
 
+    page_amount = 1
     for i in range(page_amount):
         detect_page = DetectPage(
             root, pager.notebook,

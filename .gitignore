@@ -4,3 +4,5 @@
 /build/
 /data/serviceAccountKey.json
 /AI-Survey.spec
+.gitignore
+.idea

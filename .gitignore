@@ -1,8 +1,8 @@
 /dist/
+/build/
+/AI-Survey.spec
+.idea
+
 /data/config.yml
 /data/oauth_client.json
-/build/
 /data/serviceAccountKey.json
-/AI-Survey.spec
-.gitignore
-.idea

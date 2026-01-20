@@ -54,6 +54,7 @@ class PagedFrame(WidgetFrame):
     _current_index: int | None = None
 
     _validators: dict[WidgetFrame, Callable[[], bool]] = {}
+    _on_next_callbacks: dict[WidgetFrame, Callable[[int, WidgetFrame], None]] = {}
 
     notebook: ttk.Notebook
     _progress_bar: ttk.Progressbar
@@ -116,16 +117,24 @@ class PagedFrame(WidgetFrame):
                     self.notebook.tab(self._current_index, state="normal")
             self.notebook.select(index)
 
-    def add_page(self, frame: WidgetFrame, title: str = None, validator: Callable[[], bool] | None = None):
+    def add_page(self, frame: WidgetFrame, title: str = None, validator: Callable[[], bool] | None = None,
+                 on_next: Callable[[int, WidgetFrame], None] | None = None):
         index = len(self._pages)
         self._pages.append(frame)
         if validator: self._validators[frame] = validator
+        if on_next: self._on_next_callbacks[frame] = on_next
         self.notebook.add(frame, text=title or f"Page {index + 1}")
         frame.bind("<<PageValidityChanged>>", self._update_ui)
         self._update_ui()
 
     def next_page(self):
-        self.select_page(self.index() + 1)
+        i = self.index()
+        frame = self._pages[i]
+
+        if frame in self._on_next_callbacks:
+            self._on_next_callbacks[frame](i, frame)
+
+        self.select_page(i + 1)
 
     def prev_page(self):
         self.select_page(self.index() - 1)

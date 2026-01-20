@@ -23,6 +23,7 @@ class DemoPage(WidgetFrame):
 
         self.gender_var = tk.StringVar(value=None)
         self.deg_level_var = tk.StringVar(value=None)
+        self.deg_field_var = tk.StringVar(value=None)
         self.age_var = tk.StringVar(value=None)
         self.ai_use_var = tk.StringVar(value=None)
 
@@ -47,7 +48,7 @@ class DemoPage(WidgetFrame):
 
         edu_level = ttk.Frame(answers_frame)
         edu_level.pack(fill="x", pady=5)
-        ttk.Label(edu_level, text="What degree are you currently pursuing?", font=self.body_font).pack(anchor="w")
+        ttk.Label(edu_level, text="What Degree are you currently pursuing?", font=self.body_font).pack(anchor="w")
         edu_opts = ttk.Frame(edu_level)
         edu_opts.pack(anchor="w", padx=10)
         for text, value in [
@@ -60,6 +61,12 @@ class DemoPage(WidgetFrame):
                 text=text, value=value,
                 variable=self.deg_level_var
             ).pack(side="left", padx=5)
+
+        edu_field_frame = ttk.Frame(answers_frame)
+        edu_field_frame.pack(fill="x", pady=5)
+        ttk.Label(edu_field_frame, text="What is the field of your Degree?", font=self.body_font).pack(anchor="w")
+        edu_field_text = ttk.Entry(edu_field_frame, textvariable=self.deg_field_var)
+        edu_field_text.pack(anchor="w", padx=10)
 
         age_frame = ttk.Frame(answers_frame)
         age_frame.pack(fill="x", pady=5)
@@ -102,6 +109,7 @@ class DemoPage(WidgetFrame):
         return {
             "gender": self.gender_var.get() or None,
             "edu_pursuing": self.deg_level_var.get() or None,
+            "edu_field": self.deg_field_var.get() or None,
             "age": self.age_var.get() or None,
             "ai_use_freq": self.ai_use_var.get() or None,
         }

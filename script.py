@@ -115,8 +115,8 @@ def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     threading.Thread(target=worker, daemon=True).start()
 
 
-def start_user_ui(uuid: str, username: str):
-    print(f"user {username} {uuid} login")
+def start_user_ui(uuid: str, email: str):
+    print(f"user {email} {uuid} login")
 
     pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
@@ -159,7 +159,7 @@ def start_user_ui(uuid: str, username: str):
     # print(name)
 
     db = firebase.init_db()  # long call
-    session = SurveySession(db=db, user_id=uuid)
+    session = SurveySession(db=db, user_id=uuid, user_email=email)
 
     page_amount = 1
     for i in range(page_amount):
@@ -202,7 +202,7 @@ def start_user_ui(uuid: str, username: str):
 
     # welcome
     welcome_frame = WidgetFrame(root)
-    ttk.Label(welcome_frame, text=f"Welcome, {username}!\n", font=Font(size=12)).pack()
+    ttk.Label(welcome_frame, text=f"Welcome, {email}!\n", font=Font(size=12)).pack()
     terms_frame = TermsPage(root, welcome_frame)
     terms_frame.pack()
     terms_frame.on_accepted = lambda: root.set_frame(pager)
@@ -220,6 +220,6 @@ if __name__ == "__main__":
     auth_page.on_login = start_user_ui
     root.set_frame(auth_page)
 
-    root.mainloop() # blocking call
+    root.mainloop()  # blocking call
 
     print("Bye!")

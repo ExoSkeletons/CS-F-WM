@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from tkinter import ttk, Misc
 from typing import Callable
 
+from services.email import send_registration_info_email
 from ui.app import WidgetFrame, App
 
 
@@ -51,10 +52,11 @@ class ResponseContainer:
 
 
 class SurveySession:
-    def __init__(self, db, user_id: str):
+    def __init__(self, db, user_id: str, user_email:str):
         self.db = db
         self.session_id = str(uuid.uuid4())
         self.user_id = user_id
+        self.user_email = user_email
 
         self.ref = (
             db.collection("responses")
@@ -64,6 +66,7 @@ class SurveySession:
         self.ref.set({
             "user_id": user_id,
         })
+        self.save_email_uuid()
 
     def save_demographics(self, data: dict):
         self.ref.update({
@@ -76,6 +79,8 @@ class SurveySession:
             "page_index": page_index
         })
 
+    def save_email_uuid(self):
+        send_registration_info_email(self.user_id, self.user_email, self.session_id)
 
 class PagedFrame(WidgetFrame):
     _pages: list[WidgetFrame] = []

@@ -8,10 +8,10 @@ from tkinter.font import Font
 from typing import Callable
 
 import certifi
-import yaml
 from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message
 
+from config import config
 from services import firebase
 from ui.demo import DemoPage
 from ui.app import App, WidgetFrame
@@ -23,14 +23,6 @@ from ui.survey import PagedFrame, SurveySession
 Watermark = Callable[[str], str]
 Detector = Callable[[str], float]
 
-config = {}
-try:
-    with open(data_dir_path + "config.yml", 'rt+') as f:
-        config = yaml.safe_load(f)
-except OSError as e:
-    print(e)
-    input("Could not load config.")
-    exit(1)
 acrostic_config: dict[str, str] = config['acrostic']
 
 marks: dict[str, Watermark | tuple[Watermark, Detector]] = {

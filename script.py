@@ -13,10 +13,10 @@ from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_i
 
 from config import config
 from services import firebase
-from ui.demo import DemoPage
 from ui.app import App, WidgetFrame
 from ui.app import data_dir_path
 from ui.auth import TermsPage, AuthPage
+from ui.demo import DemoPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame, SurveySession
 
@@ -161,12 +161,17 @@ def start_user_ui(uuid: str, email: str):
     db = firebase.init_db()  # long call
     session = SurveySession(db=db, user_id=uuid, user_email=email)
 
-    page_amount = 1
+    page_amount = 4
+    wm_amount = 2
+    lf = [False for _ in range(page_amount- wm_amount)]
+    lt = [True for _ in range(wm_amount)]
+    flags = list(lf + lt)
+    random.shuffle(flags)
     for i in range(page_amount):
         detect_page = DetectPage(
             root, pager.notebook,
             title=f"Assignment {i + 1}",
-            watermark=mark, mark_prob=mark_prob,
+            watermark=mark, mark_prob=1.0 if flags[i] else 0.0,
             questions=questions
         )
         detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)

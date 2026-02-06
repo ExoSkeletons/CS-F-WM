@@ -148,6 +148,7 @@ def start_user_ui(uuid: str, email: str):
     for am in active_watermarks().items(): m.append(am)
 
     mark_prob = 1.0
+    random.seed(uuid)
 
     # random.shuffle(m)
     # for i, (name, wm) in enumerate(m):
@@ -155,7 +156,7 @@ def start_user_ui(uuid: str, email: str):
     #     detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
     #     pager.add_page(detect_page, title=f"Page {i+1}", validator=detect_page.validate)
 
-    (name, mark) = random.choice(m)  # todo: use hash with user id
+    (name, mark) = random.choice(m)
     # print(name)
 
     db = firebase.init_db()  # long call

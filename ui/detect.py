@@ -187,7 +187,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         reasoning_change_frame.pack()
         ttk.Label(
             reasoning_change_frame,
-            text="If so, try to remove it by editing the text response.\nDo you best to remove only the watermark and keep the original text intact as much as possible.",
+            text="If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         ttk.Label(

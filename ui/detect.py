@@ -110,14 +110,22 @@ class DetectPage(WidgetFrame, ResponseContainer):
         self.scroll = ScrollableFrame(model_frame, scroll_y=True, scroll_x=True)
         self.scroll.pack(fill="both", expand=True)
         self.text_var = tkinter.StringVar()
+        response_font = ("TkDefaultFont", 10)
         # text form (editable)
-        self.tt = tkinter.Text(self.scroll.content, wrap="word")
+        self.tt = tkinter.Text(self.scroll.content, wrap="word", font=response_font)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tt, self.text_var.get()))
         self.tt.grid(row=0, column=0, sticky="nsew")
         # text label (non-editable)
-        self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
+        # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
+        self.tl = tkinter.Text(
+            self.scroll.content, wrap="word",
+            bg=self.app.cget("bg"), fg="black", font=response_font,
+            relief="flat"
+        )
+        config_enable(self.tl, False)
+        self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tl, self.text_var.get(), force=True))
         self.tl.grid(row=0, column=0, sticky="nsew")
-        self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
+        # self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
         # query submission
         self.submit_frame = ttk.Frame(model_frame)
         self.submit_frame.pack(fill="x", expand=True)

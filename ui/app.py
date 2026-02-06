@@ -4,6 +4,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import Misc, TclError
 
+
 def resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
         # PyInstaller temp folder
@@ -12,6 +13,7 @@ def resource_path(relative_path):
         # Running from source
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
 
 data_dir_path = resource_path("data/")
 padding = {'padx': 5, 'pady': 5}
@@ -24,9 +26,12 @@ header_font = (font, 14)
 #     return "\u200F" + text + "\u200F"
 
 
-def set_text(w: tk.Text, text: str):
+def set_text(w: tk.Text, text: str, force: bool = False):
+    c = force and w['state'] == 'disabled'
+    if c: config_enable(w, True)
     w.delete("1.0", tk.END)
     w.insert("1.0", text)
+    if c: config_enable(w, False)
 
 
 def config_enable(widget: tk.Misc, enabled: bool):

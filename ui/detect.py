@@ -7,6 +7,7 @@ from tkinter.font import Font
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
+from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, ResponseContainer
@@ -323,7 +324,8 @@ class DetectPage(WidgetFrame, ResponseContainer):
             # update UI safely from main thread
             self.app.after(0, lambda: self.set_response_text(wmr, user_response_enabled=True))
 
-        self.set_response_text("Watermarking...")
+        if config['show_watermarking']:
+            self.set_response_text("Watermarking...")
 
         threading.Thread(target=watermark_worker, daemon=True).start()
 

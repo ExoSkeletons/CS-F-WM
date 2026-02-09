@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from tkinter import ttk, Misc
 from typing import Callable
 
-from services.email import send_registration_info_email
+from config import config
+from services.email import send_email_from_app
 from ui.app import WidgetFrame, App
 
 
@@ -63,10 +64,10 @@ class SurveySession:
             .document(self.session_id)
         )
 
-        self.ref.set({
-            "user_id": user_id,
-        })
-        self.save_email_uuid()
+        # self.ref.set({
+        #     "user_id": user_id,
+        # })
+        self.save_session_id_uuid_association()
 
     def save_demographics(self, data: dict):
         self.ref.update({
@@ -79,8 +80,19 @@ class SurveySession:
             "page_index": page_index
         })
 
-    def save_email_uuid(self):
-        send_registration_info_email(self.user_id, self.user_email, self.session_id)
+    def save_session_id_uuid_association(self):
+        email_config = config['email']
+        receiver = email_config['collection_email']
+
+        user_id = self.user_id
+        user_email = self.user_email
+        session_id = self.session_id
+
+        subject = f"Watermark Study | {user_id} {user_email} {session_id}"
+        body = f"uuid: {user_id}\nemail: {user_email}\nsurvey session id: {session_id}"
+
+        send_email_from_app(receiver, subject, body)
+        print(f"Registration info sent for {user_id}, {user_email}")
 
 class PagedFrame(WidgetFrame):
     _pages: list[WidgetFrame] = []

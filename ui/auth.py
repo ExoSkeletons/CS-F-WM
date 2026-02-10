@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Any
 
+from config import config
 from services.oauth2 import google_login
 from ui.app import WidgetFrame
 from ui.app import data_dir_path
@@ -25,7 +26,7 @@ class TermsPage(WidgetFrame):
         # terms
         ttk.Label(self, text="Consent Form", font=Font(size=12, weight="bold")).pack()
         ttk.Label(self, text="Please read the form below carefully.", font=Font(size=8, slant="italic")).pack()
-        online_doc_url = "https://arielacil-my.sharepoint.com/personal/harelb_ariel_ac_il/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fharelb%5Fariel%5Fac%5Fil%2FDocuments%2FParticipant%20Information%20and%20Consent%20Form%2Epdf&parent=%2Fpersonal%2Fharelb%5Fariel%5Fac%5Fil%2FDocuments&ga=1"
+        online_doc_url = config["consent_form_url"]
         ttk.Button(self, text="View Document Online", command=lambda: webbrowser.open(online_doc_url)).pack(anchor="e")
 
         # scroll text

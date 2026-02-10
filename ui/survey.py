@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from tkinter import ttk, Misc
 from typing import Callable
 
+from google.cloud.firestore_v1 import Client
+
 from config import config
 from services.email import send_email_from_app
 from ui.app import WidgetFrame, App
@@ -53,7 +55,7 @@ class ResponseContainer:
 
 
 class SurveySession:
-    def __init__(self, db, user_id: str, user_email:str):
+    def __init__(self, db: Client, user_id: str, user_email: str):
         self.db = db
         self.session_id = str(uuid.uuid4())
         self.user_id = user_id
@@ -68,6 +70,9 @@ class SurveySession:
         #     "user_id": user_id,
         # })
         self.save_session_id_uuid_association()
+
+    def save_accept_terms(self):
+        self.ref.set({'accepted_terms': True})
 
     def save_demographics(self, data: dict):
         self.ref.update({
@@ -93,6 +98,7 @@ class SurveySession:
 
         send_email_from_app(receiver, subject, body)
         print(f"Registration info sent for {user_id}, {user_email}")
+
 
 class PagedFrame(WidgetFrame):
     _pages: list[WidgetFrame] = []

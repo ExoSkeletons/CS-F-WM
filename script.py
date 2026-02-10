@@ -13,7 +13,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_i
 
 from config import config
 from services import firebase
-from ui.app import App, WidgetFrame
+from ui.app import App, WidgetFrame, LoadingWidget, config_enable
 from ui.app import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
@@ -161,7 +161,7 @@ def start_session_ui(session: SurveySession):
 
     page_amount = 4
     wm_amount = 2
-    lf = [False for _ in range(page_amount- wm_amount)]
+    lf = [False for _ in range(page_amount - wm_amount)]
     lt = [True for _ in range(wm_amount)]
     flags = list(lf + lt)
     random.shuffle(flags)
@@ -208,7 +208,12 @@ def start_session_ui(session: SurveySession):
     ttk.Label(welcome_frame, text=f"Welcome, {session.user_email}!\n", font=Font(size=12)).pack()
     terms_frame = TermsPage(root, welcome_frame)
     terms_frame.pack()
-    terms_frame.on_accepted = lambda: root.set_frame(pager)
+
+    def on_accepted():
+        session.save_accept_terms()
+        root.set_frame(pager)
+
+    terms_frame.on_accepted = on_accepted
 
     root.set_frame(welcome_frame)
 

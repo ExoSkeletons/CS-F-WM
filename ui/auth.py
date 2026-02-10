@@ -52,10 +52,10 @@ class AuthPage(WidgetFrame):
     user_id: str
 
     def _create_widgets(self):
-        ttk.Label(self, text="Login:").pack()
-        ttk.Label(self, text="TBI").pack()
+        ttk.Label(self, text="Login", font=Font(size=14, weight='bold')).pack()
+        # ttk.Label(self, text="TBI").pack()
         ttk.Button(self, text="Log in with Google", command=lambda: self.login_async()).pack()
-        ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+        # ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
 
     def login_async(self):
         def worker():

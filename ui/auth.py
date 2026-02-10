@@ -50,7 +50,6 @@ class TermsPage(WidgetFrame):
 
 class AuthPage(WidgetFrame):
     user_id: str
-    on_login: Callable[[str, str], Any] = lambda uuid: None
 
     def _create_widgets(self):
         ttk.Label(self, text="Login:").pack()
@@ -64,6 +63,9 @@ class AuthPage(WidgetFrame):
             self.app.after(0, lambda: self.login_callback(user))
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def on_login(self, uuid, email):
+        pass
 
     def login_callback(self, user):
         self.app.lift()

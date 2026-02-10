@@ -115,8 +115,8 @@ def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     threading.Thread(target=worker, daemon=True).start()
 
 
-def start_user_ui(uuid: str, email: str):
-    print(f"user {email} {uuid} login")
+def start_session_ui(session: SurveySession):
+    print(f"user {session.user_email} {session.user_id} login")
 
     pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
@@ -148,7 +148,7 @@ def start_user_ui(uuid: str, email: str):
     for am in active_watermarks().items(): m.append(am)
 
     mark_prob = 1.0
-    random.seed(uuid)
+    random.seed(session.user_id)
 
     # random.shuffle(m)
     # for i, (name, wm) in enumerate(m):
@@ -158,9 +158,6 @@ def start_user_ui(uuid: str, email: str):
 
     (name, mark) = random.choice(m)
     # print(name)
-
-    db = firebase.init_db()  # long call
-    session = SurveySession(db=db, user_id=uuid, user_email=email)
 
     page_amount = 4
     wm_amount = 2
@@ -208,12 +205,29 @@ def start_user_ui(uuid: str, email: str):
 
     # welcome
     welcome_frame = WidgetFrame(root)
-    ttk.Label(welcome_frame, text=f"Welcome, {email}!\n", font=Font(size=12)).pack()
+    ttk.Label(welcome_frame, text=f"Welcome, {session.user_email}!\n", font=Font(size=12)).pack()
     terms_frame = TermsPage(root, welcome_frame)
     terms_frame.pack()
     terms_frame.on_accepted = lambda: root.set_frame(pager)
 
     root.set_frame(welcome_frame)
+
+
+# heavy function. run on thread
+def setup_session(uuid, email) -> SurveySession:
+    db = firebase.init_db()
+    return SurveySession(db=db, user_id=uuid, user_email=email)
+
+
+class AP(AuthPage):
+    def on_login(self, uuid, email):
+        config_enable(self, False)
+        config_enable(loading_widget, True)
+        loading_widget.pack()
+
+        loading_widget.load = lambda kwargs: setup_session(kwargs['uuid'], kwargs['email'])
+        loading_widget.on_complete = lambda session: start_session_ui(session)
+        loading_widget.start(uuid=uuid, email=email)
 
 
 if __name__ == "__main__":
@@ -222,8 +236,10 @@ if __name__ == "__main__":
 
     root = App()
 
-    auth_page = AuthPage(root)
-    auth_page.on_login = start_user_ui
+    auth_page = AP(root)
+    loading_widget = LoadingWidget(root, auth_page)
+    loading_widget.pack()
+    loading_widget.pack_forget()
     root.set_frame(auth_page)
 
     root.mainloop()  # blocking call

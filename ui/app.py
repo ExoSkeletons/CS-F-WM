@@ -1,8 +1,10 @@
 import os
 import sys
+import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import Misc, TclError
+from typing import Callable, Mapping, Any
 
 
 def resource_path(relative_path):
@@ -121,3 +123,23 @@ class WidgetFrame(ttk.Frame):
 
     def reset_widgets(self):
         pass
+
+
+class LoadingWidget(WidgetFrame):
+    on_complete: Callable[[object], None] = None
+    load: Callable[[Mapping[str, Any] | None], object] | None = None
+
+    def _thread_worker(self, **kwargs):
+        if not self.load: return
+        result = self.load(kwargs)
+        if result:  # post result on ui thread
+            self.app.after(0, lambda r=result: self.on_complete(r) if self.on_complete else None)
+
+    def _create_widgets(self):
+        ttk.Label(self, text="Loading...").pack()
+
+    def start(self, **kwargs):
+        # launch background worker
+        thread = threading.Thread(target=self._thread_worker, kwargs=kwargs)
+        thread.start()
+

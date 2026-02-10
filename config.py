@@ -1,12 +1,30 @@
 import yaml
+from deepmerge import always_merger
+from google.cloud.firestore_v1 import Client
 
 from ui.app import data_dir_path
 
 config = {}
-try:
-    with open(data_dir_path + "config.yml", 'rt+') as f:
-        config = yaml.safe_load(f)
-except OSError as e:
-    print(e)
-    input("Could not load config.")
-    exit(1)
+
+
+def load_from_file():
+    global config
+    try:
+        with open(data_dir_path + "config.yml", 'rt+') as f:
+            config = always_merger.merge(config, yaml.safe_load(f))
+    except OSError as e:
+        print(e)
+        print("Could not load config file.")
+
+
+def load_from_fb(db: Client):
+    global config
+    try:
+        snapshot = db.collection('data').document('config').get()
+        if not snapshot or not snapshot.exists:
+            print(f"Failed to get config document snapshot.\n{snapshot}.")
+            return
+        config = always_merger.merge(config, snapshot.to_dict())
+    except ValueError as e:
+        print(e)
+        print("Could not load config from firestore.")

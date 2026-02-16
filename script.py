@@ -223,7 +223,7 @@ def start_session_ui(session: SurveySession):
 
 
 # heavy function. run on thread
-def setup_session(uuid, email) -> SurveySession:
+def setup_session(uuid: str, email: str | None) -> SurveySession:
     cfg.load_from_file()
 
     db = firebase.init_db()

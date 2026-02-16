@@ -127,7 +127,7 @@ class WidgetFrame(ttk.Frame):
 
 class LoadingWidget(WidgetFrame):
     on_complete: Callable[[object], None] = None
-    load: Callable[[Mapping[str, Any] | None], object] | None = None
+    load: Callable[[Mapping[str, Any | None] | None], object] | None = None
 
     def _thread_worker(self, **kwargs):
         if not self.load: return

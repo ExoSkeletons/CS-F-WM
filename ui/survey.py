@@ -55,7 +55,7 @@ class ResponseContainer:
 
 
 class SurveySession:
-    def __init__(self, db: Client, user_id: str, user_email: str):
+    def __init__(self, db: Client, user_id: str, user_email: str | None):
         self.db = db
         self.session_id = str(uuid.uuid4())
         self.user_id = user_id
@@ -86,18 +86,19 @@ class SurveySession:
         })
 
     def save_session_id_uuid_association(self):
-        email_config = config['email']
-        receiver = email_config['collection_email']
+        if self.user_email:
+            user_id = self.user_id
+            user_email = self.user_email
+            session_id = self.session_id
 
-        user_id = self.user_id
-        user_email = self.user_email
-        session_id = self.session_id
+            email_config = config['email']
+            receiver = email_config['collection_email']
 
-        subject = f"Watermark Study | {user_id} {user_email} {session_id}"
-        body = f"uuid: {user_id}\nemail: {user_email}\nsurvey session id: {session_id}"
+            subject = f"Watermark Study | {user_id} {user_email} {session_id}"
+            body = f"uuid: {user_id}\nemail: {user_email}\nsurvey session id: {session_id}"
 
-        send_email_from_app(receiver, subject, body)
-        print(f"Registration info sent for {user_id}, {user_email}")
+            send_email_from_app(receiver, subject, body)
+            print(f"Registration info sent for {user_id}, {user_email}")
 
 
 class PagedFrame(WidgetFrame):

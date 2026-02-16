@@ -186,9 +186,17 @@ class DetectPage(WidgetFrame, ResponseContainer):
             width=entry_dim[0], height=entry_dim[1],
         )
         self.reasoning_detect_entry.pack(expand=True)
+        len_rd_frame = ttk.Frame(reasoning_detect_frame)
+        len_rd_frame.pack(expand=True, fill="x")
+        ttk.Label(
+            len_rd_frame,
+            text=f"Your response must be at least {self._min_response_char_count} characters long.",
+            wraplength=ins_wrap_l, font=Font(size=7, slant='italic')
+        ).grid(row=0, column=0, sticky="nsw")
+        len_rd_frame.columnconfigure(0, weight=1)
+        rd_len_l = ttk.Label(len_rd_frame)
+        rd_len_l.grid(row=0, column=1)
         self.len_rd_var = tkinter.IntVar()
-        rd_len_l = ttk.Label(reasoning_detect_frame)
-        rd_len_l.pack(anchor="ne")
         self.len_rd_var.trace_add("write", lambda m, l, c: rd_len_l.config(
             text=f"{self.len_rd_var.get()}/{self._min_response_char_count}"
         ))
@@ -210,9 +218,17 @@ class DetectPage(WidgetFrame, ResponseContainer):
             width=entry_dim[0], height=entry_dim[1],
         )
         self.reasoning_change_entry.pack(expand=True)
+        len_rc_frame = ttk.Frame(reasoning_change_frame)
+        len_rc_frame.pack(expand=True, fill="x")
+        ttk.Label(
+            len_rc_frame,
+            text=f"Your response must be at least {self._min_response_char_count} characters long.",
+            anchor='nw', wraplength=ins_wrap_l, font=Font(size=7, slant='italic')
+        ).grid(row=0, column=0, sticky="nsw")
+        len_rc_frame.columnconfigure(0, weight=1)
+        rc_len_l = ttk.Label(len_rc_frame)
+        rc_len_l.grid(row=0, column=1)
         self.len_rc_var = tkinter.IntVar()
-        rc_len_l = ttk.Label(reasoning_change_frame)
-        rc_len_l.pack(anchor="ne")
         self.len_rc_var.trace_add("write", lambda m, l, c: rc_len_l.config(
             text=f"{self.len_rc_var.get()}/{self._min_response_char_count}"
         ))

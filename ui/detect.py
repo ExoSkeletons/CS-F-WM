@@ -147,7 +147,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         ).grid(row=0, column=0, sticky="nw"))
         (ttk.Label(
             self.user_response_frame,
-            text="Do you believe it has been watermarked? You may use any external resource.",
+            text="• Do you believe it has been watermarked? You may use any external resource.",
             justify="left", wraplength=ins_wrap_l
         ).grid(row=1, column=0, sticky="nw"))
         # yes/no radios
@@ -176,7 +176,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         reasoning_detect_frame.pack()
         ttk.Label(
             reasoning_detect_frame,
-            text="What made you think text was watermarked?",
+            text="• What made you think text was watermarked?",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         entry_dim = (int(ins_wrap_l * 0.15), 3)
@@ -196,12 +196,12 @@ class DetectPage(WidgetFrame, ResponseContainer):
         reasoning_change_frame.pack()
         ttk.Label(
             reasoning_change_frame,
-            text="If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
+            text="• If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         ttk.Label(
             reasoning_change_frame,
-            text="What did you do to try and remove the watermark?",
+            text="• What did you do to try and remove the watermark?",
             justify="left", wraplength=ins_wrap_l
         ).pack(anchor="nw")
         self.reasoning_change_entry = tkinter.Text(

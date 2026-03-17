@@ -21,12 +21,10 @@ from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame, SurveySession
-
-Watermark = Callable[[str], str]
-Detector = Callable[[str], float]
+from watermarks import Watermarks, Watermark
 
 
-def marks() -> dict[str, Watermark | tuple[Watermark, Detector]]:
+def marks() -> Watermarks:
     acrostic_config: dict[str, str] = config['acrostic']
 
     return {
@@ -72,12 +70,9 @@ def marks() -> dict[str, Watermark | tuple[Watermark, Detector]]:
     }
 
 
-def active_watermarks() -> dict[str, Watermark | tuple[Watermark, Detector]]:
+def active_watermarks() -> Watermarks:
     return {
-        k:
-            v[0] if type(v) == tuple[Watermark, Detector]
-            else v
-        for k, v in marks().items() if k in config['watermarks']
+        k: v for k, v in marks().items() if k in config['watermarks']
     }
 
 
@@ -148,7 +143,7 @@ def start_session_ui(session: SurveySession):
         input("Could not load questions.")
         exit(1)
 
-    m: list = []
+    m: list[Watermark] = []
     for am in active_watermarks().items(): m.append(am)
 
     mark_prob = 1.0
@@ -160,8 +155,8 @@ def start_session_ui(session: SurveySession):
     #     detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
     #     pager.add_page(detect_page, title=f"Page {i+1}", validator=detect_page.validate)
 
-    (name, mark) = random.choice(m)
-    # print(name)
+    wm = random.choice(m)
+    # print(wm[0])
 
     page_amount = 4
     wm_amount = 2
@@ -173,7 +168,7 @@ def start_session_ui(session: SurveySession):
         detect_page = DetectPage(
             root, pager.notebook,
             title=f"Assignment {i + 1}",
-            watermark=mark, mark_prob=1.0 if flags[i] else 0.0,
+            watermark=wm, mark_prob=1.0 if flags[i] else 0.0,
             questions=questions
         )
         detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)

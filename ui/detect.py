@@ -11,6 +11,7 @@ from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, ResponseContainer
+from watermarks import Watermark
 
 
 class DetectPage(WidgetFrame, ResponseContainer):
@@ -23,17 +24,22 @@ class DetectPage(WidgetFrame, ResponseContainer):
 
     _response_cell: Optional[str] = None
 
+    mark: Watermark | None
+
     def __init__(
             self, app: App, master: tkinter.Misc | None = None,
             title: str = None,
-            watermark: Callable[[str], str] | None = None, mark_prob: float = 1.0,
+            watermark: Watermark | None = None, mark_prob: float = 1.0,
             questions=None
     ):
         # title
         self.title = title
 
         # random mark
-        self.mark = random.choices([watermark, None], weights=[mark_prob, 1 - mark_prob])[0]
+        self.mark = random.choices(
+            [watermark, None],
+            weights=[mark_prob, 1 - mark_prob]
+        )[0]
 
         # random question
         self.question_text = ''
@@ -338,7 +344,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
             return
 
         def watermark_worker():
-            wm = self.mark
+            wm = None if not self.mark else self.mark[1][1] if type(self.mark[1]) == type(tuple) else self.mark[1]
             wmr = wm(response) if wm is not None else response
 
             self.is_wm_yes_var.set(False)

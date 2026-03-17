@@ -1,7 +1,7 @@
 import random
 import threading
 import tkinter
-from tkinter import END, font
+from tkinter import END, font, StringVar
 from tkinter import ttk
 from tkinter.font import Font
 from tkinter.scrolledtext import ScrolledText
@@ -25,6 +25,8 @@ class DetectPage(WidgetFrame, ResponseContainer):
     _response_cell: Optional[str] = None
 
     mark: Watermark | None
+    mr: StringVar
+    wmr: StringVar
 
     def __init__(
             self, app: App, master: tkinter.Misc | None = None,
@@ -100,6 +102,9 @@ class DetectPage(WidgetFrame, ResponseContainer):
             wraplength=ins_wrap_l
         ).pack()
 
+        # model vars
+        self.mr = StringVar(value=None)
+        self.wmr = StringVar(value=None)
         # ai model frame
         model_frame = ttk.Frame(body, relief="sunken", padding=(5, 5))
         model_col = 1
@@ -343,13 +348,21 @@ class DetectPage(WidgetFrame, ResponseContainer):
             self.app.after(0, lambda: self.set_response_text(response))
             return
 
+        # set model response
+        self.mr.set(response)
+        self.wmr.set('')
+
         def watermark_worker():
             wm = None if not self.mark else self.mark[1][1] if type(self.mark[1]) == type(tuple) else self.mark[1]
             wmr = wm(response) if wm is not None else response
 
+            # reset user responses
             self.is_wm_yes_var.set(False)
             self.is_wm_no_var.set(False)
             self._response_correctness_var.set("")
+
+            # set watermarked model response
+            self.wmr.set(wmr)
 
             # update UI safely from main thread
             self.app.after(0, lambda: self.set_response_text(wmr, user_response_enabled=True))
@@ -394,7 +407,12 @@ class DetectPage(WidgetFrame, ResponseContainer):
             "t": self.timer.dtime().seconds,
             "question": self.question_text,
             "user_query": self.q_var.get(),
-            "model_response": self.text_var.get(),
+            "model_response": self.mr.get(),
+            "watermark": {
+                "name": self.mark[0],
+                "watermarked_model_response": self.wmr.get(),
+            } if self.mark is not None
+            else False,
             "user_survey":
                 {
                     "is_wm": True,

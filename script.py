@@ -8,8 +8,7 @@ from tkinter.font import Font
 from typing import Callable, Optional
 
 import certifi
-from google import genai
-from google.genai import Client
+import requests
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message
 
 import config as cfg
@@ -67,7 +66,7 @@ def marks() -> Watermarks:
             "Here below is the original text:"
             "\n\n\n"
             + s
-        ).text
+        )
     }
 
 
@@ -85,8 +84,24 @@ def apply_watermarks(text: str):
 
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
-client: Client
-model: str = 'gemini-flash-latest'
+
+
+def generation(q:str)->str:
+    # return client.models.generate_content(model=model, contents=q).text
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{config['model']}:generateContent"
+    params = {"key": config['genai_api_key']}
+
+    data = {
+        "contents": [
+            {"parts": [{"text": q}]}
+        ]
+    }
+
+    res = dict(requests.post(url, params=params, json=data).json())
+    cand = res['candidates'][0]
+    part = cand['parts'][0]
+    return part['text']
 
 
 @retry(
@@ -94,15 +109,15 @@ model: str = 'gemini-flash-latest'
     wait=wait_exponential_jitter(initial=1, max=10),
     retry=retry_if_exception_message(match=r"overloaded|503"),
 )
-def stubborn_generation(q: str):
+def stubborn_generation(q: str)->str:
     print(f"querying:\n\"{q}\"")
-    return client.models.generate_content(model=model, contents=q)
+    return generation(q)
 
 
 def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     def worker():
         try:
-            resp = stubborn_generation(q).text
+            resp = stubborn_generation(q)
             ok = True
         except Exception as e:
             resp = f"Error: {e}"
@@ -223,11 +238,8 @@ def setup_session(uuid: str, email: Optional[str]) -> SurveySession:
     cfg.load_from_file()
 
     db = firebase.init_db()
+    wtgb.init_model()
     cfg.load_from_fb(db)
-
-    global client, model
-    client = genai.Client(api_key=config['genai_api_key'])
-    model = config['model']
 
     return SurveySession(db=db, user_id=uuid, user_email=email)
 

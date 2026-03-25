@@ -142,10 +142,16 @@ class LoadingWidget(WidgetFrame):
             self.app.after(0, lambda r=result: self.on_complete(r) if self.on_complete else None)
 
     def _create_widgets(self):
-        ttk.Label(self, text="Loading...").pack()
+        self.load_label = ttk.Label(self, text="")
+        self.load_label.pack()
+
+    def _on_progress_update(self, action:str, **kwargs):
+        self.load_label.config(text=f"{action.capitalize()}...")
 
     def start(self, **kwargs):
         # launch background worker
         thread = threading.Thread(target=self._thread_worker, kwargs=kwargs)
         thread.start()
 
+    def post_progress(self, action: str = "loading", **kwargs):
+        self.app.after(0, lambda: self._on_progress_update(action=action, kwargs=kwargs))

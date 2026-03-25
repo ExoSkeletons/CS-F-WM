@@ -235,12 +235,17 @@ def start_session_ui(session: SurveySession):
 
 
 # heavy function. run on thread
-def setup_session(uuid: str, email: Optional[str]) -> SurveySession:
+def setup_session(uuid: str, email: Optional[str], post_action: Callable[[str], None]) -> SurveySession:
+    post_action('loading config')
     cfg.load_from_file()
 
+    post_action('initializing database')
     db = firebase.init_db()
-    wtgb.init_model()
+    post_action('loading config')
     cfg.load_from_fb(db)
+
+    post_action('building models (this may take a while)')
+    wtgb.init_model()
 
     return SurveySession(db=db, user_id=uuid, user_email=email)
 
@@ -251,7 +256,10 @@ class AP(AuthPage):
         config_enable(loading_widget, True)
         loading_widget.pack()
 
-        loading_widget.load = lambda kwargs: setup_session(kwargs['uuid'], kwargs['email'])
+        loading_widget.load = lambda kwargs: setup_session(
+            kwargs['uuid'], kwargs['email'],
+            lambda a: loading_widget.post_progress(a)
+        )
         loading_widget.on_complete = lambda session: start_session_ui(session)
         loading_widget.start(uuid=uuid, email=email)
 

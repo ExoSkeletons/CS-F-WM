@@ -14,7 +14,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_i
 
 import config as cfg
 from config import config
-from services import firebase
+from services import firebase, wtgb
 from ui.app import App, WidgetFrame, LoadingWidget, config_enable
 from ui.app import data_dir_path
 from ui.auth import TermsPage, AuthPage
@@ -32,6 +32,7 @@ def marks() -> Watermarks:
         "space#": lambda s: s.replace(' ', '#'),
         "ab": lambda s: s.replace('A', 'B').replace('a', 'b'),
         "phishing": lambda s: s.replace("m", "rn"),
+        "wtgb": lambda s: wtgb.watermark(s),
         "space-replace": lambda s: s.replace(' ', random.choice(['\u2004', '\u2005', '\u2006', '\u2007', '\u2008'])),
         "acrostic": lambda s: stubborn_generation(
             "consider the poem technique of \'acrostic\', where the leading letters of sentence in the poem "

@@ -1,4 +1,3 @@
-from datetime import datetime
 import warnings
 
 from models.watermark_faster import watermark_model
@@ -25,42 +24,7 @@ def precise_watermark_detect(raw):
     return f"{confidence:.2f}%"
 
 
-def watermarking_test():
-    # init
-    print("init...")
-    ti0 = datetime.now()
-    print("nltk")
-    import nltk
-    nltk.download('punkt')
-    print("model")
-    model = watermark_model(language='English', mode='embed', tau_word=0.8, lamda=0.83)
-    ti = datetime.now()
-    print("init done.")
-
-    # watermark
-    ori_text = 'Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to sea as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the ocean with me.'
-
-    print("watermarking...")
-    tw0 = datetime.now()
-    wm_text = (model.embed(ori_text)
-               .replace(' .', '.')
-               .replace(' ,', ',')
-               .replace(' ;', ',')
-               .replace(' \' s ' , '\'s ')
-               .replace(' \'', '\'')
-               )
-    tw = datetime.now()
-    print(wm_text)
-
-    print()
-
-    print(f'init took {ti - ti0}s, wm took {tw - tw0}s')
-
-
 if __name__ == "__main__":
-    watermarking_test()
-    exit(0)
-
     opts = get_parser_main_model().parse_args()
     model = watermark_model(language=opts.language, mode=opts.mode, tau_word=opts.tau_word, lamda=opts.lamda)
 

@@ -44,4 +44,5 @@ def post_process(wm_text: str) -> str:
         .replace(' ;', ',')
         .replace(' \' s ', '\'s ')
         .replace(' \'', '\'')
+        .replace('\' ','\'')
     )

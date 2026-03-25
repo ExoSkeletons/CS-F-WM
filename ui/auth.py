@@ -69,9 +69,6 @@ class AuthPage(WidgetFrame):
         pass
 
     def login_callback(self, user):
-        self.app.lift()
-        self.app.focus_force()
-        self.app.attributes('-topmost', True)
-        self.app.attributes('-topmost', False)
+        self.app.raise_window()
 
         self.on_login(user['user_id'], user['email'])

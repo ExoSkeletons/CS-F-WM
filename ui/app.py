@@ -89,6 +89,12 @@ class App(tk.Tk):
 
         frame.tkraise()
 
+    def raise_window(self):
+        self.lift()
+        self.focus_force()
+        self.attributes('-topmost', True)
+        self.attributes('-topmost', False)
+
     def __setup_dimensions(self):
         window_width = 960
         window_height = 540

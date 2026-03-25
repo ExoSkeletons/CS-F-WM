@@ -253,6 +253,7 @@ if __name__ == "__main__":
     loading_widget.pack()
     loading_widget.pack_forget()
     root.set_frame(auth_page)
+    root.raise_window()
 
     root.mainloop()  # blocking call
 

@@ -171,8 +171,8 @@ def start_session_ui(session: SurveySession):
     #     detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
     #     pager.add_page(detect_page, title=f"Page {i+1}", validator=detect_page.validate)
 
-    wm = random.choice(m)
-    # print(wm[0])
+    wm = (name, _) = random.choice(m)
+    print(name)
 
     page_amount = 4
     wm_amount = 2

@@ -231,6 +231,7 @@ def start_session_ui(session: SurveySession):
     terms_frame.on_accepted = on_accepted
 
     root.set_frame(welcome_frame)
+    root.raise_window()
 
 
 # heavy function. run on thread

@@ -100,7 +100,7 @@ def generation(q:str)->str:
 
     res = dict(requests.post(url, params=params, json=data).json())
     cand = res['candidates'][0]
-    part = cand['parts'][0]
+    part = cand['content']['parts'][0]
     return part['text']
 
 

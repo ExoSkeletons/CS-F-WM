@@ -5,7 +5,7 @@ import threading
 from os import system
 from tkinter import ttk
 from tkinter.font import Font
-from typing import Callable
+from typing import Callable, Optional
 
 import certifi
 from google import genai
@@ -218,7 +218,7 @@ def start_session_ui(session: SurveySession):
 
 
 # heavy function. run on thread
-def setup_session(uuid: str, email: str | None) -> SurveySession:
+def setup_session(uuid: str, email: Optional[str]) -> SurveySession:
     cfg.load_from_file()
 
     db = firebase.init_db()

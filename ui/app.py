@@ -4,7 +4,7 @@ import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import Misc, TclError
-from typing import Callable, Mapping, Any
+from typing import Callable, Mapping, Any, Union, Optional
 
 
 def resource_path(relative_path):
@@ -55,7 +55,7 @@ def config_enable(widget: tk.Misc, enabled: bool):
 
 class App(tk.Tk):
     __submits: dict[Misc] = {}
-    __focus_next: dict[tk.Entry | ttk.Entry | tk.Text, Misc] = {}
+    __focus_next: dict[Union[tk.Entry, ttk.Entry, tk.Text], Misc] = {}
 
     def __bind_return(self):
         # setup return (enter) binder
@@ -105,7 +105,7 @@ class App(tk.Tk):
         # set the position of the window to the center of the screen
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-    def set_focus_next(self, entry: tk.Entry | ttk.Entry | tk.Text, f_next: Misc):
+    def set_focus_next(self, entry: Union[tk.Entry, ttk.Entry, tk.Text], f_next: Misc):
         self.__focus_next[entry] = f_next
 
     def set_on_submit(self, w: Misc, command):
@@ -113,7 +113,7 @@ class App(tk.Tk):
 
 
 class WidgetFrame(ttk.Frame):
-    def __init__(self, app: App, master: Misc | None = None):
+    def __init__(self, app: App, master: Optional[Misc] = None):
         super().__init__(master or app.container)
         self.app = app
         self._create_widgets()
@@ -127,7 +127,7 @@ class WidgetFrame(ttk.Frame):
 
 class LoadingWidget(WidgetFrame):
     on_complete: Callable[[object], None] = None
-    load: Callable[[Mapping[str, Any | None] | None], object] | None = None
+    load: Optional[Callable[[Optional[Mapping[str, Optional[Any]]]], object]] = None
 
     def _thread_worker(self, **kwargs):
         if not self.load: return

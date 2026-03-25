@@ -24,14 +24,14 @@ class DetectPage(WidgetFrame, ResponseContainer):
 
     _response_cell: Optional[str] = None
 
-    mark: Watermark | None
+    mark: Optional[Watermark]
     mr: StringVar
     wmr: StringVar
 
     def __init__(
-            self, app: App, master: tkinter.Misc | None = None,
+            self, app: App, master: Optional[tkinter.Misc] = None,
             title: str = None,
-            watermark: Watermark | None = None, mark_prob: float = 1.0,
+            watermark: Optional[Watermark] = None, mark_prob: float = 1.0,
             questions=None
     ):
         # title
@@ -317,7 +317,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
             self.tl.lift()
             self.tt.lower()
 
-    def set_response_text(self, text: str | None, user_response_enabled: bool = False):
+    def set_response_text(self, text: Optional[str], user_response_enabled: bool = False):
         # update user instructions
         if user_response_enabled:
             self.question_frame.pack_forget()
@@ -342,7 +342,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         # clear query form
         self._query_form.delete('1.0', END)
 
-    def response(self, response: str | None, ok: bool = True):
+    def response(self, response: Optional[str], ok: bool = True):
         # update model response text
         if response is None or not ok:
             self.app.after(0, lambda: self.set_response_text(response))

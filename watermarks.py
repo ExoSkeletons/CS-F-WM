@@ -1,7 +1,7 @@
-from typing import Callable, Mapping
+from typing import Callable, Mapping, Union, Optional
 
 Marker = Callable[[str], str]
 Detector = Callable[[str], float]
 
-Watermark = tuple[str, Marker | None | tuple[Marker, Detector | None]]
-Watermarks = Mapping[str, Marker | None | tuple[Marker, Detector | None]]
+Watermark = tuple[str, Union[Marker, None, tuple[Marker, Optional[Detector]]]]
+Watermarks = Mapping[str, Union[Marker, None, tuple[Marker, Optional[Detector]]]]

@@ -2,7 +2,7 @@ import tkinter as tk
 import uuid
 from datetime import datetime, timedelta
 from tkinter import ttk, Misc
-from typing import Callable
+from typing import Callable, Optional
 
 from google.cloud.firestore_v1 import Client
 
@@ -55,7 +55,7 @@ class ResponseContainer:
 
 
 class SurveySession:
-    def __init__(self, db: Client, user_id: str, user_email: str | None):
+    def __init__(self, db: Client, user_id: str, user_email: Optional[str]):
         self.db = db
         self.session_id = str(uuid.uuid4())
         self.user_id = user_id
@@ -103,7 +103,7 @@ class SurveySession:
 
 class PagedFrame(WidgetFrame):
     _pages: list[WidgetFrame] = []
-    _current_index: int | None = None
+    _current_index: Optional[int] = None
 
     _validators: dict[WidgetFrame, Callable[[], bool]] = {}
     _on_next_callbacks: dict[WidgetFrame, Callable[[int, WidgetFrame], None]] = {}
@@ -114,7 +114,7 @@ class PagedFrame(WidgetFrame):
     _next_btn: ttk.Button
 
     def __init__(
-            self, app: App, master: Misc | None = None,
+            self, app: App, master: Optional[Misc] = None,
             prev_text: str = "Prev", next_text: str = "Next",
             allow_tab_navigation=True,
             allow_prev=True,
@@ -156,7 +156,7 @@ class PagedFrame(WidgetFrame):
     def index(self):
         return 0 if self._current_index is None else self._current_index
 
-    def select_page(self, index: int | None = None):
+    def select_page(self, index: Optional[int] = None):
         if index is None or index < 0 or index >= len(self._pages):
             self._current_index = None
         else:
@@ -169,8 +169,8 @@ class PagedFrame(WidgetFrame):
                     self.notebook.tab(self._current_index, state="normal")
             self.notebook.select(index)
 
-    def add_page(self, frame: WidgetFrame, title: str = None, validator: Callable[[], bool] | None = None,
-                 on_next: Callable[[int, WidgetFrame], None] | None = None):
+    def add_page(self, frame: WidgetFrame, title: str = None, validator: Optional[Callable[[], bool]] = None,
+                 on_next: Optional[Callable[[int, WidgetFrame], None]] = None):
         index = len(self._pages)
         self._pages.append(frame)
         if validator: self._validators[frame] = validator

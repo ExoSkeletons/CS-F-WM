@@ -86,7 +86,7 @@ def apply_watermarks(text: str):
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
 
-def generation(q:str)->str:
+def generation(q: str) -> str:
     # return client.models.generate_content(model=model, contents=q).text
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{config['model']}:generateContent"
@@ -109,7 +109,7 @@ def generation(q:str)->str:
     wait=wait_exponential_jitter(initial=1, max=10),
     retry=retry_if_exception_message(match=r"overloaded|503"),
 )
-def stubborn_generation(q: str)->str:
+def stubborn_generation(q: str) -> str:
     print(f"querying:\n\"{q}\"")
     return generation(q)
 

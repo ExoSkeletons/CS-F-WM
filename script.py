@@ -7,6 +7,12 @@ from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Optional
 
+# patch console out to devnull to avoid crashing logging if no console is attached
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w")
+
 import certifi
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message

@@ -296,7 +296,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         self.q_var.set(q)
 
         # clear responses
-        self.set_response_text("Generating Response...")
+        self.set_response_text("Generating Response... (This can take a while)")
 
         # disable query form
         config_enable(self.submit_frame, False)
@@ -368,7 +368,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
             self.app.after(0, lambda: self.set_response_text(wmr, user_response_enabled=True))
 
         if config['show_watermarking']:
-            self.set_response_text("Watermarking...")
+            self.set_response_text("Watermarking... (This will take a while)")
 
         threading.Thread(target=watermark_worker, daemon=True).start()
 

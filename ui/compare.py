@@ -15,7 +15,7 @@ class ComparePage(WidgetFrame):
     _font_size = 9
 
     class ResponseFrame(ttk.Frame):
-        def __init__(self, master: tkinter.Misc | None):
+        def __init__(self, master: Optional[tkinter.Misc]):
             super().__init__(master)
 
             self.text_var = tkinter.StringVar()
@@ -37,8 +37,8 @@ class ComparePage(WidgetFrame):
 
     response_frames: list[ResponseFrame] = []
 
-    def __init__(self, watermarks: list[Callable[[str], str]], app: App, master: tkinter.Misc | None = None):
-        self.marks: list[Callable[[str], str] | None] = list(watermarks)
+    def __init__(self, watermarks: list[Callable[[str], str]], app: App, master: Optional[tkinter.Misc] = None):
+        self.marks: list[Optional[Callable[[str], str]]] = list(watermarks)
         self.marks.append(None)
 
         super().__init__(app, master)
@@ -105,7 +105,7 @@ class ComparePage(WidgetFrame):
         # fire listener
         if self.on_submit: self.on_submit(q)
 
-    def response(self, response: str | None, apply_marks=True):
+    def response(self, response: Optional[str], apply_marks=True):
         # update responses
         _response_font = font.Font(size=self._font_size)
         enabled = response is not None

@@ -1,5 +1,45 @@
+import os
+import sys
 from datetime import datetime
 from typing import Optional
+
+import spacy
+
+MODEL_NAME = "en_core_web_sm"
+MODEL_VERSION = "3.5.0"
+
+
+def resolve_model_path():
+    model_dir = f"{MODEL_NAME}-{MODEL_VERSION}"
+    # PyInstaller onefile
+    if getattr(sys, "frozen", False):
+        base_path = sys._MEIPASS
+        return os.path.join(base_path, MODEL_NAME, model_dir)
+
+    # Dev environment (venv / site-packages)
+    import en_core_web_sm
+    pkg_path = os.path.dirname(en_core_web_sm.__file__)
+    return os.path.join(pkg_path, model_dir)
+
+
+MODEL_PATH = resolve_model_path()
+
+print("MODEL PATH:", MODEL_PATH)
+print("FILES:", os.listdir(MODEL_PATH))
+
+_real_load = spacy.load
+
+
+def patched_load(name, *args, **kwargs):
+    if name == MODEL_NAME:
+        return _real_load(MODEL_PATH, *args, **kwargs)
+    return _real_load(name, *args, **kwargs)
+
+
+spacy.load = patched_load
+
+print("MODEL PATH:", MODEL_PATH)
+print("FILES:", os.listdir(MODEL_PATH))
 
 from Text_Watermark.models.watermark_faster import watermark_model
 
@@ -41,8 +81,10 @@ def post_process(wm_text: str) -> str:
         wm_text
         .replace(' .', '.')
         .replace(' ,', ',')
-        .replace(' ;', ',')
+        .replace(' ;', ';')
+        .replace(' ?', '?')
+        .replace(' !', '!')
         .replace(' \' s ', '\'s ')
         .replace(' \'', '\'')
-        .replace('\' ','\'')
+        .replace('\' ', '\'')
     )

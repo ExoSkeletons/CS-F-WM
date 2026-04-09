@@ -145,8 +145,9 @@ class LoadingWidget(WidgetFrame):
     def _thread_worker(self, **kwargs):
         if not self.load: return
         result = self.load(kwargs)
-        if result:  # post result on ui thread
-            self.app.after(0, lambda r=result: self.on_complete(r) if self.on_complete else None)
+        # post result on ui thread
+        if self.on_complete:
+            self.app.after(0, lambda c=self.on_complete, r=result: c(r))
 
     def _create_widgets(self):
         self.load_label = ttk.Label(self, text="")

@@ -66,11 +66,6 @@ class SurveySession:
             .document(self.session_id)
         )
 
-        # self.ref.set({
-        #     "user_id": user_id,
-        # })
-        self.save_session_id_uuid_association()
-
     def save_accept_terms(self):
         self.ref.set({'accepted_terms': True})
 

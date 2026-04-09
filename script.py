@@ -7,6 +7,8 @@ from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Optional
 
+from google.cloud.firestore_v1 import Client
+
 # patch console out to devnull to avoid crashing logging if no console is attached
 if sys.stdout is None:
     sys.stdout = open(os.devnull, "w")
@@ -104,10 +106,19 @@ def generation(q: str) -> str:
         ]
     }
 
-    res = dict(requests.post(url, params=params, json=data).json())
-    cand = res['candidates'][0]
-    part = cand['content']['parts'][0]
-    return part['text']
+    res = requests.post(url, params=params, json=data)
+
+    d = dict(res.json())
+    if 'candidates' in d.keys():
+        cand = d['candidates'][0]
+        parts = cand['content']['parts']
+    elif 'parts' in d.keys():
+        parts = d['parts']
+    else:
+        raise RuntimeError(f"Could not get response text.\ndata: {d}")
+    part = parts[0]
+    text = str(part['text'])
+    return text
 
 
 @retry(
@@ -126,7 +137,7 @@ def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
             resp = stubborn_generation(q)
             ok = True
         except Exception as e:
-            resp = f"Error: {e}"
+            resp = f"Error Generating response.\n{e.__repr__()}"
             ok = False
 
         # update UI safely from main thread
@@ -136,9 +147,11 @@ def threaded_query(q: str, response_callback: Callable[[str, bool], None]):
     threading.Thread(target=worker, daemon=True).start()
 
 
-def start_session_ui(session: SurveySession):
-    print(f"user {session.user_email} {session.user_id} login")
+root: App
+db: Client
 
+
+def start_survey_ui(session: SurveySession):
     pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
     intro_frame = WidgetFrame(root, pager.notebook)
@@ -224,50 +237,72 @@ def start_session_ui(session: SurveySession):
 
     pager.select_page(0)
 
-    # welcome
-    welcome_frame = WidgetFrame(root)
-    ttk.Label(welcome_frame, text=f"Welcome, {session.user_email}!\n", font=Font(size=12)).pack()
-    terms_frame = TermsPage(root, welcome_frame)
-    terms_frame.pack()
-
-    def on_accepted():
-        session.save_accept_terms()
-        root.set_frame(pager)
-
-    terms_frame.on_accepted = on_accepted
-
-    root.set_frame(welcome_frame)
+    root.set_frame(pager)
     root.raise_window()
 
 
 # heavy function. run on thread
-def setup_session(uuid: str, email: Optional[str], post_action: Callable[[str], None]) -> SurveySession:
+def setup_data(post_action: Callable[[str], None]):
     post_action('loading config')
     cfg.load_from_file()
 
     post_action('initializing database')
+    global db
     db = firebase.init_db()
     post_action('loading config')
     cfg.load_from_fb(db)
 
+    return
+
+
+# heavy function. run on thread
+def setup_user_session(
+        uuid: str, email: Optional[str],
+        post_action: Callable[[str], None]
+) -> SurveySession:
+    post_action('initialising survey')
+    session = SurveySession(db=db, user_id=uuid, user_email=email)
+
+    session.save_accept_terms()
+    session.save_session_id_uuid_association()
+
     post_action('building models (this may take a while)')
     wtgb.init_model()
 
-    return SurveySession(db=db, user_id=uuid, user_email=email)
+    return session
 
 
 class AP(AuthPage):
-    def on_login(self, uuid, email):
-        config_enable(self, False)
-        config_enable(loading_widget, True)
-        loading_widget.pack()
+    def _create_widgets(self):
+        super()._create_widgets()
+        self.lw = LoadingWidget(self.app, self)
+        self.lw.pack()
+        self.lw.pack_forget()
 
-        loading_widget.load = lambda kwargs: setup_session(
+    def on_login(self, uuid, email):
+        print(f"user {email} {uuid} login")
+
+        # load session
+        print("starting survey setup")
+        config_enable(self, False)
+        config_enable(self.lw, True)
+        self.lw.pack()
+
+        self.lw.load = lambda kwargs: setup_user_session(
             kwargs['uuid'], kwargs['email'],
-            lambda a: loading_widget.post_progress(a)
+            lambda a, l=self.lw: l.post_progress(a)
         )
-        loading_widget.on_complete = lambda session: start_session_ui(session)
-        loading_widget.start(uuid=uuid, email=email)
+        self.lw.on_complete = lambda session: start_survey_ui(session)
+        self.lw.start(uuid=uuid, email=email)
+
+
+def start_user_ui():
+    auth_page = AP(root)
+
+    terms_frame = TermsPage(root)
+    terms_frame.on_accepted = lambda: root.set_frame(auth_page)
+
+    root.set_frame(terms_frame)
 
 
 if __name__ == "__main__":
@@ -276,11 +311,15 @@ if __name__ == "__main__":
 
     root = App()
 
-    auth_page = AP(root)
-    loading_widget = LoadingWidget(root, auth_page)
-    loading_widget.pack()
-    loading_widget.pack_forget()
-    root.set_frame(auth_page)
+    splash_frame = WidgetFrame(root)
+    splash_frame.pack()
+    lw = splash_frame.lw = LoadingWidget(root, splash_frame)
+    lw.load = lambda _: setup_data(lambda a, l=lw: l.post_progress(a))
+    lw.pack()
+    lw.on_complete = lambda _: start_user_ui()
+    lw.start()
+
+    root.set_frame(splash_frame)
     root.raise_window()
 
     root.mainloop()  # blocking call

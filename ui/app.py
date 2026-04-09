@@ -57,6 +57,8 @@ class App(tk.Tk):
     __submits: dict[Misc] = {}
     __focus_next: dict[Union[tk.Entry, ttk.Entry, tk.Text], Misc] = {}
 
+    frame: Optional[tk.Frame] = None
+
     def __bind_return(self):
         # setup return (enter) binder
         def on_return(event):
@@ -83,11 +85,16 @@ class App(tk.Tk):
 
         self.title("Welcome")
 
-    def set_frame(self, frame):
-        frame.grid(row=0, column=0)
-        frame.reset_widgets()
+    def set_frame(self, frame: tk.Frame):
+        if self.frame:
+            self.frame.grid_forget()
 
-        frame.tkraise()
+        if frame:
+            frame.grid(row=0, column=0)
+            frame.reset_widgets()
+            frame.tkraise()
+
+        self.frame = frame
 
     def raise_window(self):
         self.lift()

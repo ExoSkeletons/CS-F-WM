@@ -24,9 +24,6 @@ def resolve_model_path():
 
 MODEL_PATH = resolve_model_path()
 
-print("MODEL PATH:", MODEL_PATH)
-print("FILES:", os.listdir(MODEL_PATH))
-
 _real_load = spacy.load
 
 
@@ -37,9 +34,6 @@ def patched_load(name, *args, **kwargs):
 
 
 spacy.load = patched_load
-
-print("MODEL PATH:", MODEL_PATH)
-print("FILES:", os.listdir(MODEL_PATH))
 
 from Text_Watermark.models.watermark_faster import watermark_model
 

@@ -151,7 +151,7 @@ root: App
 db: Client
 
 
-def start_survey_ui(session: SurveySession):
+def start_survey_ui(session: SurveySession, wm: Watermark):
     pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
 
     intro_frame = WidgetFrame(root, pager.notebook)
@@ -178,19 +178,7 @@ def start_survey_ui(session: SurveySession):
         input("Could not load questions.")
         exit(1)
 
-    m: list[Watermark] = []
-    for am in active_watermarks().items(): m.append(am)
-
-    mark_prob = 1.0
-    random.seed(session.user_id)
-
-    # random.shuffle(m)
-    # for i, (name, wm) in enumerate(m):
-    #     detect_page = DetectPage(root, pager.notebook, watermark=wm, mark_prob=mark_prob, questions=questions)
-    #     detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
-    #     pager.add_page(detect_page, title=f"Page {i+1}", validator=detect_page.validate)
-
-    wm = (name, _) = random.choice(m)
+    (name, _) = wm
     print(name)
 
     page_amount = 4
@@ -242,58 +230,80 @@ def start_survey_ui(session: SurveySession):
 
 
 # heavy function. run on thread
-def setup_data(post_action: Callable[[str], None]):
-    post_action('loading config')
+def setup_data(log: Callable[[str], None]):
+    log('loading config')
     cfg.load_from_file()
 
-    post_action('initializing database')
+    log('initializing database')
     global db
     db = firebase.init_db()
-    post_action('loading config')
+    log('loading config')
     cfg.load_from_fb(db)
 
     return
 
 
 # heavy function. run on thread
-def setup_user_session(
-        uuid: str, email: Optional[str],
-        post_action: Callable[[str], None]
-) -> SurveySession:
-    post_action('initialising survey')
+def setup_user_session(uuid: str, email: Optional[str], log: Callable[[str], None]) -> SurveySession:
+    log('initialising survey')
     session = SurveySession(db=db, user_id=uuid, user_email=email)
 
     session.save_accept_terms()
     session.save_session_id_uuid_association()
 
-    post_action('building models (this may take a while)')
+    log('building models (this may take a while)')
     wtgb.init_model()
 
     return session
 
 
-class AP(AuthPage):
+# heavy function. run on thread
+def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
+    log("setting up marks")
+    m: list[Watermark] = []
+    for am in active_watermarks().items(): m.append(am)
+    random.seed(uuid)
+
+    log("randomizing")
+    # setup watermark randomizer with user as seed
+    wm_rand = random.Random(uuid)
+    wm = wm_rand.choice(m)
+
+    return wm
+
+
+class AP(WidgetFrame):
     def _create_widgets(self):
         super()._create_widgets()
+        self.ap = AuthPage(self.app, self)
+        self.ap.pack()
+        self.ap.on_login = self.on_login
+
         self.lw = LoadingWidget(self.app, self)
+        self.lw.load = lambda kwargs: self.setup(**kwargs)
+        self.lw.on_complete = lambda res: start_survey_ui(**res)
+
         self.lw.pack()
+        # hide loader widget until used
         self.lw.pack_forget()
 
     def on_login(self, uuid, email):
         print(f"user {email} {uuid} login")
 
-        # load session
-        print("starting survey setup")
+        # start loading
         config_enable(self, False)
         config_enable(self.lw, True)
         self.lw.pack()
-
-        self.lw.load = lambda kwargs: setup_user_session(
-            kwargs['uuid'], kwargs['email'],
-            lambda a, l=self.lw: l.post_progress(a)
-        )
-        self.lw.on_complete = lambda session: start_survey_ui(session)
         self.lw.start(uuid=uuid, email=email)
+
+    def setup(self, uuid, email):
+        print("starting setup")
+        log = self.lw.post_progress
+        session = setup_user_session(uuid, email, log)
+        wm = setup_watermark(uuid, log)
+        print("setup complete")
+
+        return {'session': session, 'wm': wm}
 
 
 def start_user_ui():

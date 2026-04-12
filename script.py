@@ -266,8 +266,10 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     wm_rand = random.Random(uuid)
     wm = wm_rand.choice(m)
 
-    log('building models (this can take up to a few minutes)')
-    wtgb.init_model()
+    # todo: replace with mapping of wm->setup function | None
+    if wm[0] == "wtgb":
+        log('building models (this can take up to a few minutes)')
+        wtgb.init_model()
 
     return wm
 

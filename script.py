@@ -251,9 +251,6 @@ def setup_user_session(uuid: str, email: Optional[str], log: Callable[[str], Non
     session.save_accept_terms()
     session.save_session_id_uuid_association()
 
-    log('building models (this may take a while)')
-    wtgb.init_model()
-
     return session
 
 
@@ -268,6 +265,9 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     # setup watermark randomizer with user as seed
     wm_rand = random.Random(uuid)
     wm = wm_rand.choice(m)
+
+    log('building models (this can take up to a few minutes)')
+    wtgb.init_model()
 
     return wm
 

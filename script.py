@@ -95,6 +95,7 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 
 
 def generation(q: str) -> str:
+    # had to downgrade from this to direct http request, due to versions
     # return client.models.generate_content(model=model, contents=q).text
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{config['model']}:generateContent"

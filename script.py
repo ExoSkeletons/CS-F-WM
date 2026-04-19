@@ -259,11 +259,11 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     log("setting up marks")
     m: list[Watermark] = []
     for am in active_watermarks().items(): m.append(am)
-    random.seed(uuid)
 
     log("randomizing")
     # setup watermark randomizer with user as seed
-    wm_rand = random.Random(uuid)
+    wm_rand = random.Random()
+    wm_rand.seed(uuid)
     wm = wm_rand.choice(m)
 
     # todo: replace with mapping of wm->setup function | None

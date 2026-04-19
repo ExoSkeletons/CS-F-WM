@@ -53,8 +53,8 @@ class AuthPage(WidgetFrame):
     user_id: str
 
     def _create_widgets(self):
-        ttk.Label(self, text="Welcome!", font=Font(size=18, weight="bold")).pack()
-        ttk.Label(self, text="Please Login", font=Font(size=14, weight='bold')).pack()
+        ttk.Label(self, text="Welcome!", font=Font(size=22, weight="bold")).pack()
+        ttk.Label(self, text="Please Login to continue:", font=Font(size=12, weight='bold')).pack()
         # ttk.Label(self, text="TBI").pack()
         ttk.Button(self, text="Log in with Google", command=lambda: self.login_async()).pack()
         # ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()

@@ -92,15 +92,20 @@ class DetectPage(WidgetFrame, ResponseContainer):
             font=Font(size=self._font_size),
             justify="left", anchor="nw", wraplength=ins_wrap_l
         ).pack(expand=True, fill="both")
+        # question
         ttk.Label(self.question_frame, text="question:").pack()
-        ttk.Label(
-            self.question_frame, text=self.question_text,
+        q_label = tkinter.Text(
+            self.question_frame,
             font=font.Font(
                 size=self._font_size,
                 weight="bold", slant="italic"
             ),
-            wraplength=ins_wrap_l
-        ).pack()
+            wrap='word', width=int(ins_wrap_l / 10), height=4
+        )
+        config_style_as_label(q_label, self.app)
+        set_text(q_label, self.question_text)
+        config_enable(q_label, False)
+        q_label.pack()
 
         # model vars
         self.mr = StringVar(value=None)

@@ -178,9 +178,6 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         input("Could not load questions.")
         exit(1)
 
-    (name, _) = wm
-    print(name)
-
     page_amount = 4
     wm_amount = 2
     lf = [False for _ in range(page_amount - wm_amount)]
@@ -265,6 +262,9 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     wm_rand = random.Random()
     wm_rand.seed(uuid)
     wm = wm_rand.choice(m)
+
+    (name, _) = wm
+    print(name)
 
     # todo: replace with mapping of wm->setup function | None
     if wm[0] == "wtgb":

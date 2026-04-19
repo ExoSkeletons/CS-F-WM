@@ -228,13 +228,13 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
 
 # heavy function. run on thread
 def setup_data(log: Callable[[str], None]):
-    log('loading config')
+    log('loading')
     cfg.load_from_file()
 
-    log('initializing database')
+    log('connecting to database')
     global db
     db = firebase.init_db()
-    log('loading config')
+    log('loading')
     cfg.load_from_fb(db)
 
     return
@@ -242,7 +242,7 @@ def setup_data(log: Callable[[str], None]):
 
 # heavy function. run on thread
 def setup_user_session(uuid: str, email: Optional[str], log: Callable[[str], None]) -> SurveySession:
-    log('initialising survey')
+    log('building survey')
     session = SurveySession(db=db, user_id=uuid, user_email=email)
 
     session.save_accept_terms()
@@ -257,7 +257,7 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     m: list[Watermark] = []
     for am in active_watermarks().items(): m.append(am)
 
-    log("randomizing")
+    # log("randomizing")
     # setup watermark randomizer with user as seed
     wm_rand = random.Random()
     wm_rand.seed(uuid)
@@ -267,7 +267,7 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     print(name)
 
     # todo: replace with mapping of wm->setup function | None
-    if wm[0] == "wtgb":
+    if name == "wtgb":
         log('building models (this can take up to a few minutes)')
         wtgb.init_model()
 

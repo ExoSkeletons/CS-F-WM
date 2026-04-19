@@ -53,6 +53,10 @@ def config_enable(widget: tk.Misc, enabled: bool):
         pass
 
 
+def config_style_as_label(w: tk.Text, root: tk.Tk):
+    w.configure(bg=root.cget("bg"), fg='black', relief='flat')
+
+
 class App(tk.Tk):
     __submits: dict[Misc] = {}
     __focus_next: dict[Union[tk.Entry, ttk.Entry, tk.Text], Misc] = {}

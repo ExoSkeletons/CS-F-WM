@@ -8,7 +8,7 @@ from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
 from config import config
-from ui.app import App, WidgetFrame, config_enable, set_text
+from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, ResponseContainer
 from watermarks import Watermark
@@ -128,11 +128,8 @@ class DetectPage(WidgetFrame, ResponseContainer):
         self.tt.grid(row=0, column=0, sticky="nsew")
         # text label (non-editable)
         # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
-        self.tl = tkinter.Text(
-            self.scroll.content, wrap="word",
-            bg=self.app.cget("bg"), fg="black", font=response_font,
-            relief="flat"
-        )
+        self.tl = tkinter.Text(self.scroll.content, wrap="word", font=response_font)
+        config_style_as_label(self.tl, self.app)
         config_enable(self.tl, False)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tl, self.text_var.get(), force=True))
         self.tl.grid(row=0, column=0, sticky="nsew")

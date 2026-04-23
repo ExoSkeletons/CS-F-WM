@@ -79,9 +79,9 @@ class SurveySession:
         self.ref.set({'accepted_terms': True}, merge=True)
 
     def save_demographics(self, data: dict):
-        self.ref.update({
+        self.ref.set({
             "demographics": data,
-        })
+        }, merge=True)
 
     def save_completed(self, at: datetime):
         self.ref.set({'completed': str(at)}, merge=True)

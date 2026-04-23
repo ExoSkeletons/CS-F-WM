@@ -294,6 +294,12 @@ class DetectPage(WidgetFrame, ResponseContainer):
         q = self._query_form.get('1.0', END)
         if not q.strip(): return
 
+        # validity check
+        for c in 'אבגדהוזחטיכלמנסעמצקרשתךןפץ':
+            if c in q:
+                self.set_response_error("Please ask in English only.")
+                return
+
         # set query label
         self.q_var.set(q)
 
@@ -349,10 +355,17 @@ class DetectPage(WidgetFrame, ResponseContainer):
         # clear query form
         self._query_form.delete('1.0', END)
 
+    def set_response_error(self, error: str):
+        self.app.after(0, lambda: self.set_response_text(
+            error,
+            user_query_enabled=True,
+            user_response_enabled=False
+        ))
+
     def response(self, response: Optional[str], ok: bool = True):
         # update model response text
         if response is None or not ok:
-            self.app.after(0, lambda: self.set_response_text(response, user_query_enabled=True, user_response_enabled=False))
+            self.set_response_error(response)
             return
 
         # set model response

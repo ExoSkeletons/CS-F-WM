@@ -61,13 +61,16 @@ class SurveySession:
         self.user_id = user_id
         self.user_email = user_email
 
+        created = datetime.now()
+
         self.ref = (
             db.collection("responses")
-            .document(self.session_id)
+            .document(f'{created}-{self.session_id}')
         )
         self.ref.set(
             {
                 'session-id': self.session_id,
+                'created': created
             },
             merge=True
         )
@@ -79,6 +82,9 @@ class SurveySession:
         self.ref.update({
             "demographics": data,
         })
+
+    def save_completed(self, at: datetime):
+        self.ref.set({'completed': str(at)})
 
     def save_question(self, page_index: int, data: dict):
         self.ref.collection("pages").document(str(page_index)).set({

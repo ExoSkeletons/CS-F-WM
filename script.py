@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import threading
+from datetime import datetime
 from os import system
 from tkinter import ttk
 from tkinter.font import Font
@@ -210,10 +211,14 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
     # for _ in range(2):
     #     pager.add_page(WidgetFrame(root, pager.notebook))
 
+    def conclude_session(demo_data):
+        session.save_demographics(demo_data)
+        session.save_completed(datetime.now())
+
     demo_survey_page = DemoPage(root, pager.notebook)
     pager.add_page(
         demo_survey_page, "Conclusion",
-        on_next=lambda _, p: session.save_demographics(p.get_data())
+        on_next=lambda _, p: conclude_session(p.get_data())
     )
 
     end_frame = WidgetFrame(root, pager.notebook)

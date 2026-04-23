@@ -84,7 +84,7 @@ class SurveySession:
         })
 
     def save_completed(self, at: datetime):
-        self.ref.set({'completed': str(at)})
+        self.ref.set({'completed': str(at)}, merge=True)
 
     def save_question(self, page_index: int, data: dict):
         self.ref.collection("pages").document(str(page_index)).set({

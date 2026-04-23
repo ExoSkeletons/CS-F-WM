@@ -65,9 +65,15 @@ class SurveySession:
             db.collection("responses")
             .document(self.session_id)
         )
+        self.ref.set(
+            {
+                'session-id': self.session_id,
+            },
+            merge=True
+        )
 
     def save_accept_terms(self):
-        self.ref.set({'accepted_terms': True})
+        self.ref.set({'accepted_terms': True}, merge=True)
 
     def save_demographics(self, data: dict):
         self.ref.update({

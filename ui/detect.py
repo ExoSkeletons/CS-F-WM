@@ -120,7 +120,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         # query label
         _user_font = font.Font(size=self._font_size, slant="italic")
         self.q_var: tkinter.StringVar = tkinter.StringVar()
-        ttk.Label(model_frame, textvariable=self.q_var, font=_user_font).pack()
+        ttk.Label(model_frame, textvariable=self.q_var, font=_user_font, wraplength=ins_wrap_l).pack()
         ttk.Label(model_frame, text="Response:").pack()
         # model response frame
         self.scroll = ScrollableFrame(model_frame, scroll_y=True, scroll_x=True)

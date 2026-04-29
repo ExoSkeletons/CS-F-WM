@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from datetime import datetime
 from typing import Optional
@@ -62,7 +63,7 @@ def watermark(ori_text: str, do_post_process: bool = True) -> str:
     print("watermarking...")
     tw0 = datetime.now()
     wm_text = model.embed(ori_text)
-    if do_post_process: wm_text = post_process(wm_text)
+    if do_post_process: wm_text = fix_spacing(wm_text)
     tw = datetime.now()
 
     print(f'wm done. took {tw - tw0}s')
@@ -70,15 +71,20 @@ def watermark(ori_text: str, do_post_process: bool = True) -> str:
     return wm_text
 
 
-def post_process(wm_text: str) -> str:
-    return (
-        wm_text
-        .replace(' .', '.')
-        .replace(' ,', ',')
-        .replace(' ;', ';')
-        .replace(' ?', '?')
-        .replace(' !', '!')
-        .replace(' \' s ', '\'s ')
-        .replace(' \'', '\'')
-        .replace('\' ', '\'')
-    )
+def fix_spacing(text: str) -> str:
+    # 1. Remove spaces before punctuation and closing brackets
+    text = re.sub(r"\s+([,.;:!?)\]}])", r"\1", text)
+
+    # 2. Remove spaces after opening brackets
+    text = re.sub(r"([(\[{])\s+", r"\1", text)
+
+    # 3. Fix contractions (supports ' and ’)
+    text = re.sub(r"\b(\w+)\s+[\'’]\s+(\w+)\b", r"\1'\2", text)
+
+    # 4. Fix hyphenated words
+    text = re.sub(r"\b(\w+)\s+-\s+(\w+)\b", r"\1-\2", text)
+
+    # 5. Remove padding inside quotes
+    text = re.sub(r"([\"'])\s+([^\"']*?)\s+\1", r"\1\2\1", text)
+
+    return text

@@ -306,9 +306,6 @@ class DetectPage(WidgetFrame, ResponseContainer):
         # clear responses
         self.set_response_text("Generating Response... (This can take a while)")
 
-        # disable query form
-        config_enable(self.submit_frame, False)
-
         # fire listener
         wrapped_q = (
                 q + "\n" +
@@ -346,11 +343,13 @@ class DetectPage(WidgetFrame, ResponseContainer):
         self.scroll.update_idletasks()
         self.scroll.canvas.yview_moveto(0.0)
 
-        # enable query form
+        # config query form visibility
         if user_query_enabled:
             self.submit_frame.pack()
         else:
             self.submit_frame.pack_forget()
+        # config query form enabled
+        config_enable(self.submit_frame, user_query_enabled)
 
         # clear query form
         self._query_form.delete('1.0', END)

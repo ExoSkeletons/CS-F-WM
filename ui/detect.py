@@ -1,6 +1,7 @@
 import random
 import threading
 import tkinter
+from datetime import datetime, timedelta
 from tkinter import END, font, StringVar
 from tkinter import ttk
 from tkinter.font import Font
@@ -23,6 +24,11 @@ class DetectPage(WidgetFrame, ResponseContainer):
     _min_response_char_count = 30
 
     _response_cell: Optional[str] = None
+
+    _timers_q_t0 = datetime.now()
+    _timers_gen_d: Optional[timedelta] = None
+    _timers_wm_t0 = datetime.now()
+    _timers_wm_d: Optional[timedelta] = None
 
     mark: Optional[Watermark]
     mr: StringVar
@@ -306,12 +312,16 @@ class DetectPage(WidgetFrame, ResponseContainer):
         # clear responses
         self.set_response_text("Generating Response... (This can take a while)")
 
-        # fire listener
         wrapped_q = (
                 q + "\n" +
                 f"Your answer must be at least {self._min_word_count} words long." +
                 "Your answer must be entirely plaintext and contain NO highlights or formatting (no bold, italic or any markdown)."
         )
+
+        # track time
+        self._timers_q_t0 = datetime.now()
+
+        # fire listener
         if self.on_submit: self.on_submit(wrapped_q)
 
     def set_text_editable(self, enabled: bool = True):
@@ -362,6 +372,9 @@ class DetectPage(WidgetFrame, ResponseContainer):
         ))
 
     def response(self, response: Optional[str], ok: bool = True):
+        # track time
+        self._timers_gen_d = datetime.now() - self._timers_q_t0
+
         # update model response text
         if response is None or not ok:
             self.set_response_error(response)
@@ -383,11 +396,17 @@ class DetectPage(WidgetFrame, ResponseContainer):
             # set watermarked model response
             self.wmr.set(wmr)
 
+            # track time
+            self._timers_wm_d = datetime.now() - self._timers_wm0
+
             # update UI safely from main thread
             self.app.after(0, lambda: self.set_response_text(wmr, user_query_enabled=False, user_response_enabled=True))
 
         if config['show_watermarking']:
             self.set_response_text("Watermarking... (This will take a while)")
+
+        # track time
+        self._timers_wm0 = datetime.now()
 
         threading.Thread(target=watermark_worker, daemon=True).start()
 
@@ -423,7 +442,9 @@ class DetectPage(WidgetFrame, ResponseContainer):
 
     def get_data(self) -> dict:
         return {
-            "t": self.timer.dtime().seconds,
+            "t": self.timer.dtime().total_seconds(),
+            "t_gen": self._timers_gen_d.total_seconds(),
+            "t_wm": self._timers_wm_d.total_seconds(),
             "question": self.question_text,
             "user_query": self.q_var.get(),
             "model_response": self.mr.get(),

@@ -109,6 +109,7 @@ def generation(q: str) -> str:
     }
 
     res = requests.post(url, params=params, json=data)
+    res.raise_for_status()
 
     d = dict(res.json())
     if 'candidates' in d.keys():

@@ -107,12 +107,13 @@ class App(tk.Tk):
         self.attributes('-topmost', False)
 
     def __setup_dimensions(self):
-        window_width = 960
-        window_height = 540
-
         # get the screen dimension
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
+
+        window_width = min(960, screen_width)
+        window_height = min(540, screen_height)
+
         # find the center point
         center_x = int(screen_width / 2 - window_width / 2)
         center_y = int(screen_height / 2 - window_height / 2)

@@ -89,12 +89,12 @@ class App(tk.Tk):
 
         self.title("Welcome")
 
-    def set_frame(self, frame: tk.Frame):
+    def set_frame(self, frame: tk.Frame, grow=False):
         if self.frame:
             self.frame.grid_forget()
 
         if frame:
-            frame.grid(row=0, column=0)
+            frame.grid(row=0, column=0, sticky="nsew" if grow else "")
             frame.reset_widgets()
             frame.tkraise()
 

@@ -229,7 +229,7 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
 
     pager.select_page(0)
 
-    root.set_frame(pager)
+    root.set_frame(pager, grow=True)
     root.raise_window()
 
 

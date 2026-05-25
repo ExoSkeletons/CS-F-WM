@@ -82,7 +82,8 @@ class App(tk.Tk):
         container = self.container = tk.Frame(self)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        container.pack(side="top", expand=True, fill="both")
+        pad = 50
+        container.pack(side="top", expand=True, fill="both", padx=pad, pady=pad)
 
         self.__bind_return()
         self.__setup_dimensions()

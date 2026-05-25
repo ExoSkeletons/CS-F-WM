@@ -120,7 +120,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         model_frame = ttk.Frame(body, relief="sunken", padding=(5, 5))
         model_col = 1
         model_frame.grid(row=0, column=model_col, sticky="nsew")
-        self.columnconfigure(model_col, weight=1)
+        body.columnconfigure(model_col, weight=1)
         # title
         ttk.Label(model_frame, text="AI Model", font=Font(size=self._font_size_title)).pack()
         # query label

@@ -113,7 +113,7 @@ class App(tk.Tk):
         screen_height = self.winfo_screenheight()
 
         window_width = min(960, screen_width)
-        window_height = min(540, screen_height)
+        window_height = min(640, screen_height)
 
         # find the center point
         center_x = int(screen_width / 2 - window_width / 2)

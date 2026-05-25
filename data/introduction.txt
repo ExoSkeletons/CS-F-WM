@@ -1,5 +1,23 @@
-* During this experiment, you should determine whether text watermarks are present.
+In this experiment, you will determine whether AI-generated texts contain watermarks.
 
-* Text watermarks are signals embedded within the text by the LLM.
+Watermarks are hidden information embedded in the text to enable future identification of AI-generated content.
 
-* You may use any external materials or tools to assist you.
+
+
+During the experiment:
+
+    * You will complete 4 short tasks using the AI we provide
+    * In each task, you will identify whether the AI response contains a watermark
+    * If you think a watermark exists, you will explain why and try to remove it without changing the meaning
+
+
+
+You may use any external tools or materials for translation or watermark identification.
+
+
+
+To enable copy/paste from the application to external tools, make sure your keyboard language is set to English.
+
+
+
+If you encounter a problem, you can re-enter and continue from the same point.

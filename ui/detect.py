@@ -74,6 +74,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
         # body frame
         body = ttk.Frame(self)
         body.pack(expand=True, fill="both", anchor="center")
+        body.rowconfigure(0, weight=1)
 
         # instructions
         ins_frame = ttk.Frame(body)

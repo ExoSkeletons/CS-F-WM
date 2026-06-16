@@ -56,7 +56,7 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
 
     (ttk.Label(intro_frame, text="Introduction & Instructions", font=Font(size=14, weight="bold"))
      .pack(anchor="center"))
-    (ttk.Label(intro_frame, text=intro_text, font=Font(size=12, slant="italic"), wraplength=500)
+    (ttk.Label(intro_frame, text=intro_text, font=Font(size=12, slant="italic"), wraplength=600)
      .pack(anchor="center"))
     pager.add_page(intro_frame, "Introduction")
 

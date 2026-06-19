@@ -72,3 +72,4 @@ if __name__ == "__main__":
 
         print("\n=== RESULT ===\n")
         print(result)
+        print()

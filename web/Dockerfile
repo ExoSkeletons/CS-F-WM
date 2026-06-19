@@ -17,17 +17,23 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --upgrade pip
 
-COPY web/requirements.txt /app/requirements.txt
-
 RUN pip install torch==1.13.1 torchvision==0.14.1
-
-RUN pip install -r requirements.txt
 
 RUN pip install git+https://github.com/JunnYu/WoBERT_pytorch.git
 
 RUN python -m spacy download en_core_web_sm
 
-COPY . /app
+COPY web/requirements.txt /app/requirements.txt
+
+RUN pip install -r requirements.txt
+
+COPY Text_Watermark/ /app/Text_Watermark/
+COPY data/ /app/data/
+COPY services/ /app/services/
+COPY web/ /app/web/
+COPY config.py /app/config.py
+COPY watermarks.py /app/watermarks.py
+
 
 EXPOSE 8000
 

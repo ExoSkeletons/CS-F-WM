@@ -19,8 +19,7 @@ RUN pip install --upgrade pip
 
 COPY web/requirements.txt /app/requirements.txt
 
-RUN pip install torch==1.11.0+cpu torchvision==0.12.0+cpu \
-    --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip pip install torch==1.13.1 torchvision==0.14.1
 
 RUN pip install -r requirements.txt
 

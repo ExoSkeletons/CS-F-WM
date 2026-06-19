@@ -13,7 +13,7 @@ Watermarks = dict[str, Union[Marker, None, tuple[Marker, Optional[Detector]]]]
 
 
 def marks() -> Watermarks:
-    acrostic_config: dict[str, str] = config['acrostic']
+    acrostic_config: dict[str, str] = config.get('acrostic', None)
 
     return {
         "upper": lambda s: s.upper(),
@@ -22,7 +22,7 @@ def marks() -> Watermarks:
         "phishing": lambda s: s.replace("m", "rn"),
         "wtgb": lambda s: wtgb.watermark(s),
         "space-replace": lambda s: s.replace(' ', random.choice(['\u2004', '\u2005', '\u2006', '\u2007', '\u2008'])),
-        "acrostic": lambda s: stubborn_generation(
+        "acrostic": lambda s: s if not acrostic_config else stubborn_generation(
             "consider the poem technique of \'acrostic\', where the leading letters of sentence in the poem "
             "combine sequentially to create a secret hidden message.\n"
             "Bellow, you are given a piece of text. As an assistant, your task is to rephrase the text such that the letters at "

@@ -21,11 +21,11 @@ RUN pip install torch==1.13.1 torchvision==0.14.1
 
 RUN pip install git+https://github.com/JunnYu/WoBERT_pytorch.git
 
-RUN python -m spacy download en_core_web_sm
-
 COPY web/requirements.txt /app/requirements.txt
 
 RUN pip install -r requirements.txt
+
+RUN python -m spacy download en_core_web_sm
 
 COPY Text_Watermark/ /app/Text_Watermark/
 COPY data/ /app/data/

@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 from starlette.responses import Response
 
+import config
 from services import wtgb
 from watermarks import active_watermarks
 
@@ -13,6 +14,13 @@ from watermarks import active_watermarks
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
+    print("sever starting")
+
+    # init config
+    print("loading config")
+    config.load_from_file() # todo: load fb
+
+    # init model
     print("init wtgb model")
     wtgb.init_model()
     print("init wtgb done")

@@ -8,7 +8,10 @@ from starlette.responses import Response
 
 import config
 from services import wtgb
-from watermarks import marks
+from watermarks import marks, Watermarks
+
+jobs = {}
+ms: Watermarks = {}
 
 
 @asynccontextmanager
@@ -23,6 +26,7 @@ async def lifespan(app: FastAPI):
     # load marks
     print("loading marks")
     ms = marks()
+    print(ms)
 
     # init model
     print("init wtgb model")
@@ -36,9 +40,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
-jobs = {}
-ms = {}
 
 
 def watermark_worker(job_id: str):
@@ -64,10 +65,11 @@ def watermark_worker(job_id: str):
 
 @app.post("/watermark", status_code=202)
 def watermark(data: dict, request: Request, response: Response):
-    print("client posted watermarking request:")
+    print(f"client posted watermarking request:\n{data}")
 
     wm_name = data["wm"]
     if wm_name not in ms:
+        print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 
     job_id = str(uuid4())

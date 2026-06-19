@@ -70,6 +70,6 @@ if __name__ == "__main__":
         result = poll_job(job_location)
         print(f"Done.")
 
-        print("\n=== RESULT ===\n")
+        print("\n--- Result ---")
         print(result)
         print()

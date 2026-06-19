@@ -19,7 +19,7 @@ RUN pip install --upgrade pip
 
 COPY web/requirements.txt /app/requirements.txt
 
-RUN pip pip install torch==1.13.1 torchvision==0.14.1
+RUN pip install torch==1.13.1 torchvision==0.14.1
 
 RUN pip install -r requirements.txt
 

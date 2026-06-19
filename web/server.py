@@ -3,6 +3,8 @@ from threading import Thread
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
+from starlette.requests import Request
+from starlette.responses import Response
 
 from services import wtgb
 from watermarks import active_watermarks
@@ -43,8 +45,8 @@ def watermark_worker(job_id: str, text: str, wm_name: str):
         jobs[job_id]["error"] = str(e)
 
 
-@app.post("/watermark")
-def watermark(data: dict):
+@app.post("/watermark", status_code=202)
+def watermark(data: dict, request: Request, response: Response):
     print("client posted watermarking request:")
 
     job_id = str(uuid4())
@@ -56,6 +58,9 @@ def watermark(data: dict):
     ).start()
 
     print(f"{job_id}: job started")
+
+    job_location = f"{str(request.base_url)}watermark/{job_id}"
+    response.headers["Location"] = job_location
 
     return {
         "job_id": job_id,

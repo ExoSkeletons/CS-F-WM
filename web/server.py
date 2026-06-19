@@ -28,10 +28,14 @@ app = FastAPI(lifespan=lifespan)
 jobs = {}
 
 
-def watermark_worker(job_id: str, text: str, wm_name: str):
+def watermark_worker(job_id: str):
     try:
-        print(f"{job_id}: running ({wm_name})")
-        jobs[job_id]["status"] = "running"
+        print(f"{job_id}: running worker", end='')
+        job = jobs[job_id]
+        wm_name, text = job["wm"], job["text"]
+        print(f" ({wm_name})")
+
+        job["status"] = "running"
 
         m = active_watermarks()[wm_name]
         result = m(text)
@@ -50,7 +54,13 @@ def watermark(data: dict, request: Request, response: Response):
     print("client posted watermarking request:")
 
     job_id = str(uuid4())
-    print(f"starting wm job {job_id}")
+    print(f"starting watermark job {job_id}")
+    jobs[job_id] = {
+        "job_id": job_id,
+        "status": "pending",
+        "result": None,
+    }
+    print(f"starting worker for wm job {job_id}")
     Thread(
         target=watermark_worker,
         args=(job_id, data["text"], data["wm"]),

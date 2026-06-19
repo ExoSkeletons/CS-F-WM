@@ -68,7 +68,8 @@ def watermark(data: dict, request: Request, response: Response):
     print(f"client posted watermarking request:\n{data}")
 
     wm_name = data["wm"]
-    if wm_name not in ms:
+    print(ms)
+    if wm_name not in ms.keys():
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 

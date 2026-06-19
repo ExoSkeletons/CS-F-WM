@@ -61,11 +61,15 @@ def watermark(data: dict, request: Request, response: Response):
         "result": None,
     }
     print(f"starting worker for wm job {job_id}")
-    Thread(
-        target=watermark_worker,
-        args=(job_id, data["text"], data["wm"]),
-        daemon=True
-    ).start()
+    try:
+        Thread(
+            target=watermark_worker,
+            args=job_id,
+            daemon=True
+        ).start()
+    except Exception as e:
+        print(f"{job_id}: failed to start worker\n{e}")
+        jobs[job_id]["status"] = "failed"
 
     print(f"{job_id}: job started")
 

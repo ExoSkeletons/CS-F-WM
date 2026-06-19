@@ -1,0 +1,12 @@
+watermarks: []
+show_watermarking: ''
+
+model: "gemini-flash-latest"
+
+acrostic: {
+    "mark": "abigail",
+    "position": "the initial letter in the first word of each sentence"
+}
+
+email: {
+}

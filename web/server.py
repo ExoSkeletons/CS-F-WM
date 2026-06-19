@@ -57,6 +57,7 @@ def watermark(data: dict, request: Request, response: Response):
     print(f"starting watermark job {job_id}")
     jobs[job_id] = {
         "job_id": job_id,
+        "wm": data["wm"],
         "status": "pending",
         "result": None,
     }

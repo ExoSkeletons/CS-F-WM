@@ -22,7 +22,7 @@ import certifi
 import config as cfg
 from services import firebase, wtgb
 from ui.app import App, WidgetFrame, LoadingWidget, config_enable
-from ui.app import data_dir_path
+from config import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
 from ui.detect import DetectPage

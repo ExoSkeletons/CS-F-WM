@@ -1,23 +1,9 @@
-import os
-import sys
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import Misc, TclError
 from typing import Callable, Mapping, Any, Union, Optional
 
-
-def resource_path(relative_path):
-    if hasattr(sys, "_MEIPASS"):
-        # PyInstaller temp folder
-        base_path = sys._MEIPASS
-    else:
-        # Running from source
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
-
-data_dir_path = resource_path("data/")
 padding = {'padx': 5, 'pady': 5}
 font = 'Ariel'
 title_font = (font, 22)
@@ -159,7 +145,7 @@ class LoadingWidget(WidgetFrame):
         self.load_label = ttk.Label(self, text="")
         self.load_label.pack()
 
-    def _on_progress_update(self, action:str, **kwargs):
+    def _on_progress_update(self, action: str, **kwargs):
         self.load_label.config(text=f"{action.capitalize()}...")
 
     def start(self, **kwargs):

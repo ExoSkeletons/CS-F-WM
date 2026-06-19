@@ -4,10 +4,9 @@ from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Any
 
-from config import config
+from config import config, data_dir_path
 from services.oauth2 import google_login
 from ui.app import WidgetFrame
-from ui.app import data_dir_path
 from ui.scrollable_frame import ScrollableFrame
 
 

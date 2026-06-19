@@ -1,8 +1,22 @@
+import os
+import sys
+
 import yaml
 from deepmerge import always_merger
 from google.cloud.firestore_v1 import Client
 
-from ui.app import data_dir_path
+
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        # PyInstaller temp folder
+        base_path = sys._MEIPASS
+    else:
+        # Running from source
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
+data_dir_path = resource_path("data/")
 
 config = {}
 

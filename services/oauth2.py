@@ -4,7 +4,7 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from ui.app import data_dir_path
+from config import data_dir_path
 
 os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
 

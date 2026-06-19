@@ -64,7 +64,7 @@ def watermark(data: dict, request: Request, response: Response):
     try:
         Thread(
             target=watermark_worker,
-            args=job_id,
+            kwargs={'job_id': job_id},
             daemon=True
         ).start()
     except Exception as e:

@@ -8,10 +8,9 @@ from starlette.responses import Response
 
 import config
 from services import wtgb
-from watermarks import marks, Watermarks
+from watermarks import marks
 
 jobs = {}
-ms: Watermarks = {}
 
 
 @asynccontextmanager
@@ -51,7 +50,7 @@ def watermark_worker(job_id: str):
 
         job["status"] = "running"
 
-        m = ms[wm_name]
+        m = marks()[wm_name]
         result = m(text)
 
         print(f"{job_id}: completed")
@@ -68,8 +67,7 @@ def watermark(data: dict, request: Request, response: Response):
     print(f"client posted watermarking request:\n{data}")
 
     wm_name = data["wm"]
-    print(ms)
-    if wm_name not in ms.keys():
+    if wm_name not in marks().keys():
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 

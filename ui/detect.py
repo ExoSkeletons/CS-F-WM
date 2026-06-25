@@ -11,11 +11,11 @@ from typing import Optional, Callable
 from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
 from ui.scrollable_frame import ScrollableFrame
-from ui.survey import TimerFrame, ResponseContainer
-from watermarks import Watermark
+from ui.survey import TimerFrame, DataCollector
+from m_typing import Watermark
 
 
-class DetectPage(WidgetFrame, ResponseContainer):
+class DetectPage(WidgetFrame, DataCollector):
     on_submit: Optional[Callable[[str], None]] = None
 
     _font_size = 12
@@ -29,6 +29,7 @@ class DetectPage(WidgetFrame, ResponseContainer):
     _timers_gen_d: Optional[timedelta] = None
     _timers_wm_t0 = datetime.now()
     _timers_wm_d: Optional[timedelta] = None
+    _timers_wm0 = datetime.now()
 
     mark: Optional[Watermark]
     mr: StringVar
@@ -377,7 +378,8 @@ class DetectPage(WidgetFrame, ResponseContainer):
         self._timers_gen_d = datetime.now() - self._timers_q_t0
 
         # update model response text
-        if response is None or not ok:
+        if not ok or response is None:
+            print("resp errored")
             self.set_response_error(response)
             return
 

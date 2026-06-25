@@ -49,7 +49,7 @@ class TimerFrame(tk.Frame):
         self.after(100, self.update_timer)
 
 
-class ResponseContainer:
+class DataCollector:
     def get_data(self) -> dict:
         pass
 

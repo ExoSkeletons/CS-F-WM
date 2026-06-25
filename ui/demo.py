@@ -3,10 +3,10 @@ from tkinter import ttk
 from tkinter.font import Font
 
 from ui.app import WidgetFrame
-from ui.survey import ResponseContainer
+from ui.survey import DataCollector
 
 
-class DemoPage(WidgetFrame, ResponseContainer):
+class DemoPage(WidgetFrame, DataCollector):
     def _create_widgets(self):
         self.title_font = Font(family="Arial", size=14, weight="bold")
         self.subtitle_font = Font(family="Arial", size=10, slant="italic")

@@ -1,15 +1,10 @@
 import random
-from typing import Callable, Mapping, Union, Optional
 
 from config import config
 from services import wtgb
 from services.generation import stubborn_generation
 
-Marker = Callable[[str], str]
-Detector = Callable[[str], float]
-
-Watermark = tuple[str, Union[Marker, None, tuple[Marker, Optional[Detector]]]]
-Watermarks = dict[str, Union[Marker, None, tuple[Marker, Optional[Detector]]]]
+from m_typing import Watermarks
 
 
 def marks() -> Watermarks:

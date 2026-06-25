@@ -8,7 +8,7 @@ from starlette.responses import Response
 
 import config
 from services import wtgb
-from watermarks import marks
+from services.watermarks import marks
 
 jobs = {}
 
@@ -21,11 +21,6 @@ async def lifespan(app: FastAPI):
     # init config
     print("loading config")
     config.load_from_file()  # todo: load fb
-
-    # load marks
-    print("loading marks")
-    ms = marks()
-    print(ms)
 
     # init model
     print("init wtgb model")

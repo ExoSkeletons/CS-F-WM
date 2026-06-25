@@ -27,7 +27,8 @@ from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame, SurveySession
-from watermarks import Watermark, active_watermarks
+from services.watermarks import active_watermarks
+from m_typing import Watermark
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
@@ -67,6 +68,13 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         print(e)
         input("Could not load questions.")
         exit(1)
+
+    # todo:
+    # snapshot = db.collection('data').document('questions').get()
+    # if not snapshot or not snapshot.exists:
+    #     print(f"Failed to get questions document snapshot.\n{snapshot}.")
+    #     return
+    # questions = snapshot.to_dict()['list']
 
     page_amount = 4
     wm_amount = 2

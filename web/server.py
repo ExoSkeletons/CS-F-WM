@@ -8,7 +8,7 @@ from starlette.responses import Response
 
 import config
 from services import wtgb
-from services.watermarks import marks
+from watermark.watermarks import marks
 
 jobs = {}
 

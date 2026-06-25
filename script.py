@@ -9,8 +9,6 @@ from typing import Callable, Optional
 
 from google.cloud.firestore_v1 import Client
 
-from services.generation import threaded_generation
-
 # patch console out to devnull to avoid crashing logging if no console is attached
 if sys.stdout is None:
     sys.stdout = open(os.devnull, "w")
@@ -21,14 +19,16 @@ import certifi
 
 import config as cfg
 from services import firebase, wtgb
+from services.generation import threaded_generation
+from web.client import server_poll_watermarks
+# from watermark.watermarks import active_watermarks
+from watermark.typing import Watermark
 from ui.app import App, WidgetFrame, LoadingWidget, config_enable
 from config import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame, SurveySession
-from services.watermarks import active_watermarks
-from m_typing import Watermark
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
@@ -157,7 +157,11 @@ def setup_user_session(uuid: str, email: Optional[str], log: Callable[[str], Non
 def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     log("setting up marks")
     m: list[Watermark] = []
-    for am in active_watermarks().items(): m.append(am)
+
+    # local watermarking
+    # for am in active_watermarks().items(): m.append(am)
+    # server based watermarking
+    for am in server_poll_watermarks().items(): m.append(am)
 
     # log("randomizing")
     # setup watermark randomizer with user as seed

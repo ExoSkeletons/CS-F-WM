@@ -12,7 +12,7 @@ from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, DataCollector
-from m_typing import Watermark
+from watermark.typing import Watermark
 
 
 class DetectPage(WidgetFrame, DataCollector):

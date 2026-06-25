@@ -1,7 +1,8 @@
 import time
-from urllib.error import HTTPError
 
 import requests
+
+from watermark.typing import Watermarks
 
 SERVER_IP = "54.175.192.101"
 SERVER_PORT = 8000
@@ -53,6 +54,24 @@ def poll_job(job_url: str, interval: float = 0.5, timeout: int = 300):
             raise TimeoutError("Job polling timed out")
 
         time.sleep(interval)
+
+
+def request_wm_and_await(text: str, wm: str):
+    job_id, location = submit_job(text, wm)
+    print(f"[submitted] job_id={job_id}")
+    print(f"[location] {location}")
+    # todo: interval etc. from config
+    res = poll_job(job_id, interval=1, timeout=600)
+    return res
+
+
+def server_poll_watermarks() -> Watermarks:
+    # todo: load from config/fb
+    wm_names = ['space-replace', 'acrostic', 'wtgb']
+    return {
+        wm_name: lambda t: request_wm_and_await(text=t, wm=wm_name)
+        for wm_name in wm_names
+    }
 
 
 if __name__ == "__main__":

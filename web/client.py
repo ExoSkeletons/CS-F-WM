@@ -2,10 +2,11 @@ import datetime
 import time
 
 import requests
+from requests import HTTPError
 
 from watermark.typing import Watermarks
 
-SERVER_IP = "44.201.81.4"
+SERVER_IP = "3.83.31.129"
 SERVER_PORT = 8000
 
 BASE_URL = f"http://{SERVER_IP}:{SERVER_PORT}"
@@ -91,12 +92,21 @@ if __name__ == "__main__":
     for wm in wm_tests:
         print(f"--- {wm} ---\n")
 
-        print("Submitting job...", end='')
-        job_id, job_location = submit_job(text, wm)
-        print(f"Done.\nAwaiting job [{job_id}]", end=' ')
-        result = poll_job(job_location)
-        print(f"Done.")
+        try:
+            print("Submitting job...", end='')
+            job_id, job_location = submit_job(text, wm)
+            print(f"Done.\nAwaiting job [{job_id}]", end=' ')
+            result = poll_job(job_location)
+            print(f"Done.")
 
-        print("\n--- Result ---")
-        print(result)
-        print()
+            print("\n--- Result ---")
+            print(result)
+            print()
+        except Exception as e:
+            if isinstance(e, TimeoutError):
+                print(f"Timeout.\n{e}")
+            elif isinstance(e, HTTPError):
+                print(f"HTTPError.\n{e}")
+                print(e.response.text)
+            else:
+                print(f"Error:\n{e}")

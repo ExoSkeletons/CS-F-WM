@@ -66,10 +66,6 @@ def watermark(data: dict, request: Request, response: Response):
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 
-    if wm_name not in active_watermarks().keys():
-        print(f"wm {wm_name} not active")
-        raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
-
     tmp_not_supported = ['wtgb']
     if wm_name in tmp_not_supported:
         print(f"wm {wm_name} not supported")

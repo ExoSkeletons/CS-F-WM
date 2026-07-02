@@ -26,7 +26,10 @@ COPY web/requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 RUN python -m spacy download en_core_web_sm
-RUN python -m nltk.downloader all
+RUN python -m nltk.downloader \
+    punkt \
+    stopwords \
+    averaged_perceptron_tagger
 
 COPY Text_Watermark/ /app/Text_Watermark/
 COPY services/ /app/services/

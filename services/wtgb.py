@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 import spacy
+import nltk
 
 MODEL_NAME = "en_core_web_sm"
 MODEL_VERSION = "3.5.0"
@@ -40,6 +41,14 @@ from Text_Watermark.models.watermark_faster import watermark_model
 
 model: Optional[watermark_model] = None
 
+def ensure_nltk(resource_path, download_name=None):
+    try:
+        nltk.data.find(resource_path)
+        print(f"NLTK resource already present: {resource_path}")
+    except LookupError:
+        print(f"Downloading NLTK resource: {download_name or resource_path}")
+        nltk.download(download_name or resource_path)
+
 
 def init_model():
     global model
@@ -48,8 +57,9 @@ def init_model():
     print("init...")
     ti0 = datetime.now()
     print("-nltk")
-    import nltk
-    nltk.download('punkt')
+    ensure_nltk("tokenizers/punkt", "punkt")
+    ensure_nltk("corpora/stopwords", "stopwords")
+    ensure_nltk("taggers/averaged_perceptron_tagger", "averaged_perceptron_tagger")
     print("-model")
     model = watermark_model(language='English', mode='embed', tau_word=0.8, lamda=0.83)
 

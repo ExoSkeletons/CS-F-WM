@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import requests
@@ -33,6 +34,7 @@ def submit_job(text: str, wm: str):
 def poll_job(job_url: str, interval: float = 0.5, timeout: int = 300):
     start = time.time()
 
+    last_status = None
     while True:
         res = requests.get(job_url)
 
@@ -42,9 +44,15 @@ def poll_job(job_url: str, interval: float = 0.5, timeout: int = 300):
         data = res.json()
         status = data.get("status")
 
-        print(f"[status] {status}")
+        if last_status != status:
+            if last_status is not None: print()
+            print(f"[{datetime.datetime.now()}][status] {status}", end="")
+        else:
+            print(".", end="")
+        last_status = status
 
         if status == "completed":
+            print(f"[{datetime.datetime.now()}][status] completed")
             return data["result"]
 
         if status == "failed":
@@ -75,7 +83,7 @@ def server_poll_watermarks() -> Watermarks:
 
 
 if __name__ == "__main__":
-    text = "This is a test sentence to be watermarked by the server."
+    text = "This is a test sentence to be watermarked by the server." * 10
 
     wm_tests = ['upper', 'phishing', 'space-replace', 'acrostic', 'wtgb']
 

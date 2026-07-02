@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
         print("Submitting job...", end='')
         job_id, job_location = submit_job(text, wm)
-        print(f"Done. Awaiting job [{job_id}] Result...", end='')
+        print(f"Done.\nAwaiting job [{job_id}]", end=' ')
         result = poll_job(job_location)
         print(f"Done.")
 

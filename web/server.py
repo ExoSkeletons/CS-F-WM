@@ -8,7 +8,7 @@ from starlette.responses import Response
 
 import config
 from services import wtgb
-from watermark.watermarks import marks
+from watermark.watermarks import marks, active_watermarks
 
 jobs = {}
 
@@ -65,6 +65,15 @@ def watermark(data: dict, request: Request, response: Response):
     if wm_name not in marks().keys():
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
+
+    if wm_name not in active_watermarks().keys():
+        print(f"wm {wm_name} not active")
+        raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
+
+    tmp_not_supported = ['wtgb']
+    if wm_name in tmp_not_supported:
+        print(f"wm {wm_name} not supported")
+        raise HTTPException(status_code=500, detail=f"watermark {wm_name} temporarily unavailable")
 
     job_id = str(uuid4())
     print(f"starting watermark job {job_id}")

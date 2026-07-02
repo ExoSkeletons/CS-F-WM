@@ -4,7 +4,7 @@ import requests
 
 from watermark.typing import Watermarks
 
-SERVER_IP = "54.175.192.101"
+SERVER_IP = "44.201.81.4"
 SERVER_PORT = 8000
 
 BASE_URL = f"http://{SERVER_IP}:{SERVER_PORT}"

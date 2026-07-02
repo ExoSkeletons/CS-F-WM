@@ -66,7 +66,7 @@ class watermark_model:
             self.relatedness_model = RobertaForSequenceClassification.from_pretrained('roberta-large-mnli').to(self.device)
             self.relatedness_tokenizer = RobertaTokenizer.from_pretrained('roberta-large-mnli')
             self.w2v_model = api.load("glove-wiki-gigaword-100")
-            nltk.download('stopwords')
+            #nltk.download('stopwords')
             self.stop_words = set(stopwords.words('english'))
             self.nlp = spacy.load('en_core_web_sm')
 

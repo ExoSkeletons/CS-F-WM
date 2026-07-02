@@ -42,4 +42,4 @@ COPY config.py /app/config.py
 EXPOSE 8000
 
 # Start server
-CMD ["uvicorn", "web.server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+CMD ["uvicorn", "web.server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

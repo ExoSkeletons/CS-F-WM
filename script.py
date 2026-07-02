@@ -18,9 +18,10 @@ if sys.stderr is None:
 import certifi
 
 import config as cfg
-from services import firebase, wtgb
+from services import firebase
 from services.generation import threaded_generation
 from web.client import server_poll_watermarks
+# from services import wtgb
 # from watermark.watermarks import active_watermarks
 from watermark.typing import Watermark
 from ui.app import App, WidgetFrame, LoadingWidget, config_enable
@@ -160,6 +161,7 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
 
     # local watermarking
     # for am in active_watermarks().items(): m.append(am)
+
     # server based watermarking
     for am in server_poll_watermarks().items(): m.append(am)
 
@@ -172,10 +174,11 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
     (name, _) = wm
     print(name)
 
+    # init local model for local watermarking
     # todo: replace with mapping of wm->setup function | None
-    if name == "wtgb":
-        log('building models (this can take up to a few minutes)')
-        wtgb.init_model()
+    #if name == "wtgb":
+    #    log('building models (this can take up to a few minutes)')
+    #    wtgb.init_model()
 
     return wm
 

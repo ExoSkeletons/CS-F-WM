@@ -26,6 +26,7 @@ COPY web/requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 RUN python -m spacy download en_core_web_sm
+RUN python -m nltk.downloader all
 
 COPY Text_Watermark/ /app/Text_Watermark/
 COPY data/ /app/data/

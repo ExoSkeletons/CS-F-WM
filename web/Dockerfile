@@ -29,11 +29,11 @@ RUN python -m spacy download en_core_web_sm
 RUN python -m nltk.downloader all
 
 COPY Text_Watermark/ /app/Text_Watermark/
-COPY data/ /app/data/
 COPY services/ /app/services/
+COPY watermark /app/watermark
+COPY data/ /app/data/
 COPY web/ /app/web/
 COPY config.py /app/config.py
-COPY watermarks.py /app/watermarks.py
 
 
 EXPOSE 8000

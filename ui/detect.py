@@ -1,27 +1,31 @@
 import random
 import threading
-import tkinter
 from datetime import datetime, timedelta
-from tkinter import END, font, StringVar
-from tkinter import ttk
+from tkinter import END, font, StringVar, Misc
 from tkinter.font import Font
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
+
+import ttkbootstrap as ttk
 
 from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, DataCollector
+from ui.theme import padx, pady
 from watermark.types import Watermark
 
 
 class DetectPage(WidgetFrame, DataCollector):
     on_submit: Optional[Callable[[str], None]] = None
 
-    _font_size = 12
+    _font_size = 11
     _font_size_title = 16
     _min_word_count = 100
     _min_response_char_count = 30
+
+    ins_l = 45
+    _ins_wrap_l = ins_l * 10
 
     _response_cell: Optional[str] = None
 
@@ -36,7 +40,7 @@ class DetectPage(WidgetFrame, DataCollector):
     wmr: StringVar
 
     def __init__(
-            self, app: App, master: Optional[tkinter.Misc] = None,
+            self, app: App, master: Optional[Misc] = None,
             title: str = None,
             watermark: Optional[Watermark] = None, mark_prob: float = 1.0,
             questions=None
@@ -79,7 +83,6 @@ class DetectPage(WidgetFrame, DataCollector):
 
         # instructions
         ins_frame = ttk.Frame(body)
-        ins_wrap_l = 300
         ins_col = 0
         ins_frame.grid(row=0, column=ins_col, sticky="nwe")
         self.question_frame = ttk.Frame(ins_frame)
@@ -90,7 +93,7 @@ class DetectPage(WidgetFrame, DataCollector):
             "You are given below a question from a school assignment, and an AI Assistant to your right."
             ,
             font=Font(size=self._font_size_title),
-            justify="left", anchor="nw", wraplength=ins_wrap_l
+            justify="left", anchor="nw", wraplength=self._ins_wrap_l
         ).pack(expand=True, fill="both")
         ttk.Label(
             self.question_frame,
@@ -98,17 +101,17 @@ class DetectPage(WidgetFrame, DataCollector):
             "Use the AI Assistant given here for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
             ,
             font=Font(size=self._font_size),
-            justify="left", anchor="nw", wraplength=ins_wrap_l
+            justify="left", anchor="nw", wraplength=self._ins_wrap_l
         ).pack(expand=True, fill="both")
         # question
         ttk.Label(self.question_frame, text="question:").pack()
-        q_label = tkinter.Text(
+        q_label = ttk.Text(
             self.question_frame,
             font=font.Font(
                 size=self._font_size,
                 weight="bold", slant="italic"
             ),
-            wrap='word', width=int(ins_wrap_l / 10), height=4
+            wrap='word', width=self.ins_l, height=4
         )
         config_style_as_label(q_label, self.app)
         set_text(q_label, self.question_text)
@@ -119,42 +122,62 @@ class DetectPage(WidgetFrame, DataCollector):
         self.mr = StringVar(value=None)
         self.wmr = StringVar(value=None)
         # ai model frame
-        model_frame = ttk.Frame(body, relief="sunken", padding=(5, 5))
+        model_frame = ttk.Frame(body, relief="sunken", padding=(padx, pady))
         model_col = 1
         model_frame.grid(row=0, column=model_col, sticky="nsew")
         body.columnconfigure(model_col, weight=1)
+        model_header = ttk.Frame(model_frame)
+        model_header.pack(fill='x', expand=True)
+
+        ttk.Label(
+            model_header,
+        ).grid(row=0, column=0)
+        model_info = ttk.Frame(model_header)
+        model_info.grid(row=0, column=1, sticky="nsw")
+        model_header.columnconfigure(1, weight=1)
+
         # title
-        ttk.Label(model_frame, text="AI Model", font=Font(size=self._font_size_title)).pack()
+        ttk.Label(model_info, text="AI Model", font=Font(size=self._font_size_title)).pack()
         # query label
         _user_font = font.Font(size=self._font_size, slant="italic")
-        self.q_var: tkinter.StringVar = tkinter.StringVar()
-        ttk.Label(model_frame, textvariable=self.q_var, font=_user_font, wraplength=ins_wrap_l).pack()
-        ttk.Label(model_frame, text="Response:").pack()
+        self.q_var: ttk.StringVar = ttk.StringVar()
+        ttk.Label(model_info, textvariable=self.q_var, font=_user_font, wraplength=self._ins_wrap_l).pack()
+
+        model_body = ttk.Frame(model_frame)
+        model_body.pack(fill='x', expand=True)
+        ttk.Label(model_body, text="Response:").pack()
         # model response frame
-        self.scroll = ScrollableFrame(model_frame, scroll_y=True, scroll_x=True)
+        self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=True)
         self.scroll.pack(fill="both", expand=True)
-        self.text_var = tkinter.StringVar()
+        self.text_var = ttk.StringVar()
         response_font = ("TkDefaultFont", 10)
         # text form (editable)
-        self.tt = tkinter.Text(self.scroll.content, wrap="word", font=response_font)
+        self.tt = ttk.Text(self.scroll.content, wrap="word", font=response_font)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tt, self.text_var.get()))
         self.tt.grid(row=0, column=0, sticky="nsew")
         # text label (non-editable)
         # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
-        self.tl = tkinter.Text(self.scroll.content, wrap="word", font=response_font)
+        self.tl = ttk.Text(self.scroll.content, wrap="word", font=response_font)
         config_style_as_label(self.tl, self.app)
         config_enable(self.tl, False)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tl, self.text_var.get(), force=True))
         self.tl.grid(row=0, column=0, sticky="nsew")
         # self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
         # query submission
-        self.submit_frame = ttk.Frame(model_frame)
+        self.submit_frame = ttk.Frame(model_body)
         self.submit_frame.pack(fill="x", expand=True)
         self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
         self.app.set_on_submit(self._query_form, lambda: self.submit_query())
         self._query_form.grid(row=0, column=0, sticky="nswe")
         self.submit_frame.columnconfigure(0, weight=1)
-        query_button = ttk.Button(self.submit_frame, text="Send", command=lambda: self.submit_query())
+        self._img_submit = ttk.PhotoImage(file="ui/imgs/ic/" + "send.png")
+        query_button = ttk.Button(
+            self.submit_frame,
+            compound="right", image=self._img_submit,
+            text="Send",
+            bootstyle="info",
+            command=lambda: self.submit_query()
+        )
         query_button.grid(row=0, column=1)
         self.app.set_on_submit(query_button, lambda: self.submit_query())
 
@@ -164,16 +187,16 @@ class DetectPage(WidgetFrame, DataCollector):
             self.user_response_frame,
             text="Observe the response text you've received:",
             font=Font(size=self._font_size_title),
-            justify="left", wraplength=ins_wrap_l
+            justify="left", wraplength=self._ins_wrap_l
         ).grid(row=0, column=0, sticky="nw"))
         (ttk.Label(
             self.user_response_frame,
             text="• Do you believe it has been watermarked? You may use any external resource.",
-            justify="left", wraplength=ins_wrap_l
+            justify="left", wraplength=self._ins_wrap_l
         ).grid(row=1, column=0, sticky="nw"))
         # yes/no radios
-        self.is_wm_yes_var = tkinter.BooleanVar()
-        self.is_wm_no_var = tkinter.BooleanVar()
+        self.is_wm_yes_var = ttk.BooleanVar()
+        self.is_wm_no_var = ttk.BooleanVar()
         radio_frame = ttk.Frame(self.user_response_frame)
         self.b_wm_yes = ttk.Radiobutton(
             radio_frame, text="Yes",
@@ -198,10 +221,10 @@ class DetectPage(WidgetFrame, DataCollector):
         ttk.Label(
             reasoning_detect_frame,
             text="• What made you think text was watermarked?",
-            justify="left", wraplength=ins_wrap_l
+            justify="left", wraplength=self._ins_wrap_l
         ).pack(anchor="nw")
-        entry_dim = (int(ins_wrap_l * 0.15), 3)
-        self.reasoning_detect_entry = tkinter.Text(
+        entry_dim = (self.ins_l, 3)
+        self.reasoning_detect_entry = ttk.Text(
             reasoning_detect_frame,
             wrap="word", undo=True, maxundo=10,
             width=entry_dim[0], height=entry_dim[1],
@@ -212,12 +235,13 @@ class DetectPage(WidgetFrame, DataCollector):
         ttk.Label(
             len_rd_frame,
             text=f"Your response must be at least {self._min_response_char_count} characters long.",
-            wraplength=ins_wrap_l, font=Font(size=7, slant='italic')
+            bootstyle="secondary",
+            wraplength=self._ins_wrap_l, font=Font(size=7, slant='italic')
         ).grid(row=0, column=0, sticky="nsw")
         len_rd_frame.columnconfigure(0, weight=1)
         rd_len_l = ttk.Label(len_rd_frame)
         rd_len_l.grid(row=0, column=1)
-        self.len_rd_var = tkinter.IntVar()
+        self.len_rd_var = ttk.IntVar()
         self.len_rd_var.trace_add("write", lambda m, l, c: rd_len_l.config(
             text=f"{self.len_rd_var.get()}/{self._min_response_char_count}"
         ))
@@ -226,14 +250,14 @@ class DetectPage(WidgetFrame, DataCollector):
         ttk.Label(
             reasoning_change_frame,
             text="• If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
-            justify="left", wraplength=ins_wrap_l
+            justify="left", wraplength=self._ins_wrap_l
         ).pack(anchor="nw")
         ttk.Label(
             reasoning_change_frame,
             text="• What did you do to try and remove the watermark?",
-            justify="left", wraplength=ins_wrap_l
+            justify="left", wraplength=self._ins_wrap_l
         ).pack(anchor="nw")
-        self.reasoning_change_entry = tkinter.Text(
+        self.reasoning_change_entry = ttk.Text(
             reasoning_change_frame,
             wrap="word", undo=True, maxundo=10,
             width=entry_dim[0], height=entry_dim[1],
@@ -244,12 +268,13 @@ class DetectPage(WidgetFrame, DataCollector):
         ttk.Label(
             len_rc_frame,
             text=f"Your response must be at least {self._min_response_char_count} characters long.",
-            anchor='nw', wraplength=ins_wrap_l, font=Font(size=7, slant='italic')
+            bootstyle="secondary",
+            anchor='nw', wraplength=self._ins_wrap_l, font=Font(size=7, slant='italic')
         ).grid(row=0, column=0, sticky="nsw")
         len_rc_frame.columnconfigure(0, weight=1)
         rc_len_l = ttk.Label(len_rc_frame)
         rc_len_l.grid(row=0, column=1)
-        self.len_rc_var = tkinter.IntVar()
+        self.len_rc_var = ttk.IntVar()
         self.len_rc_var.trace_add("write", lambda m, l, c: rc_len_l.config(
             text=f"{self.len_rc_var.get()}/{self._min_response_char_count}"
         ))
@@ -259,7 +284,7 @@ class DetectPage(WidgetFrame, DataCollector):
         answer_frame.grid(row=4, column=0, columnspan=2)
         confirm_button = ttk.Button(answer_frame, text="Confirm Choice", command=lambda: self.confirm_choices())
         # confirm_button.grid(row=0, column=0)
-        self._response_correctness_var = tkinter.StringVar()
+        self._response_correctness_var = ttk.StringVar()
         # results
         ttk.Label(answer_frame, textvariable=self._response_correctness_var).grid(row=0, column=1)
 

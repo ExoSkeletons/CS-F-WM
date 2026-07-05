@@ -1,13 +1,15 @@
 import threading
 import webbrowser
-from tkinter import ttk
 from tkinter.font import Font
 from typing import Callable, Any
+
+import ttkbootstrap as ttk
 
 from config import config, data_dir_path
 from services.oauth2 import google_login
 from ui.app import WidgetFrame
 from ui.scrollable_frame import ScrollableFrame
+from ui.theme import FONTS, pad, padx, pady
 
 
 class TermsPage(WidgetFrame):
@@ -23,17 +25,21 @@ class TermsPage(WidgetFrame):
             exit(1)
 
         # terms
-        ttk.Label(self, text="Consent Form", font=Font(size=12, weight="bold")).pack()
+        ttk.Label(self, text="Consent Form", font=FONTS['h1']).pack()
         ttk.Label(self, text="Please read the form below carefully.", font=Font(size=8, slant="italic")).pack()
         online_doc_url = config["consent_form_url"]
-        ttk.Button(self, text="View Document Online", command=lambda: webbrowser.open(online_doc_url)).pack(anchor="e")
+        ttk.Button(
+            self, text="View Document Online",
+            bootstyle="info",
+            command=lambda: webbrowser.open(online_doc_url)
+        ).pack(anchor="e")
 
         # scroll text
-        frame = ScrollableFrame(self, scroll_y=True, relief="sunken", padding=5)
+        frame = ScrollableFrame(self, scroll_y=True, relief="sunken", padding=pad)
         frame.pack(expand=True, fill='x')
-        frame.canvas.config(width=600)
+        frame.canvas.config(width=700, height=350)
         text_content = ttk.Label(frame.content, text=terms_text, anchor="nw", justify="left")
-        text_content.pack(expand=True, fill='x', padx=5, pady=5)
+        text_content.pack(expand=True, fill='x', padx=padx, pady=pady)
 
         def on_canvas_resize(event):
             text_content.configure(wraplength=event.width - 10)
@@ -44,7 +50,11 @@ class TermsPage(WidgetFrame):
         b_frame = ttk.Frame(self)
         b_frame.pack()
         ttk.Label(self, text="")
-        ttk.Button(b_frame, text="Accept Terms and Continue", command=lambda: self.on_accepted()).grid(row=0, column=0)
+        ttk.Button(
+            b_frame, text="Accept Terms and Continue",
+            bootstyle="success",
+            command=lambda: self.on_accepted()
+        ).grid(row=0, column=0)
         # ttk.Button(b_frame, text="Reject", command=lambda: sys.exit()).grid(row=0, column=1)
 
 

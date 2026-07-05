@@ -1,9 +1,9 @@
-import tkinter as tk
 import uuid
 from datetime import datetime, timedelta
-from tkinter import ttk, Misc
+from tkinter import Misc, DISABLED, NORMAL
 from typing import Callable, Optional
 
+import ttkbootstrap as ttk
 from google.cloud.firestore_v1 import Client
 
 from config import config
@@ -11,14 +11,14 @@ from services.email import send_email_from_app
 from ui.app import WidgetFrame, App
 
 
-class TimerFrame(tk.Frame):
+class TimerFrame(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
 
         self.start_time = None
         self.running = False
 
-        self.label = tk.Label(self)
+        self.label = ttk.Label(self)
         self.label.pack()
 
     def start(self):
@@ -136,15 +136,29 @@ class PagedFrame(WidgetFrame):
 
     def _create_widgets(self):
         # Notebook for page frames
-        self.notebook = ttk.Notebook(self)
+        self.notebook = ttk.Notebook(self, bootstyle="light")
         self.notebook.pack(fill="both", expand=True)
 
         # Footer frame
         footer = ttk.Frame(self)
         footer.pack(fill="x")
         # Navigation buttons + progress bar
-        self._prev_btn = ttk.Button(footer, text="<- " + self.prev_text, command=self.prev_page)
-        self._next_btn = ttk.Button(footer, text="" + self.next_text + " ->", command=self.next_page)
+        self._img_prev = ttk.PhotoImage(file="ui/imgs/ic/" + "left.png")
+        self._img_next = ttk.PhotoImage(file="ui/imgs/ic/" + "right.png")
+        self._prev_btn = ttk.Button(
+            footer,
+            compound="left", image=self._img_prev,
+            text="<- " + self.prev_text,
+            bootstyle="info",
+            command=self.prev_page
+        )
+        self._next_btn = ttk.Button(
+            footer,
+            compound="right", image=self._img_next,
+            text="" + self.next_text + " ->",
+            bootstyle="success",
+            command=self.next_page
+        )
         self._progress_bar = ttk.Progressbar(footer, orient="horizontal", mode="determinate")
 
         if self.allow_prev:
@@ -221,5 +235,5 @@ class PagedFrame(WidgetFrame):
             if frame and frame in self._validators.keys():
                 validator = self._validators[frame]
                 nf = nf and validator()
-        self._prev_btn["state"] = tk.NORMAL if pf else tk.DISABLED
-        self._next_btn["state"] = tk.NORMAL if nf else tk.DISABLED
+        self._prev_btn["state"] = NORMAL if pf else DISABLED
+        self._next_btn["state"] = NORMAL if nf else DISABLED

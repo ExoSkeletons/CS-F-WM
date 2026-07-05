@@ -3,11 +3,14 @@ import random
 import sys
 from datetime import datetime
 from os import system
-from tkinter import ttk
 from tkinter.font import Font
+
+import ttkbootstrap as ttk
 from typing import Callable, Optional
 
 from google.cloud.firestore_v1 import Client
+
+from ui.theme import configure_style, FONTS
 
 # patch console out to devnull to avoid crashing logging if no console is attached
 if sys.stdout is None:
@@ -56,9 +59,9 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         input("Could not load instructions.")
         exit(1)
 
-    (ttk.Label(intro_frame, text="Introduction & Instructions", font=Font(size=14, weight="bold"))
+    (ttk.Label(intro_frame, text="Introduction & Instructions", font=FONTS['h1'])
      .pack(anchor="center"))
-    (ttk.Label(intro_frame, text=intro_text, font=Font(size=12, slant="italic"), wraplength=600)
+    (ttk.Label(intro_frame, text=intro_text, font=Font(font=FONTS['body'], slant='italic'), wraplength=700)
      .pack(anchor="center"))
     pager.add_page(intro_frame, "Introduction")
 
@@ -227,10 +230,11 @@ def start_user_ui():
 
 
 if __name__ == "__main__":
-    system("title " + "Study: Identification of AI-Generated Academic Texts Using Watermarks")
+    title = "Identification of AI-Generated Academic Texts Using Watermarks"
+    system("title " + title)
     print("Starting App...")
 
-    root = App()
+    root = App(title=title, themename="lumen")
 
     splash_frame = WidgetFrame(root)
     splash_frame.pack()
@@ -242,6 +246,8 @@ if __name__ == "__main__":
 
     root.set_frame(splash_frame)
     root.raise_window()
+
+    configure_style()
 
     root.mainloop()  # blocking call
 

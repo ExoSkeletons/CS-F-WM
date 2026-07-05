@@ -1,33 +1,30 @@
 import threading
-import tkinter as tk
-import tkinter.ttk as ttk
-from tkinter import Misc, TclError
+
+import ttkbootstrap as ttk
+from tkinter import Misc, TclError, END
 from typing import Callable, Mapping, Any, Union, Optional
 
-padding = {'padx': 5, 'pady': 5}
-font = 'Ariel'
-title_font = (font, 22)
-header_font = (font, 14)
+from ui.theme import pad_l, dim
 
 
 # def rtl(text: str):
 #     return "\u200F" + text + "\u200F"
 
 
-def set_text(w: tk.Text, text: str, force: bool = False):
+def set_text(w: ttk.Text, text: str, force: bool = False):
     c = force and w['state'] == 'disabled'
     if c: config_enable(w, True)
-    w.delete("1.0", tk.END)
+    w.delete("1.0", END)
     w.insert("1.0", text)
     if c: config_enable(w, False)
 
 
-def config_enable(widget: tk.Misc, enabled: bool):
-    if isinstance(widget, (tk.Frame, ttk.Frame)):
+def config_enable(widget: Misc, enabled: bool):
+    if isinstance(widget, ttk.Frame):
         for w in widget.winfo_children():
             config_enable(w, enabled)
         return
-    if isinstance(widget, tk.Canvas):
+    if isinstance(widget, ttk.Canvas):
         for item in widget.find_all():
             if widget.type(item) == "window":
                 child_widget = widget.nametowidget(widget.itemcget(item, "window"))
@@ -39,21 +36,21 @@ def config_enable(widget: tk.Misc, enabled: bool):
         pass
 
 
-def config_style_as_label(w: tk.Text, root: tk.Tk):
+def config_style_as_label(w: ttk.Text, root: ttk.Tk):
     w.configure(bg=root.cget("bg"), fg='black', relief='flat')
 
 
-class App(tk.Tk):
+class App(ttk.Window):
     __submits: dict[Misc] = {}
-    __focus_next: dict[Union[tk.Entry, ttk.Entry, tk.Text], Misc] = {}
+    __focus_next: dict[Union[ttk.Entry, ttk.Entry, ttk.Text], Misc] = {}
 
-    frame: Optional[tk.Frame] = None
+    frame: Optional[ttk.Frame] = None
 
     def __bind_return(self):
         # setup return (enter) binder
         def on_return(event):
             focus = self.focus_get()
-            if type(focus) is tk.Button or type(focus) is ttk.Button:
+            if type(focus) is ttk.Button:
                 self.focus_get().invoke()
             if focus in self.__focus_next:
                 self.__focus_next[focus].focus()
@@ -62,21 +59,18 @@ class App(tk.Tk):
 
         self.bind("<Return>", on_return)
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        container = self.container = tk.Frame(self)
+        container = self.container = ttk.Frame(self)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        pad = 50
-        container.pack(side="top", expand=True, fill="both", padx=pad, pady=pad)
+        container.pack(side="top", expand=True, fill="both", padx=pad_l, pady=pad_l)
 
         self.__bind_return()
         self.__setup_dimensions()
 
-        self.title("Welcome")
-
-    def set_frame(self, frame: tk.Frame, grow=False):
+    def set_frame(self, frame: ttk.Frame, grow=False):
         if self.frame:
             self.frame.grid_forget()
 
@@ -98,8 +92,8 @@ class App(tk.Tk):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
-        window_width = min(960, screen_width)
-        window_height = min(640, screen_height)
+        window_width = min(dim['maxw'], screen_width)
+        window_height = min(dim['maxh'], screen_height)
 
         # find the center point
         center_x = int(screen_width / 2 - window_width / 2)
@@ -110,7 +104,7 @@ class App(tk.Tk):
         # set the position of the window to the center of the screen
         self.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-    def set_focus_next(self, entry: Union[tk.Entry, ttk.Entry, tk.Text], f_next: Misc):
+    def set_focus_next(self, entry: Union[ttk.Entry, ttk.Entry, ttk.Text], f_next: Misc):
         self.__focus_next[entry] = f_next
 
     def set_on_submit(self, w: Misc, command):

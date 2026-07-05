@@ -148,14 +148,14 @@ class PagedFrame(WidgetFrame):
         self._prev_btn = ttk.Button(
             footer,
             compound="left", image=self._img_prev,
-            text="<- " + self.prev_text,
+            #text="<- " + self.prev_text,
             bootstyle="info",
             command=self.prev_page
         )
         self._next_btn = ttk.Button(
             footer,
             compound="right", image=self._img_next,
-            text="" + self.next_text + " ->",
+            #text="" + self.next_text + " ->",
             bootstyle="success",
             command=self.next_page
         )

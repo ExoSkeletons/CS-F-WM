@@ -129,8 +129,10 @@ class DetectPage(WidgetFrame, DataCollector):
         model_header = ttk.Frame(model_frame)
         model_header.pack(fill='x', expand=True)
 
+        self._img_model = ttk.PhotoImage(file="ui/imgs/" + "model.png")
         ttk.Label(
             model_header,
+            image=self._img_model
         ).grid(row=0, column=0)
         model_info = ttk.Frame(model_header)
         model_info.grid(row=0, column=1, sticky="nsw")
@@ -413,22 +415,28 @@ class DetectPage(WidgetFrame, DataCollector):
         self.wmr.set('')
 
         def watermark_worker():
-            wm = None if not self.mark else self.mark[1][1] if type(self.mark[1]) == type(tuple) else self.mark[1]
-            wmr = wm(response) if wm is not None else response
+            try:
+                wm = None if not self.mark else self.mark[1][1] if type(self.mark[1]) == type(tuple) else self.mark[1]
+                wmr = wm(response) if wm is not None else response
 
-            # reset user responses
-            self.is_wm_yes_var.set(False)
-            self.is_wm_no_var.set(False)
-            self._response_correctness_var.set("")
+                # reset user responses
+                self.is_wm_yes_var.set(False)
+                self.is_wm_no_var.set(False)
+                self._response_correctness_var.set("")
 
-            # set watermarked model response
-            self.wmr.set(wmr)
+                # set watermarked model response
+                self.wmr.set(wmr)
 
-            # track time
-            self._timers_wm_d = datetime.now() - self._timers_wm0
+                # track time
+                self._timers_wm_d = datetime.now() - self._timers_wm0
 
-            # update UI safely from main thread
-            self.app.after(0, lambda: self.set_response_text(wmr, user_query_enabled=False, user_response_enabled=True))
+                # update UI safely from main thread
+                self.app.after(0, lambda: self.set_response_text(wmr, user_query_enabled=False,
+                                                                 user_response_enabled=True))
+            except Exception as e:
+                print(e)
+                action = "watermarking" if config['show_watermarking'] else "generating response"
+                self.app.after(0, lambda: self.set_response_error(f"A problem occurred during {action}."))
 
         if config['show_watermarking']:
             self.set_response_text("Watermarking... (This will take a while)")

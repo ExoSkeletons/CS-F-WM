@@ -95,6 +95,8 @@ class App(ttk.Window):
         window_width = min(dim['maxw'], screen_width)
         window_height = min(dim['maxh'], screen_height)
 
+        if dim.get('full', False): self.attributes("-fullscreen", True)
+
         # find the center point
         center_x = int(screen_width / 2 - window_width / 2)
         center_y = int(screen_height / 2 - window_height / 2)

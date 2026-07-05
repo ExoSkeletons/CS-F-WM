@@ -10,7 +10,8 @@ FONTS = {
 }
 
 dim = {
-    "maxw": 1050, "maxh": 780,
+    "maxw": 1080, "maxh": 820,
+    "full": False,
 }
 
 pad = 10

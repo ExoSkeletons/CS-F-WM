@@ -4,7 +4,7 @@ from config import config
 from services import wtgb
 from services.generation import stubborn_generation
 
-from .typing import Watermarks
+from types import Watermarks
 
 
 def marks() -> Watermarks:

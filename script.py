@@ -23,7 +23,7 @@ from services.generation import threaded_generation
 from web.client import server_poll_watermarks
 # from services import wtgb
 # from watermark.watermarks import active_watermarks
-from watermark.typing import Watermark
+from watermark.types import Watermark
 from ui.app import App, WidgetFrame, LoadingWidget, config_enable
 from config import data_dir_path
 from ui.auth import TermsPage, AuthPage

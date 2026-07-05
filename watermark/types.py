@@ -1,4 +1,4 @@
-from typing import Union, Optional, Callable
+from typing import Union, Callable, Optional
 
 Marker = Callable[[str], str]
 Detector = Callable[[str], float]

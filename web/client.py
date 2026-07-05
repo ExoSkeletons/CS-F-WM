@@ -4,7 +4,7 @@ import time
 import requests
 from requests import HTTPError
 
-from watermark.typing import Watermarks
+from watermark.types import Watermarks
 
 SERVER_IP = "3.83.31.129"
 SERVER_PORT = 8000

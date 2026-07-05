@@ -141,7 +141,7 @@ class DetectPage(WidgetFrame, DataCollector):
         # title
         ttk.Label(model_info, text="AI Model", font=Font(size=self._font_size_title)).pack()
         # query label
-        _user_font = font.Font(size=self._font_size, slant="italic")
+        _user_font = Font(size=self._font_size, slant="italic")
         self.q_var: ttk.StringVar = ttk.StringVar()
         ttk.Label(model_info, textvariable=self.q_var, font=_user_font, wraplength=self._ins_wrap_l).pack()
 
@@ -152,7 +152,7 @@ class DetectPage(WidgetFrame, DataCollector):
         self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=True)
         self.scroll.pack(fill="both", expand=True)
         self.text_var = ttk.StringVar()
-        response_font = ("TkDefaultFont", 10)
+        response_font = Font(size=10)
         # text form (editable)
         self.tt = ttk.Text(self.scroll.content, wrap="word", font=response_font)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tt, self.text_var.get()))

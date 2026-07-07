@@ -17,7 +17,7 @@ dim = {
 
 pad = 15
 pad_l = 50
-padx, pady = 20, 20
+padx, pady = 20, 10
 padding = {'padx': padx, 'pady': pady}
 
 sp = 10

@@ -10,9 +10,9 @@ import ttkbootstrap as ttk
 
 from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
-from ui.widgets.frame import ScrollableFrame
 from ui.survey import TimerFrame, DataCollector
 from ui.theme import Fonts, padx, pady, pad_l
+from ui.widgets.frame import ScrollableFrame
 from ui.widgets.label import WrappingLabel
 from watermark.types import Watermark
 
@@ -25,23 +25,26 @@ class ModelFrame(WidgetFrame):
     def _create_widgets(self):
         # ai model frame
         model_frame = self
-        model_header = ttk.Frame(model_frame, padding=(padx, pady), bootstyle="info")
+
+        hs = "info"
+        hsi = "inverse-" + hs
+        model_header = ttk.Frame(model_frame, padding=(padx, pady), bootstyle=hs)
         model_header.pack(fill='x', expand=True, pady=pady)
 
         self._img_model = ttk.PhotoImage(file="ui/imgs/" + "model.png")
         ttk.Label(
             model_header,
-            image=self._img_model
+            image=self._img_model, bootstyle=hsi,
         ).grid(row=0, column=0, padx=padx)
-        model_info = ttk.Frame(model_header)
+        model_info = ttk.Frame(model_header, bootstyle=hs)
         model_info.grid(row=0, column=1, sticky="nsw")
         model_header.columnconfigure(1, weight=1)
 
         # title
-        ttk.Label(model_info, text="AI Assistant", font=Fonts.h2).pack()
+        ttk.Label(model_info, text="AI Assistant", bootstyle=hsi, font=Fonts.h2).pack()
         # query label
         self.q_var: ttk.StringVar = ttk.StringVar()
-        WrappingLabel(model_info, textvariable=self.q_var, font=Fonts.small).pack(expand=True, fill="both")
+        # WrappingLabel(model_info, textvariable=self.q_var, bootstyle=hsi, font=Fonts.small).pack(expand=True, fill="x")
 
         model_body = ttk.Frame(model_frame)
         model_body.pack(fill='x', expand=True, pady=pady)
@@ -68,7 +71,7 @@ class ModelFrame(WidgetFrame):
         self.submit_frame.pack(fill="x", expand=True)
         self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
         self.app.set_on_submit(self._query_form, lambda: self.submit_query())
-        self._query_form.grid(row=0, column=0, sticky="nsew", padx=padx)
+        self._query_form.grid(row=0, column=0, sticky="nsew", padx=padx, pady=pady)
         self.submit_frame.columnconfigure(0, weight=1)
         self._img_submit = ttk.PhotoImage(file="ui/imgs/ic/" + "send.png")
         query_button = ttk.Button(
@@ -78,7 +81,7 @@ class ModelFrame(WidgetFrame):
             bootstyle="success",
             command=lambda: self.submit_query()
         )
-        query_button.grid(row=0, column=1, sticky="nse")
+        query_button.grid(row=0, column=1, sticky="nse", padx=padx, pady=pady)
         self.app.set_on_submit(query_button, lambda: self.submit_query())
 
     def set_text(self, text: str, query_enabled: bool = True):

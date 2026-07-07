@@ -4,16 +4,13 @@ import time
 import requests
 from requests import HTTPError
 
+from config import config
 from watermark.types import Watermarks
 
-SERVER_IP = "3.83.31.129"
-SERVER_PORT = 8000
 
-BASE_URL = f"http://{SERVER_IP}:{SERVER_PORT}"
-
-
-def submit_job(text: str, wm: str):
-    endpoint_url = f"{BASE_URL}/watermark"
+def submit_job(text: str, wm: str, ip: str, port: int = 8000):
+    base_url = f"http://{ip}:{port}"
+    endpoint_url = f"{base_url}/watermark"
 
     payload = {
         "text": text,
@@ -65,8 +62,8 @@ def poll_job(job_url: str, interval: float = 0.5, timeout: int = 300):
         time.sleep(interval)
 
 
-def request_wm_and_await(text: str, wm: str):
-    job_id, location = submit_job(text, wm)
+def request_wm_and_await(text: str, wm: str, ip: str, port: int):
+    job_id, location = submit_job(text=text, wm=wm, ip=ip, port=port)
     print(f"[submitted] job_id={job_id}")
     print(f"[location] {location}")
     # todo: interval etc. from config
@@ -75,10 +72,12 @@ def request_wm_and_await(text: str, wm: str):
 
 
 def server_poll_watermarks() -> Watermarks:
-    # todo: load from config/fb
     wm_names = ['space-replace', 'acrostic', 'wtgb']
+    server_config = config["wm_server"]
+    ip = str(server_config.get('ip', None) or server_config.get('address', None))
+    port = int(server_config['port'])
     return {
-        wm_name: lambda t: request_wm_and_await(text=t, wm=wm_name)
+        wm_name: lambda t, n=wm_name, i=ip, p=port: request_wm_and_await(text=t, wm=n, ip=i, port=p)
         for wm_name in wm_names
     }
 
@@ -94,7 +93,11 @@ if __name__ == "__main__":
 
         try:
             print("Submitting job...", end='')
-            job_id, job_location = submit_job(text, wm)
+
+            SERVER_IP = "3.83.31.129"
+            SERVER_PORT = 8000
+
+            job_id, job_location = submit_job(text, wm, SERVER_IP, SERVER_PORT)
             print(f"Done.\nAwaiting job [{job_id}]", end=' ')
             result = poll_job(job_location)
             print(f"Done.")

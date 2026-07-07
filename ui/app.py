@@ -3,6 +3,7 @@ from typing import Union, Optional
 
 import ttkbootstrap as ttk
 
+from config import img_dir_path
 from ui.theme import pad_l, dim
 
 
@@ -155,9 +156,9 @@ class HeaderWidget(WidgetFrame):
         super().__init__(app, master)
 
     def _create_widgets(self):
-        self.logo_img = ttk.PhotoImage(file="ui/imgs/" + self.logo_path)
+        self.logo_img = ttk.PhotoImage(file=img_dir_path + self.logo_path)
         self.logos_uni_imgs = [
-            ttk.PhotoImage(file="ui/imgs/uni/" + name)
+            ttk.PhotoImage(file=img_dir_path + "uni/" + name)
             for name in self.uni_logo_paths
         ]
 

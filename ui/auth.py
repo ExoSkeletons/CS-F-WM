@@ -6,11 +6,11 @@ from typing import Callable, Any
 
 import ttkbootstrap as ttk
 
-from config import config, data_dir_path
+from config import config, data_dir_path, img_dir_path
 from services.oauth2 import google_login
 from ui.app import WidgetFrame, HeaderWidget
-from ui.widgets.frame import ScrollableFrame
 from ui.theme import Fonts, pad, padx, pady, pad_l
+from ui.widgets.frame import ScrollableFrame
 from ui.widgets.loading import Loader
 
 
@@ -72,15 +72,14 @@ class AuthPage(WidgetFrame):
             font=Font(slant="italic"), justify="center",
         ).pack(pady=pady)
         ttk.Label(self, text="Please Login to continue", font=Fonts.h3).pack(pady=pady)
-        # ttk.Label(self, text="TBI").pack()
-        self.g_img = PhotoImage(file="ui/imgs/ic/" + "google.png")
+        self.g_img = PhotoImage(file=img_dir_path + "ic/" + "google.png")
         ttk.Button(
             self,
             compound="left", image=self.g_img, text="Log in with Google",
             bootstyle="success",
             command=lambda: self.login_async()
         ).pack(pady=pady)
-        # ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+        ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
         self.load_spinner = Loader(self, bounce=True)
 
     def login_async(self):

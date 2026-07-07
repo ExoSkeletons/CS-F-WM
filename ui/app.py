@@ -137,8 +137,8 @@ class App(ttk.Window):
 
 
 class WidgetFrame(ttk.Frame):
-    def __init__(self, app: App, master: Optional[Misc] = None):
-        super().__init__(master or app.container)
+    def __init__(self, app: App, master: Optional[Misc] = None, **kwargs):
+        super().__init__(master or app.container, **kwargs)
         self.app = app
         self._create_widgets()
 

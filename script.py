@@ -96,7 +96,7 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         detect_page.on_submit = lambda q, page=detect_page: threaded_query(q.strip(), page.response)
         pager.add_page(
             detect_page, title=detect_page.title,
-            validator=detect_page.is_valid,
+            validator=detect_page.resp_frame.is_valid,
             on_next=lambda pi, p: session.save_question(pi, p.get_data())
         )
 

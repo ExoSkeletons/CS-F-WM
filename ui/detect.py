@@ -12,17 +12,325 @@ from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label, WrappingLabel
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, DataCollector
-from ui.theme import padx, pady, Fonts
+from ui.theme import Fonts, padx, pady
 from watermark.types import Watermark
+
+
+class ModelFrame(WidgetFrame):
+    def __init__(self, app: App, on_submit: Optional[Callable[[str], None]] = None, **kwargs):
+        self.on_submit = on_submit
+        super().__init__(app, **kwargs)
+
+    def _create_widgets(self):
+        # ai model frame
+        model_frame = self
+        model_header = ttk.Frame(model_frame)
+        model_header.pack(fill='x', expand=True)
+
+        self._img_model = ttk.PhotoImage(file="ui/imgs/" + "model.png")
+        ttk.Label(
+            model_header,
+            image=self._img_model
+        ).grid(row=0, column=0)
+        model_info = ttk.Frame(model_header)
+        model_info.grid(row=0, column=1, sticky="nsw")
+        model_header.columnconfigure(1, weight=1)
+
+        # title
+        ttk.Label(model_info, text="AI Assistant", font=Fonts.h2).pack()
+        # query label
+        self.q_var: ttk.StringVar = ttk.StringVar()
+        WrappingLabel(model_info, textvariable=self.q_var, font=Fonts.small).pack(expand=True, fill="both")
+
+        model_body = ttk.Frame(model_frame)
+        model_body.pack(fill='x', expand=True)
+        # ttk.Label(model_body, text="Response:").pack()
+        # model response frame
+        self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=True)
+        self.scroll.pack(fill="both", expand=True)
+        self.text_var = ttk.StringVar()
+        response_font = Font(font=Fonts.body, size=10)
+        # text form (editable)
+        self.tt = ttk.Text(self.scroll.content, wrap="word", font=response_font)
+        self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tt, self.text_var.get()))
+        self.tt.grid(row=0, column=0, sticky="nsew")
+        # text label (non-editable)
+        # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
+        self.tl = ttk.Text(self.scroll.content, wrap="word", font=response_font)
+        config_style_as_label(self.tl, self.app)
+        config_enable(self.tl, False)
+        self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tl, self.text_var.get(), force=True))
+        self.tl.grid(row=0, column=0, sticky="nsew")
+        # self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
+        # query submission
+        self.submit_frame = ttk.Frame(model_body)
+        self.submit_frame.pack(fill="x", expand=True)
+        self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
+        self.app.set_on_submit(self._query_form, lambda: self.submit_query())
+        self._query_form.grid(row=0, column=0, sticky="nsew")
+        self.submit_frame.columnconfigure(0, weight=1)
+        self._img_submit = ttk.PhotoImage(file="ui/imgs/ic/" + "send.png")
+        query_button = ttk.Button(
+            self.submit_frame,
+            compound="right", image=self._img_submit,
+            # text="Send",
+            bootstyle="info",
+            command=lambda: self.submit_query()
+        )
+        query_button.grid(row=0, column=1, sticky="nse")
+        self.app.set_on_submit(query_button, lambda: self.submit_query())
+
+    def set_text(self, text: str, query_enabled: bool = True):
+        self.text_var.set(text)
+
+        # scroll to frame top bottom
+        self.scroll.update_idletasks()
+        self.scroll.canvas.yview_moveto(0.0)
+
+        # config query form visibility
+        if query_enabled:
+            self.submit_frame.pack()
+        else:
+            self.submit_frame.pack_forget()
+        # config query form enabled
+        config_enable(self.submit_frame, query_enabled)
+
+        # clear query form
+        self._query_form.delete('1.0', END)
+
+    def submit_query(self):
+        # get query
+        q = self._query_form.get('1.0', END)
+        if not q.strip(): return
+
+        # set var
+        self.q_var.set(q)
+
+        if self.on_submit: self.on_submit(q)
+
+    def set_text_editable(self, enabled: bool = True):
+        if enabled:
+            self.tl.lower()
+            self.tt.lift()
+        else:
+            self.tl.lift()
+            self.tt.lower()
+
+
+class QuestionFrame(WidgetFrame):
+    def __init__(self, app: App, question: str, **kwargs):
+        self.question = question
+        super().__init__(app, **kwargs)
+
+    def _create_widgets(self):
+        ins_frame = self
+        self.question_frame = ttk.Frame(ins_frame)
+        self.question_frame.pack(expand=True, fill="both")
+        WrappingLabel(
+            self.question_frame,
+            text=
+            "You are given below a question from a school assignment, and an AI Assistant to your right."
+            ,
+            font=Fonts.h2,
+            justify="left", anchor="nw",
+        ).pack(expand=True, fill="both")
+        WrappingLabel(
+            self.question_frame,
+            text=
+            "Use the AI Assistant given here for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
+            ,
+            font=Fonts.small,
+            justify="left", anchor="nw",
+        ).pack(expand=True, fill="both")
+        # question
+        ttk.Label(self.question_frame, font=Fonts.small, text="question:").pack()
+        q_label = ttk.Text(
+            self.question_frame,
+            font=Fonts.h3,
+            wrap='word', width=1, height=4
+        )
+        config_style_as_label(q_label, self.app)
+        set_text(q_label, self.question)
+        config_enable(q_label, False)
+        q_label.pack(expand=True, fill="x")
+
+
+class ResponseFrame(WidgetFrame):
+    _min_response_char_count = 30
+    entry_minw, entry_minh = 30, 3
+
+    def __init__(
+            self, app: App,
+            model_frame: ModelFrame,
+            on_validity_changed: Optional[Callable[[], None]],
+            response_correctness_var: StringVar,
+            **kwargs
+    ):
+        self.on_validity_changed = on_validity_changed
+        self.response_correctness_var = response_correctness_var
+        self.model_frame = model_frame
+        super().__init__(app, **kwargs)
+
+    def _create_widgets(self):
+        user_response_frame = self
+
+        # title
+        (WrappingLabel(
+            user_response_frame,
+            text="Observe the response text you've received:",
+            font=Fonts.h2,
+            justify="left",
+        ).pack(expand=True, fill="x"))
+
+        # yes/no
+        yes_or_no_frame = ttk.Frame(user_response_frame)
+        yes_or_no_frame.pack(expand=True, fill='x')
+        (WrappingLabel(
+            yes_or_no_frame,
+            text="• Do you believe it has been watermarked? You may use any external resource.",
+            justify="left"
+        ).pack(anchor="nw", expand=True, fill="x"))
+        # yes/no radios
+        self.is_wm_yes_var = ttk.BooleanVar()
+        self.is_wm_no_var = ttk.BooleanVar()
+        radio_frame = ttk.Frame(yes_or_no_frame)
+        self.b_wm_yes = ttk.Radiobutton(
+            radio_frame, text="Yes",
+            variable=self.is_wm_yes_var,
+            command=lambda: self.is_wm_no_var.set(not self.is_wm_yes_var.get())
+        )
+        self.b_wm_no = ttk.Radiobutton(
+            radio_frame, text="No",
+            variable=self.is_wm_no_var,
+            command=lambda: self.is_wm_yes_var.set(not self.is_wm_no_var.get())
+        )
+        self.b_wm_yes.grid(row=0, column=0)
+        self.b_wm_no.grid(row=0, column=1)
+        self.is_wm_yes_var.trace_add("write", lambda v, i, m: self.on_validity_changed())
+        self.is_wm_no_var.trace_add("write", lambda v, i, m: self.on_validity_changed())
+        radio_frame.pack()
+
+        # reasoning
+        reasoning_frame = ttk.Frame(user_response_frame)
+        reasoning_frame.pack(expand=True, fill="x")
+        reasoning_detect_frame = ttk.Frame(reasoning_frame)
+        reasoning_detect_frame.pack(expand=True, fill="x")
+        WrappingLabel(
+            reasoning_detect_frame,
+            text="• What made you think text was watermarked?",
+            justify="left"
+        ).pack(anchor="nw", expand=True, fill="x")
+        self.reasoning_detect_entry = ttk.Text(
+            reasoning_detect_frame,
+            wrap="word", undo=True, maxundo=10,
+            width=self.entry_minw, height=self.entry_minh,
+        )
+        self.reasoning_detect_entry.pack(expand=True, fill="x")
+        len_rd_frame = ttk.Frame(reasoning_detect_frame)
+        len_rd_frame.pack(expand=True, fill="x")
+        ttk.Label(
+            len_rd_frame,
+            text=f"Your response must be at least {self._min_response_char_count} characters long.",
+            bootstyle="secondary",
+            font=Font(size=7, slant='italic')
+        ).grid(row=0, column=0, sticky="nsw")
+        len_rd_frame.columnconfigure(0, weight=1)
+        rd_len_l = ttk.Label(len_rd_frame)
+        rd_len_l.grid(row=0, column=1)
+        self.len_rd_var = ttk.IntVar()
+        self.len_rd_var.trace_add("write", lambda m, l, c: rd_len_l.config(
+            text=f"{self.len_rd_var.get()}/{self._min_response_char_count}"
+        ))
+        reasoning_change_frame = ttk.Frame(reasoning_frame)
+        reasoning_change_frame.pack(expand=True, fill="x")
+        WrappingLabel(
+            reasoning_change_frame,
+            text="• If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
+            justify="left"
+        ).pack(anchor="nw", expand=True, fill="x")
+        WrappingLabel(
+            reasoning_change_frame,
+            text="• What did you do to try and remove the watermark?",
+            justify="left"
+        ).pack(anchor="nw", expand=True, fill="x")
+        self.reasoning_change_entry = ttk.Text(
+            reasoning_change_frame,
+            wrap="word", undo=True, maxundo=10,
+            width=self.entry_minw, height=self.entry_minh,
+        )
+        self.reasoning_change_entry.pack(expand=True, fill="x")
+        len_rc_frame = ttk.Frame(reasoning_change_frame)
+        len_rc_frame.pack(expand=True, fill="x")
+        WrappingLabel(
+            len_rc_frame,
+            text=f"Your response must be at least {self._min_response_char_count} characters long.",
+            bootstyle="secondary",
+            anchor="nw", justify="left", font=Font(size=7, slant='italic')
+        ).grid(row=0, column=0, sticky="nsew")
+        len_rc_frame.columnconfigure(0, weight=1)
+        rc_len_l = ttk.Label(len_rc_frame)
+        rc_len_l.grid(row=0, column=1)
+        self.len_rc_var = ttk.IntVar()
+        self.len_rc_var.trace_add("write", lambda m, l, c: rc_len_l.config(
+            text=f"{self.len_rc_var.get()}/{self._min_response_char_count}"
+        ))
+        # confirm
+        answer_frame = ttk.Frame(user_response_frame)
+        answer_frame.pack(expand=True, fill="x")
+        # confirm_button = ttk.Button(answer_frame, text="Confirm Choice", command=lambda: self.confirm_choices())
+        # confirm_button.grid(row=0, column=0)
+        # results
+        ttk.Label(answer_frame, textvariable=self.response_correctness_var).grid(row=0, column=1)
+
+        def update_user_response():
+            is_w: bool = self.is_wm_yes_var.get()
+
+            self.len_rd_var.set(len(self.reasoning_detect_entry.get("1.0", END).strip()))
+            self.len_rc_var.set(len(self.reasoning_change_entry.get("1.0", END).strip()))
+
+            is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
+            is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
+
+            config_enable(reasoning_frame, is_w)
+            config_enable(reasoning_change_frame, is_w and is_rd_over_min)
+            self.model_frame.set_text_editable(is_w and is_rd_over_min)
+
+            self.on_validity_changed()
+
+        self.is_wm_yes_var.trace_add(
+            "write",
+            lambda var, index, mode: update_user_response()
+        )
+        self.reasoning_detect_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
+        self.reasoning_change_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
+        self.reasoning_detect_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
+        self.reasoning_change_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
+
+        # self.app.set_focus_next(reasoning_entry, remove_entry)
+        # self.app.set_focus_next(remove_entry, confirm_button)
+        # self.app.set_focus_next(self._query_form, confirm_button)
+
+    def reset_widgets(self):
+        self.is_wm_yes_var.set(False)
+        self.is_wm_no_var.set(False)
+
+    def is_valid(self, show_errors: bool = False) -> bool:
+        if self.is_wm_yes_var.get() == self.is_wm_no_var.get():
+            # todo: show "red" required-notice and return False if not.
+            return False
+        if self.is_wm_no_var.get():
+            return True
+        is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
+        is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
+        if not (is_rd_over_min and is_rc_over_min):
+            return False
+        return True
 
 
 class DetectPage(WidgetFrame, DataCollector):
     on_submit: Optional[Callable[[str], None]] = None
 
     _min_word_count = 100
-    _min_response_char_count = 30
-
-    entry_w, entry_h = 30, 3
 
     _response_cell: Optional[str] = None
 
@@ -35,6 +343,7 @@ class DetectPage(WidgetFrame, DataCollector):
     mark: Optional[Watermark]
     mr: StringVar
     wmr: StringVar
+    _response_correctness_var: StringVar
 
     def __init__(
             self, app: App, master: Optional[Misc] = None,
@@ -87,251 +396,42 @@ class DetectPage(WidgetFrame, DataCollector):
         # instructions
         ins_frame = ttk.Frame(body_frame)
         ins_frame.grid(row=0, column=ins_col, sticky="nwe")
-        self.question_frame = ttk.Frame(ins_frame)
-        self.question_frame.pack(expand=True, fill="both")
-        WrappingLabel(
-            self.question_frame,
-            text=
-            "You are given below a question from a school assignment, and an AI Assistant to your right."
-            ,
-            font=Fonts.h2,
-            justify="left", anchor="nw",
-        ).pack(expand=True, fill="both")
-        WrappingLabel(
-            self.question_frame,
-            text=
-            "Use the AI Assistant given here for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
-            ,
-            font=Fonts.small,
-            justify="left", anchor="nw",
-        ).pack(expand=True, fill="both")
-        # question
-        ttk.Label(self.question_frame, font=Fonts.small, text="question:").pack()
-        q_label = ttk.Text(
-            self.question_frame,
-            font=Fonts.h3,
-            wrap='word', width=self.entry_w, height=4
-        )
-        config_style_as_label(q_label, self.app)
-        set_text(q_label, self.question_text)
-        config_enable(q_label, False)
-        q_label.pack(expand=True, fill="x")
 
         # model vars
         self.mr = StringVar(value=None)
         self.wmr = StringVar(value=None)
-        # ai model frame
-        model_frame = ttk.Frame(body_frame, relief="sunken", padding=(padx, pady))
-        model_frame.grid(row=0, column=model_col, sticky="nsew")
-        model_header = ttk.Frame(model_frame)
-        model_header.pack(fill='x', expand=True)
-
-        self._img_model = ttk.PhotoImage(file="ui/imgs/" + "model.png")
-        ttk.Label(
-            model_header,
-            image=self._img_model
-        ).grid(row=0, column=0)
-        model_info = ttk.Frame(model_header)
-        model_info.grid(row=0, column=1, sticky="nsw")
-        model_header.columnconfigure(1, weight=1)
-
-        # title
-        ttk.Label(model_info, text="AI Assistant", font=Fonts.h2).pack()
-        # query label
-        self.q_var: ttk.StringVar = ttk.StringVar()
-        WrappingLabel(model_info, textvariable=self.q_var, font=Fonts.small).pack()
-
-        model_body = ttk.Frame(model_frame)
-        model_body.pack(fill='x', expand=True)
-        # ttk.Label(model_body, text="Response:").pack()
-        # model response frame
-        self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=True)
-        self.scroll.pack(fill="both", expand=True)
-        self.text_var = ttk.StringVar()
-        response_font = Font(font=Fonts.body, size=10)
-        # text form (editable)
-        self.tt = ttk.Text(self.scroll.content, wrap="word", font=response_font)
-        self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tt, self.text_var.get()))
-        self.tt.grid(row=0, column=0, sticky="nsew")
-        # text label (non-editable)
-        # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
-        self.tl = ttk.Text(self.scroll.content, wrap="word", font=response_font)
-        config_style_as_label(self.tl, self.app)
-        config_enable(self.tl, False)
-        self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tl, self.text_var.get(), force=True))
-        self.tl.grid(row=0, column=0, sticky="nsew")
-        # self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
-        # query submission
-        self.submit_frame = ttk.Frame(model_body)
-        self.submit_frame.pack(fill="x", expand=True)
-        self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
-        self.app.set_on_submit(self._query_form, lambda: self.submit_query())
-        self._query_form.grid(row=0, column=0, sticky="nswe")
-        self.submit_frame.columnconfigure(0, weight=1)
-        self._img_submit = ttk.PhotoImage(file="ui/imgs/ic/" + "send.png")
-        query_button = ttk.Button(
-            self.submit_frame,
-            compound="right", image=self._img_submit,
-            # text="Send",
-            bootstyle="info",
-            command=lambda: self.submit_query()
+        # model frame
+        self.model_frame = ModelFrame(
+            self.app, lambda q: self.submit_query(q),
+            master=body_frame,
+            relief="sunken", padding=(padx, pady),
         )
-        query_button.grid(row=0, column=1)
-        self.app.set_on_submit(query_button, lambda: self.submit_query())
+        self.model_frame.grid(row=0, column=model_col, sticky="nsew")
 
+        # question
+        self.question_frame = QuestionFrame(self.app, question=self.question_text, master=ins_frame)
+        self.question_frame.pack(expand=True, fill="both")
         # user response
-        self.user_response_frame = ttk.Frame(ins_frame)
-        (WrappingLabel(
-            self.user_response_frame,
-            text="Observe the response text you've received:",
-            font=Fonts.h2,
-            justify="left",
-        ).grid(row=0, column=0, sticky="nw"))
-        (WrappingLabel(
-            self.user_response_frame,
-            text="• Do you believe it has been watermarked? You may use any external resource.",
-            justify="left"
-        ).grid(row=1, column=0, sticky="nw"))
-        # yes/no radios
-        self.is_wm_yes_var = ttk.BooleanVar()
-        self.is_wm_no_var = ttk.BooleanVar()
-        radio_frame = ttk.Frame(self.user_response_frame)
-        self.b_wm_yes = ttk.Radiobutton(
-            radio_frame, text="Yes",
-            variable=self.is_wm_yes_var,
-            command=lambda: self.is_wm_no_var.set(not self.is_wm_yes_var.get())
-        )
-        self.b_wm_no = ttk.Radiobutton(
-            radio_frame, text="No",
-            variable=self.is_wm_no_var,
-            command=lambda: self.is_wm_yes_var.set(not self.is_wm_no_var.get())
-        )
-        self.b_wm_yes.grid(row=0, column=0)
-        self.b_wm_no.grid(row=0, column=1)
-        self.is_wm_yes_var.trace_add("write", lambda v, i, m: self.validity_changed())
-        self.is_wm_no_var.trace_add("write", lambda v, i, m: self.validity_changed())
-        radio_frame.grid(row=2, column=0)
-        # reasoning
-        reasoning_frame = ttk.Frame(self.user_response_frame)
-        reasoning_frame.grid(row=3, column=0, sticky="nsew")
-        reasoning_detect_frame = ttk.Frame(reasoning_frame)
-        reasoning_detect_frame.pack()
-        WrappingLabel(
-            reasoning_detect_frame,
-            text="• What made you think text was watermarked?",
-            justify="left"
-        ).pack(anchor="nw")
-        self.reasoning_detect_entry = ttk.Text(
-            reasoning_detect_frame,
-            wrap="word", undo=True, maxundo=10,
-            width=self.entry_w, height=self.entry_h,
-        )
-        self.reasoning_detect_entry.pack(expand=True, fill="x")
-        len_rd_frame = ttk.Frame(reasoning_detect_frame)
-        len_rd_frame.pack(expand=True, fill="x")
-        ttk.Label(
-            len_rd_frame,
-            text=f"Your response must be at least {self._min_response_char_count} characters long.",
-            bootstyle="secondary",
-            font=Font(size=7, slant='italic')
-        ).grid(row=0, column=0, sticky="nsw")
-        len_rd_frame.columnconfigure(0, weight=1)
-        rd_len_l = ttk.Label(len_rd_frame)
-        rd_len_l.grid(row=0, column=1)
-        self.len_rd_var = ttk.IntVar()
-        self.len_rd_var.trace_add("write", lambda m, l, c: rd_len_l.config(
-            text=f"{self.len_rd_var.get()}/{self._min_response_char_count}"
-        ))
-        reasoning_change_frame = ttk.Frame(reasoning_frame)
-        reasoning_change_frame.pack()
-        WrappingLabel(
-            reasoning_change_frame,
-            text="• If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
-            justify="left"
-        ).pack(anchor="nw")
-        WrappingLabel(
-            reasoning_change_frame,
-            text="• What did you do to try and remove the watermark?",
-            justify="left"
-        ).pack(anchor="nw")
-        self.reasoning_change_entry = ttk.Text(
-            reasoning_change_frame,
-            wrap="word", undo=True, maxundo=10,
-            width=self.entry_w, height=self.entry_h,
-        )
-        self.reasoning_change_entry.pack(expand=True, fill="x")
-        len_rc_frame = ttk.Frame(reasoning_change_frame)
-        len_rc_frame.pack(expand=True, fill="x")
-        WrappingLabel(
-            len_rc_frame,
-            text=f"Your response must be at least {self._min_response_char_count} characters long.",
-            bootstyle="secondary",
-            anchor='nw', font=Font(size=7, slant='italic')
-        ).grid(row=0, column=0, sticky="nsw")
-        len_rc_frame.columnconfigure(0, weight=1)
-        rc_len_l = ttk.Label(len_rc_frame)
-        rc_len_l.grid(row=0, column=1)
-        self.len_rc_var = ttk.IntVar()
-        self.len_rc_var.trace_add("write", lambda m, l, c: rc_len_l.config(
-            text=f"{self.len_rc_var.get()}/{self._min_response_char_count}"
-        ))
-        self.user_response_frame.columnconfigure(1, weight=1)
-        # confirm
-        answer_frame = ttk.Frame(self.user_response_frame)
-        answer_frame.grid(row=4, column=0, columnspan=2)
-        confirm_button = ttk.Button(answer_frame, text="Confirm Choice", command=lambda: self.confirm_choices())
-        # confirm_button.grid(row=0, column=0)
         self._response_correctness_var = ttk.StringVar()
-        # results
-        ttk.Label(answer_frame, textvariable=self._response_correctness_var).grid(row=0, column=1)
-
-        def update_user_response():
-            is_w: bool = self.is_wm_yes_var.get()
-
-            self.len_rd_var.set(len(self.reasoning_detect_entry.get("1.0", END).strip()))
-            self.len_rc_var.set(len(self.reasoning_change_entry.get("1.0", END).strip()))
-
-            is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
-            is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
-
-            config_enable(reasoning_frame, is_w)
-            config_enable(reasoning_change_frame, is_w and is_rd_over_min)
-            self.set_text_editable(is_w and is_rd_over_min)
-
-            self.validity_changed()
-
-        self.is_wm_yes_var.trace_add(
-            "write",
-            lambda var, index, mode: update_user_response()
+        self.resp_frame = ResponseFrame(
+            self.app,
+            self.model_frame,
+            lambda: self.event_generate("<<PageValidityChanged>>"),
+            self._response_correctness_var,
+            master=ins_frame
         )
-        self.reasoning_detect_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
-        self.reasoning_change_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
-        self.reasoning_detect_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
-        self.reasoning_change_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
-
-        self.user_response_frame.pack(fill="x", expand=True)
-
-        # self.app.set_focus_next(reasoning_entry, remove_entry)
-        # self.app.set_focus_next(remove_entry, confirm_button)
-        # self.app.set_focus_next(self._query_form, confirm_button)
+        self.resp_frame.pack(expand=True, fill="x")
 
         super()._create_widgets()
 
         self.set_response_text("Hi! How can I help you today?", user_query_enabled=True)
 
-    def submit_query(self):
-        # get query
-        q = self._query_form.get('1.0', END)
-        if not q.strip(): return
-
+    def submit_query(self, q: str):
         # validity check
         for c in 'אבגדהוזחטיכלמנסעמצקרשתךןפץ':
             if c in q:
                 self.set_response_error("Please ask in English only.")
                 return
-
-        # set query label
-        self.q_var.set(q)
 
         # clear responses
         self.set_response_text("Generating Response... (This can take a while)")
@@ -348,14 +448,6 @@ class DetectPage(WidgetFrame, DataCollector):
         # fire listener
         if self.on_submit: self.on_submit(wrapped_q)
 
-    def set_text_editable(self, enabled: bool = True):
-        if enabled:
-            self.tl.lower()
-            self.tt.lift()
-        else:
-            self.tl.lift()
-            self.tt.lower()
-
     def set_response_text(
             self,
             text: Optional[str],
@@ -365,28 +457,13 @@ class DetectPage(WidgetFrame, DataCollector):
         # update user instructions
         if user_response_enabled:
             self.question_frame.pack_forget()
-            self.user_response_frame.pack()
+            self.resp_frame.pack(expand=True, fill="x")
         else:
-            self.question_frame.pack()
-            self.user_response_frame.pack_forget()
+            self.question_frame.pack(expand=True, fill="x")
+            self.resp_frame.pack_forget()
 
         # set text
-        self.text_var.set(text)
-
-        # scroll to frame top bottom
-        self.scroll.update_idletasks()
-        self.scroll.canvas.yview_moveto(0.0)
-
-        # config query form visibility
-        if user_query_enabled:
-            self.submit_frame.pack()
-        else:
-            self.submit_frame.pack_forget()
-        # config query form enabled
-        config_enable(self.submit_frame, user_query_enabled)
-
-        # clear query form
-        self._query_form.delete('1.0', END)
+        self.model_frame.set_text(text, user_query_enabled)
 
     def set_response_error(self, error: str):
         self.app.after(0, lambda: self.set_response_text(
@@ -412,11 +489,10 @@ class DetectPage(WidgetFrame, DataCollector):
         def watermark_worker():
             try:
                 wm = None if not self.mark else self.mark[1][1] if type(self.mark[1]) == type(tuple) else self.mark[1]
-                wmr = wm(response) if wm is not None else response
+                wmr = response  # wm(response) if wm is not None else response
 
                 # reset user responses
-                self.is_wm_yes_var.set(False)
-                self.is_wm_no_var.set(False)
+                self.resp_frame.reset_widgets()
                 self._response_correctness_var.set("")
 
                 # set watermarked model response
@@ -426,8 +502,14 @@ class DetectPage(WidgetFrame, DataCollector):
                 self._timers_wm_d = datetime.now() - self._timers_wm0
 
                 # update UI safely from main thread
-                self.app.after(0, lambda: self.set_response_text(wmr, user_query_enabled=False,
-                                                                 user_response_enabled=True))
+                self.app.after(
+                    0,
+                    lambda: self.set_response_text(
+                        wmr,
+                        user_query_enabled=False,
+                        user_response_enabled=True
+                    )
+                )
             except Exception as e:
                 print(e)
                 action = "watermarking" if config['show_watermarking'] else "generating response"
@@ -444,32 +526,17 @@ class DetectPage(WidgetFrame, DataCollector):
     def confirm_choices(self):
         # lock in choices
         config_enable(self, False)
-        self.set_text_editable(False)
+        self.model_frame.set_text_editable(False)
 
         # mark correct choices
         w = self.mark
         self._response_correctness_var.set(
-            "Correct!" if ((w is not None) == self.is_wm_yes_var.get())
+            "Correct!" if ((w is not None) == self.resp_frame.is_wm_yes_var.get())
             else "Incorrect"
         )
 
         # stop timer
         self.timer.stop()
-
-    def is_valid(self, show_errors: bool = False) -> bool:
-        if self.is_wm_yes_var.get() == self.is_wm_no_var.get():
-            # todo: show "red" required-notice and return False if not.
-            return False
-        if self.is_wm_no_var.get():
-            return True
-        is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
-        is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
-        if not (is_rd_over_min and is_rc_over_min):
-            return False
-        return True
-
-    def validity_changed(self):
-        self.event_generate("<<PageValidityChanged>>")
 
     def get_data(self) -> dict:
         return {
@@ -477,7 +544,7 @@ class DetectPage(WidgetFrame, DataCollector):
             "t_gen": self._timers_gen_d.total_seconds(),
             "t_wm": self._timers_wm_d.total_seconds(),
             "question": self.question_text,
-            "user_query": self.q_var.get(),
+            "user_query": self.model_frame.q_var.get(),
             "model_response": self.mr.get(),
             "watermark": {
                 "name": self.mark[0],
@@ -487,10 +554,10 @@ class DetectPage(WidgetFrame, DataCollector):
             "user_survey":
                 {
                     "is_wm": True,
-                    "reasoning": self.reasoning_detect_entry.get("1.0", END).strip(),
-                    "text_edited": self.tt.get("1.0", END).strip(),
-                    "edited_action": self.reasoning_change_entry.get("1.0", END).strip()
+                    "reasoning": self.resp_frame.reasoning_detect_entry.get("1.0", END).strip(),
+                    "text_edited": self.model_frame.tt.get("1.0", END).strip(),
+                    "edited_action": self.resp_frame.reasoning_change_entry.get("1.0", END).strip()
                 }
-                if self.is_wm_yes_var.get()
+                if self.resp_frame.is_wm_yes_var.get()
                 else {"is_wm": False}
         }

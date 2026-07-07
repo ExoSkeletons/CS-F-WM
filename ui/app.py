@@ -154,6 +154,7 @@ class WrappingLabel(ttk.Label):
 
     def __init__(self, container, *args, **kwargs):
         """A Label that automatically adjusts the wrap to the size."""
+        self.label = self.frame = None
 
         # save text to apply it to actual label below
         self.text: str = kwargs.get("text", "")
@@ -180,6 +181,10 @@ class WrappingLabel(ttk.Label):
     def _wrap(self, _):
         # also apply small safe padding
         self.label.configure(wraplength=self.winfo_width() - 10)
+
+    def configure(self, cnf = None, **kwargs):
+        super().configure(cnf=cnf, **kwargs)
+        if self.label: self.label.configure(cnf=cnf,**kwargs)
 
 
 class LoadingWidget(WidgetFrame):

@@ -9,7 +9,8 @@ from typing import Callable, Optional
 import ttkbootstrap as ttk
 from google.cloud.firestore_v1 import Client
 
-from ui.theme import configure_style, Fonts, pady
+from ui.theme import configure_style, Fonts
+from ui.widgets.loading import LoadingWidget
 
 # patch console out to devnull to avoid crashing logging if no console is attached
 if sys.stdout is None:
@@ -26,7 +27,7 @@ from web.client import server_poll_watermarks
 # from services import wtgb
 # from watermark.watermarks import active_watermarks
 from watermark.types import Watermark
-from ui.app import App, WidgetFrame, LoadingWidget, config_enable, HeaderWidget
+from ui.app import App, WidgetFrame, config_enable, HeaderWidget
 from config import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage

@@ -6,7 +6,7 @@ from tkinter.scrolledtext import ScrolledText
 from typing import Optional, Callable
 
 from ui.app import App, WidgetFrame
-from ui.scrollable_frame import ScrollableFrame
+from ui.widgets.frame import ScrollableFrame
 
 
 class ComparePage(WidgetFrame):

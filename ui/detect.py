@@ -9,10 +9,11 @@ from typing import Optional, Callable
 import ttkbootstrap as ttk
 
 from config import config
-from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label, WrappingLabel
-from ui.scrollable_frame import ScrollableFrame
+from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
+from ui.widgets.frame import ScrollableFrame
 from ui.survey import TimerFrame, DataCollector
 from ui.theme import Fonts, padx, pady, pad_l
+from ui.widgets.label import WrappingLabel
 from watermark.types import Watermark
 
 

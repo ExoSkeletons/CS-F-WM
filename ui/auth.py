@@ -8,9 +8,10 @@ import ttkbootstrap as ttk
 
 from config import config, data_dir_path
 from services.oauth2 import google_login
-from ui.app import WidgetFrame, HeaderWidget, Loader
-from ui.scrollable_frame import ScrollableFrame
+from ui.app import WidgetFrame, HeaderWidget
+from ui.widgets.frame import ScrollableFrame
 from ui.theme import Fonts, pad, padx, pady, pad_l
+from ui.widgets.loading import Loader
 
 
 class TermsPage(WidgetFrame):

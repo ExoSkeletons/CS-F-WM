@@ -182,9 +182,9 @@ class WrappingLabel(ttk.Label):
         # also apply small safe padding
         self.label.configure(wraplength=self.winfo_width() - 10)
 
-    def configure(self, cnf = None, **kwargs):
+    def configure(self, cnf=None, **kwargs):
         super().configure(cnf=cnf, **kwargs)
-        if self.label: self.label.configure(cnf=cnf,**kwargs)
+        if self.label: self.label.configure(cnf=cnf, **kwargs)
 
 
 class LoadingWidget(WidgetFrame):
@@ -212,3 +212,27 @@ class LoadingWidget(WidgetFrame):
 
     def post_progress(self, action: str = "loading", **kwargs):
         self.app.after(0, lambda: self._on_progress_update(action=action, kwargs=kwargs))
+
+
+class HeaderWidget(WidgetFrame):
+    def __init__(self, app: App, logo_path: str, logo_paths_uni: list[str], master: Optional[Misc] = None):
+        self.logo_path = logo_path
+        self.uni_logo_paths = logo_paths_uni
+        super().__init__(app, master)
+
+    def _create_widgets(self):
+        self.logo_img = ttk.PhotoImage(file="ui/imgs/" + self.logo_path)
+        self.logos_uni_imgs = [
+            ttk.PhotoImage(file="ui/imgs/uni/" + name)
+            for name in self.uni_logo_paths
+        ]
+
+        self.logo_label = ttk.Label(self, image=self.logo_img)
+        self.logos_unis_labels = [
+            ttk.Label(self, image=img)
+            for img in self.logos_uni_imgs
+        ]
+
+        self.logo_label.grid(row=0, column=0, sticky="nsew")
+        for i, l in enumerate(self.logos_unis_labels):
+            l.grid(row=0, column=(i + 1), sticky="nsew")

@@ -9,6 +9,7 @@ from google.cloud.firestore_v1 import Client
 from config import config
 from services.email import send_email_from_app
 from ui.app import WidgetFrame, App
+from ui.theme import pady, padx
 
 
 class TimerFrame(ttk.Frame):
@@ -136,8 +137,8 @@ class PagedFrame(WidgetFrame):
 
     def _create_widgets(self):
         # Notebook for page frames
-        self.notebook = ttk.Notebook(self, bootstyle="light")
-        self.notebook.pack(fill="both", expand=True)
+        self.notebook = ttk.Notebook(self, bootstyle="secondary")
+        self.notebook.pack(fill="both", expand=True, pady=pady)
 
         # Footer frame
         footer = ttk.Frame(self)
@@ -148,22 +149,22 @@ class PagedFrame(WidgetFrame):
         self._prev_btn = ttk.Button(
             footer,
             compound="left", image=self._img_prev,
-            #text="<- " + self.prev_text,
+            # text="<- " + self.prev_text,
             bootstyle="info",
             command=self.prev_page
         )
         self._next_btn = ttk.Button(
             footer,
             compound="right", image=self._img_next,
-            #text="" + self.next_text + " ->",
+            # text="" + self.next_text + " ->",
             bootstyle="success",
             command=self.next_page
         )
         self._progress_bar = ttk.Progressbar(footer, orient="horizontal", mode="determinate")
 
         if self.allow_prev:
-            self._prev_btn.pack(side="left")
-        self._progress_bar.pack(side="left", fill="x", expand=True)
+            self._prev_btn.pack(side="left", padx=padx)
+        self._progress_bar.pack(side="left", fill="x", expand=True, padx=padx)
         self._next_btn.pack(side="right")
 
         # Bind to notebook changes

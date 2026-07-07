@@ -12,7 +12,7 @@ from config import config
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label, WrappingLabel
 from ui.scrollable_frame import ScrollableFrame
 from ui.survey import TimerFrame, DataCollector
-from ui.theme import Fonts, padx, pady
+from ui.theme import Fonts, padx, pady, pad_l
 from watermark.types import Watermark
 
 
@@ -24,14 +24,14 @@ class ModelFrame(WidgetFrame):
     def _create_widgets(self):
         # ai model frame
         model_frame = self
-        model_header = ttk.Frame(model_frame)
-        model_header.pack(fill='x', expand=True)
+        model_header = ttk.Frame(model_frame, padding=(padx, pady), bootstyle="info")
+        model_header.pack(fill='x', expand=True, pady=pady)
 
         self._img_model = ttk.PhotoImage(file="ui/imgs/" + "model.png")
         ttk.Label(
             model_header,
             image=self._img_model
-        ).grid(row=0, column=0)
+        ).grid(row=0, column=0, padx=padx)
         model_info = ttk.Frame(model_header)
         model_info.grid(row=0, column=1, sticky="nsw")
         model_header.columnconfigure(1, weight=1)
@@ -43,11 +43,11 @@ class ModelFrame(WidgetFrame):
         WrappingLabel(model_info, textvariable=self.q_var, font=Fonts.small).pack(expand=True, fill="both")
 
         model_body = ttk.Frame(model_frame)
-        model_body.pack(fill='x', expand=True)
+        model_body.pack(fill='x', expand=True, pady=pady)
         # ttk.Label(model_body, text="Response:").pack()
         # model response frame
         self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=True)
-        self.scroll.pack(fill="both", expand=True)
+        self.scroll.pack(fill="both", expand=True, pady=pady)
         self.text_var = ttk.StringVar()
         response_font = Font(font=Fonts.body, size=10)
         # text form (editable)
@@ -67,14 +67,14 @@ class ModelFrame(WidgetFrame):
         self.submit_frame.pack(fill="x", expand=True)
         self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
         self.app.set_on_submit(self._query_form, lambda: self.submit_query())
-        self._query_form.grid(row=0, column=0, sticky="nsew")
+        self._query_form.grid(row=0, column=0, sticky="nsew", padx=padx)
         self.submit_frame.columnconfigure(0, weight=1)
         self._img_submit = ttk.PhotoImage(file="ui/imgs/ic/" + "send.png")
         query_button = ttk.Button(
             self.submit_frame,
             compound="right", image=self._img_submit,
             # text="Send",
-            bootstyle="info",
+            bootstyle="success",
             command=lambda: self.submit_query()
         )
         query_button.grid(row=0, column=1, sticky="nse")
@@ -131,9 +131,9 @@ class QuestionFrame(WidgetFrame):
             text=
             "You are given below a question from a school assignment, and an AI Assistant to your right."
             ,
-            font=Fonts.h2,
+            font=Fonts.h3,
             justify="left", anchor="nw",
-        ).pack(expand=True, fill="both")
+        ).pack(expand=True, fill="both", pady=pady)
         WrappingLabel(
             self.question_frame,
             text=
@@ -141,13 +141,13 @@ class QuestionFrame(WidgetFrame):
             ,
             font=Fonts.small,
             justify="left", anchor="nw",
-        ).pack(expand=True, fill="both")
+        ).pack(expand=True, fill="both", pady=pad_l)
         # question
-        ttk.Label(self.question_frame, font=Fonts.small, text="question:").pack()
+        ttk.Label(self.question_frame, font=Fonts.h2, text="Question:").pack(anchor="nw")
         q_label = ttk.Text(
             self.question_frame,
             font=Fonts.h3,
-            wrap='word', width=1, height=4
+            wrap='word', width=1, height=4,
         )
         config_style_as_label(q_label, self.app)
         set_text(q_label, self.question)
@@ -370,10 +370,10 @@ class DetectPage(WidgetFrame, DataCollector):
         super().__init__(app, master)
 
     def _create_widgets(self):
-        # todo: split to widgets
+        self.config(padding=(padx, pady))
         # title
         title_frame = ttk.Frame(self)
-        title_frame.pack(expand=True, fill="x")
+        title_frame.pack(expand=True, fill="x", pady=pady)
         ttk.Label(
             title_frame, text=self.title,
             font=Font(font=Fonts.h1, underline=True)
@@ -395,7 +395,7 @@ class DetectPage(WidgetFrame, DataCollector):
 
         # instructions
         ins_frame = ttk.Frame(body_frame)
-        ins_frame.grid(row=0, column=ins_col, sticky="nwe")
+        ins_frame.grid(row=0, column=ins_col, sticky="nwe", padx=padx)
 
         # model vars
         self.mr = StringVar(value=None)
@@ -404,7 +404,9 @@ class DetectPage(WidgetFrame, DataCollector):
         self.model_frame = ModelFrame(
             self.app, lambda q: self.submit_query(q),
             master=body_frame,
-            relief="sunken", padding=(padx, pady),
+            padding=(padx, pady),
+            # relief="sunken",
+            bootstyle="light",
         )
         self.model_frame.grid(row=0, column=model_col, sticky="nsew")
 

@@ -4,13 +4,12 @@ import sys
 from datetime import datetime
 from os import system
 from tkinter.font import Font
-
-import ttkbootstrap as ttk
 from typing import Callable, Optional
 
+import ttkbootstrap as ttk
 from google.cloud.firestore_v1 import Client
 
-from ui.theme import configure_style, Fonts
+from ui.theme import configure_style, Fonts, pady
 
 # patch console out to devnull to avoid crashing logging if no console is attached
 if sys.stdout is None:
@@ -27,7 +26,7 @@ from web.client import server_poll_watermarks
 # from services import wtgb
 # from watermark.watermarks import active_watermarks
 from watermark.types import Watermark
-from ui.app import App, WidgetFrame, LoadingWidget, config_enable
+from ui.app import App, WidgetFrame, LoadingWidget, config_enable, HeaderWidget
 from config import data_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
@@ -47,9 +46,13 @@ db: Client
 
 
 def start_survey_ui(session: SurveySession, wm: Watermark):
-    pager = PagedFrame(root, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
+    frame = WidgetFrame(root)
+    header = HeaderWidget(root, "logo.png", ['jct.png', 'ariel.png'], master=frame)
+    header.pack(expand=True, fill="x")
+    pager = PagedFrame(root, master=frame, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
+    pager.pack(expand=True, fill="both")
 
-    intro_frame = WidgetFrame(root, pager.notebook)
+    intro_frame = WidgetFrame(root, master=pager.notebook)
     intro_text = ""
     try:
         with open(data_dir_path + "introduction.txt", "rt", encoding='utf-8') as f:
@@ -88,7 +91,7 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
     random.shuffle(flags)
     for i in range(page_amount):
         detect_page = DetectPage(
-            root, pager.notebook,
+            root, master=pager.notebook,
             title=f"Assignment {i + 1}",
             watermark=wm, mark_prob=1.0 if flags[i] else 0.0,
             questions=questions
@@ -115,20 +118,20 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         session.save_demographics(demo_data)
         session.save_completed(datetime.now())
 
-    demo_survey_page = DemoPage(root, pager.notebook)
+    demo_survey_page = DemoPage(root, master=pager.notebook)
     pager.add_page(
-        demo_survey_page, "Conclusion",
+        demo_survey_page, "",
         on_next=lambda _, p: conclude_session(p.get_data())
     )
 
-    end_frame = WidgetFrame(root, pager.notebook)
-    ttk.Label(end_frame, text="Thanks for Participating!").pack()
+    end_frame = WidgetFrame(root, master=pager.notebook)
+    ttk.Label(end_frame, text="Thanks for participating").pack()
     ttk.Button(end_frame, text="Quit", command=lambda: sys.exit(0)).pack()
-    pager.add_page(end_frame, "Thanks for participating")
+    pager.add_page(end_frame, "")
 
     pager.select_page(0)
 
-    root.set_frame(pager, grow=True)
+    root.set_frame(frame, grow=True)
     root.raise_window()
 
 
@@ -179,7 +182,7 @@ def setup_watermark(uuid: str, log: Callable[[str], None]) -> Watermark:
 
     # init local model for local watermarking
     # todo: replace with mapping of wm->setup function | None
-    #if name == "wtgb":
+    # if name == "wtgb":
     #    log('building models (this can take up to a few minutes)')
     #    wtgb.init_model()
 
@@ -234,10 +237,9 @@ if __name__ == "__main__":
     system("title " + title)
     print("Starting App...")
 
-    root = App(title=title, themename="lumen")
+    root = App(title=title, themename="litera")
 
     splash_frame = WidgetFrame(root)
-    splash_frame.pack()
     lw = splash_frame.lw = LoadingWidget(root, splash_frame)
     lw.load = lambda _: setup_data(lambda a, l=lw: l.post_progress(a))
     lw.pack()

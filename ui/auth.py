@@ -8,9 +8,9 @@ import ttkbootstrap as ttk
 
 from config import config, data_dir_path
 from services.oauth2 import google_login
-from ui.app import WidgetFrame
+from ui.app import WidgetFrame, HeaderWidget
 from ui.scrollable_frame import ScrollableFrame
-from ui.theme import Fonts, pad, padx, pady
+from ui.theme import Fonts, pad, padx, pady, pad_l
 
 
 class TermsPage(WidgetFrame):
@@ -63,6 +63,7 @@ class AuthPage(WidgetFrame):
     user_id: str
 
     def _create_widgets(self):
+        HeaderWidget(self.app, "logo.png", ['jct.png', 'ariel.png'], master=self).pack(pady=pad_l)
         ttk.Label(self, text="Welcome!", font=Fonts.h1).pack()
         ttk.Label(
             self,

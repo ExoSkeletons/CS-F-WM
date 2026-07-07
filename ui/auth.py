@@ -26,7 +26,7 @@ class TermsPage(WidgetFrame):
 
         # terms
         ttk.Label(self, text="Consent Form", font=Fonts.h1).pack()
-        ttk.Label(self, text="Please read the form below carefully.", font=Font(size=8, slant="italic")).pack()
+        ttk.Label(self, text="Please read the form below carefully.", font=Fonts.small).pack()
         online_doc_url = config["consent_form_url"]
         ttk.Button(
             self, text="View Document Online",

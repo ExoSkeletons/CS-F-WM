@@ -4,9 +4,9 @@ from tkinter import ttk
 class Fonts:
     h1 = ("Segoe UI", 24, "bold")
     h2 = ("Segoe UI", 18, "bold")
-    h3 = ("Segoe UI", 16, "bold")
+    h3 = ("Segoe UI", 14, "bold")
     body = ("Segoe UI", 11)
-    small = ("Segoe UI", 9)
+    small = ("Segoe UI", 8, "italic")
     mono = ("Consolas", 10)
 
 

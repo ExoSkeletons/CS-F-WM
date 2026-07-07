@@ -9,7 +9,7 @@ class Loader(ttk.Frame):
     def __init__(
             self,
             master,
-            size=30,
+            size=40,
             thickness=5,
             update_ms=10,
             step_by=2,

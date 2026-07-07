@@ -1,5 +1,6 @@
 import threading
 import webbrowser
+from tkinter import PhotoImage
 from tkinter.font import Font
 from typing import Callable, Any
 
@@ -30,7 +31,7 @@ class TermsPage(WidgetFrame):
         online_doc_url = config["consent_form_url"]
         ttk.Button(
             self, text="View Document Online",
-            bootstyle="info",
+            bootstyle="link",
             command=lambda: webbrowser.open(online_doc_url)
         ).pack(anchor="e")
 
@@ -48,13 +49,13 @@ class TermsPage(WidgetFrame):
 
         # accept/reject buttons
         b_frame = ttk.Frame(self)
-        b_frame.pack()
+        b_frame.pack(pady=pady)
         ttk.Label(self, text="")
         ttk.Button(
             b_frame, text="Accept Terms and Continue",
             bootstyle="success",
             command=lambda: self.on_accepted()
-        ).grid(row=0, column=0)
+        ).grid(row=0, column=0, padx=padx)
         # ttk.Button(b_frame, text="Reject", command=lambda: sys.exit()).grid(row=0, column=1)
 
 
@@ -62,10 +63,21 @@ class AuthPage(WidgetFrame):
     user_id: str
 
     def _create_widgets(self):
-        ttk.Label(self, text="Welcome!", font=Font(size=22, weight="bold")).pack()
-        ttk.Label(self, text="Please Login to continue:", font=Font(size=12, weight='bold')).pack()
+        ttk.Label(self, text="Welcome!", font=Fonts.h1).pack()
+        ttk.Label(
+            self,
+            text="Thanks for participating in our Experiment.\nYou're contribution today helps us push Science forward!",
+            font=Font(slant="italic"), justify="center",
+        ).pack(pady=pady)
+        ttk.Label(self, text="Please Login to continue", font=Fonts.h3).pack(pady=pady)
         # ttk.Label(self, text="TBI").pack()
-        ttk.Button(self, text="Log in with Google", command=lambda: self.login_async()).pack()
+        self.g_img = PhotoImage(file="ui/imgs/ic/" + "google.png")
+        ttk.Button(
+            self,
+            compound="left", image=self.g_img, text="Log in with Google",
+            bootstyle="success",
+            command=lambda: self.login_async()
+        ).pack(pady=pady)
         ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
 
     def login_async(self):

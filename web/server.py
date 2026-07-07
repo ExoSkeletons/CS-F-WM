@@ -66,10 +66,11 @@ def watermark(data: dict, request: Request, response: Response):
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 
-    tmp_not_supported = ['wtgb']
-    if wm_name in tmp_not_supported:
-        print(f"wm {wm_name} not supported")
-        raise HTTPException(status_code=500, detail=f"watermark {wm_name} temporarily unavailable")
+    if wm_name == 'wtgb':
+        text = data["text"]
+        l = 40
+        if len(text) > l:
+            raise HTTPException(status_code=401, detail=f"text too long.\ncurrent server specs are low, watermarking with wtgb temporarily limited to {l} characters.")
 
     job_id = str(uuid4())
     print(f"starting watermark job {job_id}")

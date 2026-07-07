@@ -68,6 +68,7 @@ class App(ttk.Window):
         container.pack(side="top", expand=True, fill="both", padx=pad_l, pady=pad_l)
 
         self.__bind_return()
+        self.__bind_lang_keys()
         self.__setup_dimensions()
 
     def set_frame(self, frame: ttk.Frame, grow=False):
@@ -111,6 +112,28 @@ class App(ttk.Window):
 
     def set_on_submit(self, w: Misc, command):
         self.__submits[w] = command
+
+    def __bind_lang_keys(self):
+        def global_shortcuts(event):
+            ctrl = 0x4
+            if not (event.state & ctrl):
+                return None
+
+            if event.keycode == ord('C'):
+                event.widget.event_generate("<<Copy>>")
+                return "break"
+            elif event.keycode == ord('V'):
+                event.widget.event_generate("<<Paste>>")
+                return "break"
+            elif event.keycode == ord('X'):
+                event.widget.event_generate("<<Cut>>")
+                return "break"
+            elif event.keycode == ord('A'):
+                event.widget.event_generate("<<SelectAll>>")
+                return "break"
+            return None
+
+        self.bind_all("<KeyPress>", global_shortcuts)
 
 
 class WidgetFrame(ttk.Frame):

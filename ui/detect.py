@@ -8,7 +8,7 @@ from typing import Optional, Callable
 
 import ttkbootstrap as ttk
 
-from config import config
+from config import config, img_dir_path
 from ui.app import App, WidgetFrame, config_enable, set_text, config_style_as_label
 from ui.survey import TimerFrame, DataCollector
 from ui.theme import Fonts, padx, pady, pad_l
@@ -31,7 +31,7 @@ class ModelFrame(WidgetFrame):
         model_header = ttk.Frame(model_frame, padding=(padx, pady), bootstyle=hs)
         model_header.pack(fill='x', expand=True, pady=pady)
 
-        self._img_model = ttk.PhotoImage(file="ui/imgs/" + "model.png")
+        self._img_model = ttk.PhotoImage(file=img_dir_path + "model.png")
         ttk.Label(
             model_header,
             image=self._img_model, bootstyle=hsi,
@@ -73,7 +73,7 @@ class ModelFrame(WidgetFrame):
         self.app.set_on_submit(self._query_form, lambda: self.submit_query())
         self._query_form.grid(row=0, column=0, sticky="nsew", padx=padx, pady=pady)
         self.submit_frame.columnconfigure(0, weight=1)
-        self._img_submit = ttk.PhotoImage(file="ui/imgs/ic/" + "send.png")
+        self._img_submit = ttk.PhotoImage(file=img_dir_path + "ic/" + "send.png")
         query_button = ttk.Button(
             self.submit_frame,
             compound="right", image=self._img_submit,

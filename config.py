@@ -17,6 +17,7 @@ def resource_path(relative_path):
 
 
 data_dir_path = resource_path("data/")
+img_dir_path = data_dir_path + "imgs/"
 
 config = {}
 

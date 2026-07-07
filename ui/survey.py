@@ -6,7 +6,7 @@ from typing import Callable, Optional
 import ttkbootstrap as ttk
 from google.cloud.firestore_v1 import Client
 
-from config import config
+from config import config, img_dir_path
 from services.email import send_email_from_app
 from ui.app import WidgetFrame, App
 from ui.theme import pady, padx
@@ -144,8 +144,8 @@ class PagedFrame(WidgetFrame):
         footer = ttk.Frame(self)
         footer.pack(fill="x")
         # Navigation buttons + progress bar
-        self._img_prev = ttk.PhotoImage(file="ui/imgs/ic/" + "left.png")
-        self._img_next = ttk.PhotoImage(file="ui/imgs/ic/" + "right.png")
+        self._img_prev = ttk.PhotoImage(file=img_dir_path + "ic/" + "left.png")
+        self._img_next = ttk.PhotoImage(file=img_dir_path + "ic/" + "right.png")
         self._prev_btn = ttk.Button(
             footer,
             compound="left", image=self._img_prev,

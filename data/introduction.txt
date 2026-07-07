@@ -8,6 +8,4 @@ During the experiment:
 
 You may use any external tools or materials for translation or watermark identification.
 
-To enable copy/paste from the application to external tools, make sure your keyboard language is set to English.
-
 If you encounter a problem, you can re-enter and continue from the same point.

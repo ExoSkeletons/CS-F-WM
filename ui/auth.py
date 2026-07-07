@@ -79,7 +79,7 @@ class AuthPage(WidgetFrame):
             bootstyle="success",
             command=lambda: self.login_async()
         ).pack(pady=pady)
-        ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+        # ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
         self.load_spinner = Loader(self, bounce=True)
 
     def login_async(self):

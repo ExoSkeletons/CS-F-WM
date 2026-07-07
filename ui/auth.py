@@ -8,7 +8,7 @@ import ttkbootstrap as ttk
 
 from config import config, data_dir_path
 from services.oauth2 import google_login
-from ui.app import WidgetFrame, HeaderWidget
+from ui.app import WidgetFrame, HeaderWidget, Loader
 from ui.scrollable_frame import ScrollableFrame
 from ui.theme import Fonts, pad, padx, pady, pad_l
 
@@ -79,7 +79,8 @@ class AuthPage(WidgetFrame):
             bootstyle="success",
             command=lambda: self.login_async()
         ).pack(pady=pady)
-        ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+        # ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+        self.load_spinner = Loader(self, bounce=True)
 
     def login_async(self):
         def worker():
@@ -87,6 +88,8 @@ class AuthPage(WidgetFrame):
             self.app.after(0, lambda: self.login_callback(user))
 
         threading.Thread(target=worker, daemon=True).start()
+        self.load_spinner.pack()
+        self.load_spinner.start()
 
     def on_login(self, uuid, email):
         pass

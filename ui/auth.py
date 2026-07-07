@@ -9,7 +9,7 @@ from config import config, data_dir_path
 from services.oauth2 import google_login
 from ui.app import WidgetFrame
 from ui.scrollable_frame import ScrollableFrame
-from ui.theme import FONTS, pad, padx, pady
+from ui.theme import Fonts, pad, padx, pady
 
 
 class TermsPage(WidgetFrame):
@@ -25,7 +25,7 @@ class TermsPage(WidgetFrame):
             exit(1)
 
         # terms
-        ttk.Label(self, text="Consent Form", font=FONTS['h1']).pack()
+        ttk.Label(self, text="Consent Form", font=Fonts.h1).pack()
         ttk.Label(self, text="Please read the form below carefully.", font=Font(size=8, slant="italic")).pack()
         online_doc_url = config["consent_form_url"]
         ttk.Button(
@@ -66,7 +66,7 @@ class AuthPage(WidgetFrame):
         ttk.Label(self, text="Please Login to continue:", font=Font(size=12, weight='bold')).pack()
         # ttk.Label(self, text="TBI").pack()
         ttk.Button(self, text="Log in with Google", command=lambda: self.login_async()).pack()
-        # ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
+        ttk.Button(self, text="Dummy Login", command=lambda: self.on_login("dummy", "test@example.com")).pack()
 
     def login_async(self):
         def worker():

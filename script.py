@@ -10,7 +10,7 @@ from typing import Callable, Optional
 
 from google.cloud.firestore_v1 import Client
 
-from ui.theme import configure_style, FONTS
+from ui.theme import configure_style, Fonts
 
 # patch console out to devnull to avoid crashing logging if no console is attached
 if sys.stdout is None:
@@ -59,9 +59,9 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         input("Could not load instructions.")
         exit(1)
 
-    (ttk.Label(intro_frame, text="Introduction & Instructions", font=FONTS['h1'])
+    (ttk.Label(intro_frame, text="Introduction & Instructions", font=Fonts.h1)
      .pack(anchor="center"))
-    (ttk.Label(intro_frame, text=intro_text, font=Font(font=FONTS['body'], slant='italic'), wraplength=700)
+    (ttk.Label(intro_frame, text=intro_text, font=Font(font=Fonts.body, slant='italic'), wraplength=700)
      .pack(anchor="center"))
     pager.add_page(intro_frame, "Introduction")
 

@@ -11,8 +11,8 @@ class Fonts:
 
 
 dim = {
-    "maxw": 1080, "maxh": 820,
-    "full": True,
+    # "maxw": 1080, "maxh": 820,
+    "full": False,
 }
 
 pad = 15

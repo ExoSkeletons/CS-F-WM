@@ -93,8 +93,8 @@ class App(ttk.Window):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
-        window_width = min(dim['maxw'], screen_width)
-        window_height = min(dim['maxh'], screen_height)
+        window_width = min(dim.get('maxw', screen_width), screen_width)
+        window_height = min(dim.get('maxh', screen_height), screen_height)
 
         if dim.get('full', False): self.attributes("-fullscreen", True)
 

@@ -207,7 +207,7 @@ class ResponseFrame(WidgetFrame):
         self.b_wm_no = ttk.Radiobutton(
             radio_frame, text="No",
             variable=self.is_wm_no_var,
-            bootstyle="success-outline-toolbutton",
+            bootstyle="danger-outline-toolbutton",
             command=lambda: self.is_wm_yes_var.set(not self.is_wm_no_var.get())
         )
         self.b_wm_yes.grid(row=0, column=0)

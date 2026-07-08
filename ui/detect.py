@@ -223,7 +223,7 @@ class ResponseFrame(WidgetFrame):
         reasoning_detect_frame.pack(expand=True, fill="x")
         WrappingLabel(
             reasoning_detect_frame,
-            text="• What made you think text was watermarked?",
+            text="• What made you think text the was watermarked?",
             justify="left"
         ).pack(anchor="nw", expand=True, fill="x")
         self.reasoning_detect_entry = ttk.Text(

@@ -26,6 +26,7 @@ def get_user_data(cred):
     info = id_token.verify_oauth2_token(
         cred.id_token,
         requests.Request(),
+        clock_skew_in_seconds=30,
     )
 
     return {

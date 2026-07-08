@@ -6,6 +6,7 @@ from requests import HTTPError
 
 from config import config
 from watermark.types import Watermarks
+from config import max_len
 
 
 def submit_job(text: str, wm: str, ip: str, port: int = 8000):
@@ -94,8 +95,11 @@ if __name__ == "__main__":
         try:
             print("Submitting job...", end='')
 
-            SERVER_IP = "3.83.31.129"
+            SERVER_IP = "54.166.148.34"
             SERVER_PORT = 8000
+
+            if wm in max_len:
+                text = text[:max_len[wm]]
 
             job_id, job_location = submit_job(text, wm, SERVER_IP, SERVER_PORT)
             print(f"Done.\nAwaiting job [{job_id}]", end=' ')

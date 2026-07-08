@@ -197,7 +197,7 @@ class PagedFrame(WidgetFrame):
         self._pages.append(frame)
         if validator: self._validators[frame] = validator
         if on_next: self._on_next_callbacks[frame] = on_next
-        self.notebook.add(frame, text=title or f"Page {index + 1}")
+        self.notebook.add(frame, text=title if title is not None else f"Page {index + 1}")
         frame.bind("<<PageValidityChanged>>", self._update_ui)
         self._update_ui()
 

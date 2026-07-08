@@ -57,6 +57,11 @@ def watermark_worker(job_id: str):
         jobs[job_id]["error"] = str(e)
 
 
+max_len = {
+    "wtgb": 50
+}
+
+
 @app.post("/watermark", status_code=202)
 def watermark(data: dict, request: Request, response: Response):
     print(f"client posted watermarking request:\n{data}")
@@ -66,11 +71,16 @@ def watermark(data: dict, request: Request, response: Response):
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 
-    if wm_name == 'wtgb':
+    if wm_name in max_len:
         text = data["text"]
-        l = 40
+        l = max_len[wm_name]
         if len(text) > l:
-            raise HTTPException(status_code=401, detail=f"text too long.\ncurrent server specs are low, watermarking with wtgb temporarily limited to {l} characters.")
+            raise HTTPException(
+                status_code=401,
+                detail=f"text too long.\n"
+                       f"current server specs are low,"
+                       f"watermarking with {wm_name} temporarily limited to {l} characters."
+            )
 
     job_id = str(uuid4())
     print(f"starting watermark job {job_id}")

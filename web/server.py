@@ -58,6 +58,11 @@ def watermark_worker(job_id: str):
         jobs[job_id]["error"] = str(e)
 
 
+max_len = {
+    "wtgb": 50
+}
+
+
 @app.post("/watermark", status_code=202)
 def watermark(data: dict, request: Request, response: Response):
     print(f"client posted watermarking request:\n{data}")

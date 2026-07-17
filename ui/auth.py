@@ -64,7 +64,7 @@ class AuthPage(WidgetFrame):
     user_id: str
 
     def _create_widgets(self):
-        HeaderWidget(self.app, "logo.png", ['jct.png', 'ariel.png'], master=self).pack(pady=pad_l)
+        HeaderWidget(self.app, "logo.png", ['jct.png', 'ariel.png', 'csic.png'], master=self).pack(pady=pad_l)
         ttk.Label(self, text="Welcome!", font=Fonts.h1).pack()
         ttk.Label(
             self,

@@ -29,7 +29,7 @@ class ModelFrame(WidgetFrame):
         hs = "info"
         hsi = "inverse-" + hs
         model_header = ttk.Frame(model_frame, padding=(padx, pady), bootstyle=hs)
-        model_header.pack(fill='x', expand=True, pady=pady)
+        model_header.pack(fill='x', pady=pady)
 
         self._img_model = ttk.PhotoImage(file=img_dir_path + "model.png")
         ttk.Label(
@@ -47,10 +47,9 @@ class ModelFrame(WidgetFrame):
         # WrappingLabel(model_info, textvariable=self.q_var, bootstyle=hsi, font=Fonts.small).pack(expand=True, fill="x")
 
         model_body = ttk.Frame(model_frame)
-        model_body.pack(fill='x', expand=True, pady=pady)
-        # ttk.Label(model_body, text="Response:").pack()
+        model_body.pack(expand=True, fill='both', pady=pady)
         # model response frame
-        self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=True)
+        self.scroll = ScrollableFrame(model_body, scroll_y=True, scroll_x=False)
         self.scroll.pack(fill="both", expand=True, pady=pady)
         self.text_var = ttk.StringVar()
         response_font = Font(font=Fonts.body, size=10)
@@ -58,17 +57,19 @@ class ModelFrame(WidgetFrame):
         self.tt = ttk.Text(self.scroll.content, wrap="word", font=response_font)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tt, self.text_var.get()))
         self.tt.grid(row=0, column=0, sticky="nsew")
+        self.scroll.content.columnconfigure(0, weight=1)
+        self.scroll.content.rowconfigure(0, weight=1)
         # text label (non-editable)
         # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
         self.tl = ttk.Text(self.scroll.content, wrap="word", font=response_font)
         config_style_as_label(self.tl, self.app)
         config_enable(self.tl, False)
         self.text_var.trace_add("write", lambda var, index, mode: set_text(self.tl, self.text_var.get(), force=True))
-        self.tl.grid(row=0, column=0, sticky="nsew")
+        self.tl.place(relx=0, rely=0, relwidth=1, relheight=1)
         # self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
         # query submission
         self.submit_frame = ttk.Frame(model_body)
-        self.submit_frame.pack(fill="x", expand=True)
+        self.submit_frame.pack(fill="x")
         self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
         self.app.set_on_submit(self._query_form, lambda: self.submit_query())
         self._query_form.grid(row=0, column=0, sticky="nsew", padx=padx, pady=pady)
@@ -127,9 +128,7 @@ class QuestionFrame(WidgetFrame):
         super().__init__(app, **kwargs)
 
     def _create_widgets(self):
-        ins_frame = self
-        self.question_frame = ttk.Frame(ins_frame)
-        self.question_frame.pack(expand=True, fill="both")
+        self.question_frame = self
         WrappingLabel(
             self.question_frame,
             text=
@@ -137,7 +136,7 @@ class QuestionFrame(WidgetFrame):
             ,
             font=Fonts.h3,
             justify="left", anchor="nw",
-        ).pack(expand=True, fill="both", pady=pady)
+        ).pack(fill="x")
         WrappingLabel(
             self.question_frame,
             text=
@@ -145,18 +144,22 @@ class QuestionFrame(WidgetFrame):
             ,
             font=Fonts.h3,
             justify="left", anchor="nw",
-        ).pack(expand=True, fill="both", pady=pad_l)
+        ).pack(fill="x", pady=pad_l)
         # question
-        ttk.Label(self.question_frame, font=Fonts.h2, text="Question:").pack(anchor="nw")
+        qs = "light"
+        qsi = "inverse-" + qs
+        q_frame = ttk.Frame(self.question_frame, padding=(padx, pady), bootstyle=qs)
+        q_frame.pack(fill="x", expand=True)
+        ttk.Label(q_frame, text="Question", bootstyle=qsi).pack(anchor="nw", pady=pady)
         q_label = ttk.Text(
-            self.question_frame,
+            q_frame,
             font=Fonts.h3,
             wrap='word', width=1, height=4,
         )
         config_style_as_label(q_label, self.app)
         set_text(q_label, self.question)
         config_enable(q_label, False)
-        q_label.pack(expand=True, fill="x")
+        q_label.pack(fill="x")
 
 
 class ResponseFrame(WidgetFrame):
@@ -184,20 +187,22 @@ class ResponseFrame(WidgetFrame):
             text="Observe the response text you've received:",
             font=Fonts.h2,
             justify="left",
-        ).pack(expand=True, fill="x"))
+        ).pack(fill="x"))
 
         # yes/no
         yes_or_no_frame = ttk.Frame(user_response_frame)
-        yes_or_no_frame.pack(expand=True, fill='x')
+        yes_or_no_frame.pack(fill='x')
         (WrappingLabel(
             yes_or_no_frame,
             text="• Do you believe it has been watermarked? You may use any external resource.",
             justify="left"
-        ).pack(anchor="nw", expand=True, fill="x"))
+        ).grid(row=0, column=0, sticky="nsew"))
         # yes/no radios
         self.is_wm_yes_var = ttk.BooleanVar()
         self.is_wm_no_var = ttk.BooleanVar()
         radio_frame = ttk.Frame(yes_or_no_frame)
+        radio_frame.grid(row=0, column=1, sticky="nse")
+        yes_or_no_frame.grid_columnconfigure(0, weight=1)
         self.b_wm_yes = ttk.Radiobutton(
             radio_frame, text="Yes",
             variable=self.is_wm_yes_var,
@@ -214,26 +219,25 @@ class ResponseFrame(WidgetFrame):
         self.b_wm_no.grid(row=0, column=1)
         self.is_wm_yes_var.trace_add("write", lambda v, i, m: self.on_validity_changed())
         self.is_wm_no_var.trace_add("write", lambda v, i, m: self.on_validity_changed())
-        radio_frame.pack()
 
         # reasoning
         reasoning_frame = ttk.Frame(user_response_frame)
-        reasoning_frame.pack(expand=True, fill="x")
+        reasoning_frame.pack(fill="x")
         reasoning_detect_frame = ttk.Frame(reasoning_frame)
-        reasoning_detect_frame.pack(expand=True, fill="x")
+        reasoning_detect_frame.pack(fill="x")
         WrappingLabel(
             reasoning_detect_frame,
             text="• What made you think text the was/wasn't watermarked?",
             justify="left"
-        ).pack(anchor="nw", expand=True, fill="x")
+        ).pack(anchor="nw", fill="x")
         self.reasoning_detect_entry = ttk.Text(
             reasoning_detect_frame,
             wrap="word", undo=True, maxundo=10,
             width=self.entry_minw, height=self.entry_minh,
         )
-        self.reasoning_detect_entry.pack(expand=True, fill="x")
+        self.reasoning_detect_entry.pack(fill="x")
         len_rd_frame = ttk.Frame(reasoning_detect_frame)
-        len_rd_frame.pack(expand=True, fill="x")
+        len_rd_frame.pack(fill="x")
         ttk.Label(
             len_rd_frame,
             text=f"Your response must be at least {self._min_response_char_count} characters long.",
@@ -248,27 +252,27 @@ class ResponseFrame(WidgetFrame):
             text=f"{self.len_rd_var.get()}/{self._min_response_char_count}"
         ))
         reasoning_change_frame = ttk.Frame(reasoning_frame)
-        reasoning_change_frame.pack(expand=True, fill="x")
+        reasoning_change_frame.pack(fill="x")
         WrappingLabel(
             reasoning_change_frame,
             text=
             "• Whether you think there is a watermark or not, try removing the potential watermark by editing the text response.\n"
             "Do your best to remove only the watermark and keep the original text intact as much as possible.",
             justify="left"
-        ).pack(anchor="nw", expand=True, fill="x")
+        ).pack(anchor="nw", fill="x", pady=pady)
         WrappingLabel(
             reasoning_change_frame,
             text="• What did you do to try and remove the potential watermark?",
             justify="left"
-        ).pack(anchor="nw", expand=True, fill="x")
+        ).pack(anchor="nw", fill="x")
         self.reasoning_change_entry = ttk.Text(
             reasoning_change_frame,
             wrap="word", undo=True, maxundo=10,
             width=self.entry_minw, height=self.entry_minh,
         )
-        self.reasoning_change_entry.pack(expand=True, fill="x")
+        self.reasoning_change_entry.pack(fill="x")
         len_rc_frame = ttk.Frame(reasoning_change_frame)
-        len_rc_frame.pack(expand=True, fill="x")
+        len_rc_frame.pack(fill="x")
         WrappingLabel(
             len_rc_frame,
             text=f"Your response must be at least {self._min_response_char_count} characters long.",
@@ -338,8 +342,9 @@ class ResponseFrame(WidgetFrame):
 class DetectPage(WidgetFrame, DataCollector):
     on_submit: Optional[Callable[[str], None]] = None
 
-    _min_word_count = 100
+    _model_min_word_count = 100
 
+    _pane_ratio = (3, 2)
     _response_cell: Optional[str] = None
 
     _timers_q_t0 = datetime.now()
@@ -381,7 +386,7 @@ class DetectPage(WidgetFrame, DataCollector):
         self.config(padding=(padx, pady))
         # title
         title_frame = ttk.Frame(self)
-        title_frame.pack(expand=True, fill="x", pady=pady)
+        title_frame.pack(fill="x")
         ttk.Label(
             title_frame, text=self.title,
             font=Font(font=Fonts.h1, underline=True)
@@ -389,17 +394,17 @@ class DetectPage(WidgetFrame, DataCollector):
         title_frame.columnconfigure(0, weight=1)
         # timer frame
         self.timer = TimerFrame(title_frame)
-        self.timer.grid(row=0, column=1, sticky="nse")
+        self.timer.grid(row=0, column=1, sticky="ne")
         self.timer.start()
 
         # body frame
         body_frame = ttk.Frame(self)
-        body_frame.pack(expand=True, fill="both", anchor="center")
+        body_frame.pack(expand=True, fill="both", anchor="n")
         body_frame.rowconfigure(0, weight=1)
 
         ins_col, model_col = 0, 1
-        body_frame.columnconfigure(ins_col, weight=1)
-        body_frame.columnconfigure(model_col, weight=3)
+        body_frame.columnconfigure(ins_col, weight=self._pane_ratio[0], uniform='cols')
+        body_frame.columnconfigure(model_col, weight=self._pane_ratio[1], uniform='cols')
 
         # instructions
         ins_frame = ttk.Frame(body_frame)
@@ -448,7 +453,7 @@ class DetectPage(WidgetFrame, DataCollector):
 
         wrapped_q = (
                 q + "\n" +
-                f"Your answer must be at least {self._min_word_count} words long." +
+                f"Your answer must be at least {self._model_min_word_count} words long." +
                 "Your answer must be entirely plaintext and contain NO highlights or formatting (no bold, italic or any markdown)."
         )
 

@@ -37,7 +37,11 @@ def config_enable(widget: Misc, enabled: bool):
 
 
 def config_style_as_label(w: ttk.Text, root: ttk.Tk):
-    w.configure(bg=root.cget("bg"), fg='black', relief='flat')
+    w.configure(
+        bg=root.cget("bg"), fg='black',
+        relief='flat',
+        borderwidth=0, highlightthickness=0
+    )
 
 
 class App(ttk.Window):

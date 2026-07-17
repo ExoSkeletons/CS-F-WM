@@ -6,7 +6,7 @@ You are invited to take part in a research study conducted by researchers from A
 
 You will be asked to use an experimental software interface that sends your queries to an AI text generator, receives the AI’s answer, and may embed special patterns (watermarks) in that answer. You will also be asked to read, edit, or rewrite AI-generated academic text to try to modify the embedded watermarks. 
 
-Participation in this study is voluntary. The participants will be rewarded with 50 NIS upon completion of the experiment tasks. Please read the information below carefully before deciding whether to take part. 
+Participation in this study is voluntary. The participants will be rewarded with 40 NIS upon completion of the experiment tasks. Please read the information below carefully before deciding whether to take part.
 
 2. What your participation involves 
 
@@ -67,8 +67,6 @@ However, this protection applies only to activities performed within this contro
     You may gain insight into how AI text-generation and watermarking work. 
 
     Your participation will contribute to the development of better tools for managing AI use in higher education and for protecting academic integrity. 
-
-    You will be compensated by 50 NIS upon completion of the experiment.  
 
 6. Voluntary participation and right to withdraw 
 

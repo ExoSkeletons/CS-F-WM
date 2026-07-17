@@ -163,11 +163,13 @@ class HeaderWidget(WidgetFrame):
         ]
 
         self.logo_label = ttk.Label(self, image=self.logo_img)
+        self.logo_label.grid(row=0, column=0, sticky="nsew")
+        uni_logos_frame = ttk.Frame(self)
+        uni_logos_frame.grid(row=0, column=1, sticky="nsew")
         self.logos_unis_labels = [
-            ttk.Label(self, image=img)
+            ttk.Label(uni_logos_frame, image=img)
             for img in self.logos_uni_imgs
         ]
 
-        self.logo_label.grid(row=0, column=0, sticky="nsew")
         for i, l in enumerate(self.logos_unis_labels):
-            l.grid(row=0, column=(i + 1), sticky="nsew")
+            l.grid(row=0, column=i, sticky="nsew")

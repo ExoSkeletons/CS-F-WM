@@ -223,7 +223,7 @@ class ResponseFrame(WidgetFrame):
         reasoning_detect_frame.pack(expand=True, fill="x")
         WrappingLabel(
             reasoning_detect_frame,
-            text="• What made you think text the was watermarked?",
+            text="• What made you think text the was/wasn't watermarked?",
             justify="left"
         ).pack(anchor="nw", expand=True, fill="x")
         self.reasoning_detect_entry = ttk.Text(
@@ -251,12 +251,14 @@ class ResponseFrame(WidgetFrame):
         reasoning_change_frame.pack(expand=True, fill="x")
         WrappingLabel(
             reasoning_change_frame,
-            text="• If so, try to remove it by editing the text response.\nDo your best to remove only the watermark and keep the original text intact as much as possible.",
+            text=
+            "• Whether you think there is a watermark or not, try removing the potential watermark by editing the text response.\n"
+            "Do your best to remove only the watermark and keep the original text intact as much as possible.",
             justify="left"
         ).pack(anchor="nw", expand=True, fill="x")
         WrappingLabel(
             reasoning_change_frame,
-            text="• What did you do to try and remove the watermark?",
+            text="• What did you do to try and remove the potential watermark?",
             justify="left"
         ).pack(anchor="nw", expand=True, fill="x")
         self.reasoning_change_entry = ttk.Text(
@@ -297,9 +299,9 @@ class ResponseFrame(WidgetFrame):
             is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
             is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
 
-            config_enable(reasoning_frame, is_w)
-            config_enable(reasoning_change_frame, is_w and is_rd_over_min)
-            self.model_frame.set_text_editable(is_w and is_rd_over_min)
+            config_enable(reasoning_frame, True)
+            config_enable(reasoning_change_frame, is_rd_over_min)
+            self.model_frame.set_text_editable(is_rd_over_min)
 
             self.on_validity_changed()
 
@@ -324,8 +326,8 @@ class ResponseFrame(WidgetFrame):
         if self.is_wm_yes_var.get() == self.is_wm_no_var.get():
             # todo: show "red" required-notice and return False if not.
             return False
-        if self.is_wm_no_var.get():
-            return True
+        # if self.is_wm_no_var.get():
+        #     return True
         is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
         is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
         if not (is_rd_over_min and is_rc_over_min):

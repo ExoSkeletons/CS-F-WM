@@ -2,9 +2,10 @@ In this experiment, you will determine whether AI-generated texts contain waterm
 Watermarks are hidden information embedded in the text to enable future identification of AI-generated content.
 
 During the experiment:
-    * You will complete 4 short tasks using the AI we provide
-    * In each task, you will identify whether the AI response contains a watermark
-    * If you think a watermark exists, you will explain why and try to remove it without changing the meaning
+    * You will complete 4 short tasks using the AI we provide.
+    * In each task, identify whether the AI response contains a watermark.
+    * If you think a watermark exists, explain why and try to remove it without changing the meaning.
+    * If you believe no watermark exists, explain why not and try to edit the text anyway to remove any potential watermarks.
 
 You may use any external tools or materials for translation or watermark identification.
 

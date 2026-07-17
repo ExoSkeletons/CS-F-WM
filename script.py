@@ -48,8 +48,7 @@ db: Client
 
 def start_survey_ui(session: SurveySession, wm: Watermark):
     frame = WidgetFrame(root)
-    header = HeaderWidget(root, "logo.png", ['jct.png', 'ariel.png', 'csic.png'], master=frame)
-    header.pack(expand=True, fill="x")
+    HeaderWidget(root, "logo.png", ['jct.png', 'ariel.png', 'csic.png'], master=frame).pack(fill="x")
     pager = PagedFrame(root, master=frame, next_text="Confirm", allow_tab_navigation=False, allow_prev=False)
     pager.pack(expand=True, fill="both")
 

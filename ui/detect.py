@@ -143,7 +143,7 @@ class QuestionFrame(WidgetFrame):
             text=
             "Use the AI Assistant given here for help with the assignment, by writing a single prompt question - as long as you'd like - to help you solve the question."
             ,
-            font=Fonts.small,
+            font=Fonts.h3,
             justify="left", anchor="nw",
         ).pack(expand=True, fill="both", pady=pad_l)
         # question

@@ -32,6 +32,7 @@ class WrappingLabel(ttk.Label):
 
     def _wrap(self, _):
         # also apply small safe padding
+        self.update_idletasks()
         self.label.configure(wraplength=self.winfo_width() - 10)
 
     def configure(self, cnf=None, **kwargs):

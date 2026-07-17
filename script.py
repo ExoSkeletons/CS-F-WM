@@ -3,6 +3,7 @@ import random
 import sys
 from datetime import datetime
 from os import system
+from tkinter import PhotoImage
 from tkinter.font import Font
 from typing import Callable, Optional
 
@@ -28,7 +29,7 @@ from web.client import server_poll_watermarks
 # from watermark.watermarks import active_watermarks
 from watermark.types import Watermark
 from ui.app import App, WidgetFrame, config_enable, HeaderWidget
-from config import data_dir_path
+from config import data_dir_path, img_dir_path
 from ui.auth import TermsPage, AuthPage
 from ui.demo import DemoPage
 from ui.detect import DetectPage
@@ -237,7 +238,7 @@ if __name__ == "__main__":
     system("title " + title)
     print("Starting App...")
 
-    root = App(title=title, themename="litera")
+    root = App(title=title, themename="litera", iconphoto=img_dir_path + "logo.png")
 
     splash_frame = WidgetFrame(root)
     lw = splash_frame.lw = LoadingWidget(root, splash_frame)

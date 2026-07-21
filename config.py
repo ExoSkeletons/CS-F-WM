@@ -21,10 +21,6 @@ img_dir_path = data_dir_path + "imgs/"
 
 config = {}
 
-max_len = {
-    "wtgb": 50
-}
-
 
 def load_from_file():
     global config

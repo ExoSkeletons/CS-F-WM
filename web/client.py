@@ -98,9 +98,6 @@ if __name__ == "__main__":
             SERVER_IP = "54.166.148.34"
             SERVER_PORT = 8000
 
-            if wm in max_len:
-                text = text[:max_len[wm]]
-
             job_id, job_location = submit_job(text, wm, SERVER_IP, SERVER_PORT)
             print(f"Done.\nAwaiting job [{job_id}]", end=' ')
             result = poll_job(job_location)

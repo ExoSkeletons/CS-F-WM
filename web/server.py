@@ -6,8 +6,7 @@ from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 from starlette.responses import Response
 
-import config
-from config import max_len
+from config import config
 from services import wtgb
 from watermark.watermarks import marks
 
@@ -58,11 +57,6 @@ def watermark_worker(job_id: str):
         jobs[job_id]["error"] = str(e)
 
 
-max_len = {
-    "wtgb": 50
-}
-
-
 @app.post("/watermark", status_code=202)
 def watermark(data: dict, request: Request, response: Response):
     print(f"client posted watermarking request:\n{data}")
@@ -72,9 +66,11 @@ def watermark(data: dict, request: Request, response: Response):
         print(f"wm {wm_name} not found")
         raise HTTPException(status_code=400, detail=f"watermark {wm_name} not found")
 
-    if wm_name in max_len:
+    wm_config = config.get(wm_name, {})
+    max_len = wm_config.get("max_len", None)
+    if max_len:
         text = data["text"]
-        l = max_len[wm_name]
+        l = int(max_len)
         if len(text) > l:
             raise HTTPException(
                 status_code=401,

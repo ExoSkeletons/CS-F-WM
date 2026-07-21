@@ -83,7 +83,18 @@ def server_poll_watermarks() -> Watermarks:
 
 
 if __name__ == "__main__":
-    text = "This is a test sentence to be watermarked by the server." * 10
+    text = (
+        "According to all known laws of aviation, there is no way a bee should be able to fly.\n"
+        " Its wings are too small to get its fat little body off the ground.\n"
+        " The bee, of course, flies anyway because bees don't care what humans think is impossible.\n"
+        "Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little.\n"
+        "Barry! Breakfast is ready! \nComing! Hang on a second. Hello?\n - Barry?\n - Adam?\n"
+        " Man you believe this is happening?\n - I can't. I'll pick you up.\n"
+        " Looking sharp.\n Use the stairs. Your father paid good money for those.\n Sorry. I'm excited.\n Here's the graduate. We're very proud of you, son.\n"
+        "A perfect report card, all B's.\n Very proud.\n Ma! I got a thing going here.\n"
+        " - You got lint on your fuzz.\n - Ow! That's me!\n - Wave to us! We'll be in row 118,000.\n"
+        " - Bye!\n "
+    )
 
     wm_tests = ['upper', 'phishing', 'space-replace', 'acrostic', 'wtgb']
 
@@ -94,7 +105,7 @@ if __name__ == "__main__":
         try:
             print("Submitting job...", end='')
 
-            SERVER_IP = "54.166.148.34"
+            SERVER_IP = "13.222.141.112"
             SERVER_PORT = 8000
 
             job_id, job_location = submit_job(text, wm, SERVER_IP, SERVER_PORT)

@@ -7,7 +7,8 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from config import config
-from services import wtgb
+import config as cfg
+from services import wtgb, firebase
 from watermark.watermarks import marks
 
 jobs = {}
@@ -19,8 +20,12 @@ async def lifespan(app: FastAPI):
     print("sever starting")
 
     # init config
-    print("loading config")
-    config.load_from_file()  # todo: load fb
+    print("loading config file")
+    cfg.load_from_file()
+    print("connecting to firebase db")
+    db = firebase.init_db()
+    print("loading config from firebase db")
+    cfg.load_from_fb(db=db)
 
     # init model
     print("init wtgb model")

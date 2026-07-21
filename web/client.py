@@ -6,7 +6,6 @@ from requests import HTTPError
 
 from config import config
 from watermark.types import Watermarks
-from config import max_len
 
 
 def submit_job(text: str, wm: str, ip: str, port: int = 8000):

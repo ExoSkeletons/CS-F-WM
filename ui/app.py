@@ -118,9 +118,11 @@ class App(ttk.Window):
         self.__submits[w] = command
 
     def __bind_lang_keys(self):
-        def global_shortcuts(event):
+        def non_eng_shortcuts_handler(event):
             ctrl = 0x4
-            if not (event.state & ctrl):
+            if not (event.state & ctrl): # skip if not pressed ctrl
+                return None
+            if str(event.keysym).lower().isalpha(): # skip if is english, let tkinter handle
                 return None
 
             if event.keycode == ord('C'):
@@ -137,7 +139,7 @@ class App(ttk.Window):
                 return "break"
             return None
 
-        self.bind_all("<KeyPress>", global_shortcuts)
+        self.bind_all("<KeyPress>", non_eng_shortcuts_handler)
 
 
 class WidgetFrame(ttk.Frame):

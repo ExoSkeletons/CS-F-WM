@@ -3,14 +3,13 @@ import random
 import sys
 from datetime import datetime
 from os import system
-from tkinter import PhotoImage
 from tkinter.font import Font
 from typing import Callable, Optional
 
 import ttkbootstrap as ttk
 from google.cloud.firestore_v1 import Client
 
-from ui.theme import configure_style, Fonts
+from ui.theme import configure_style, Fonts, pady, padx, pad_l
 from ui.widgets.loading import LoadingWidget
 
 # patch console out to devnull to avoid crashing logging if no console is attached
@@ -125,9 +124,10 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
         on_next=lambda _, p: conclude_session(p.get_data())
     )
 
-    end_frame = WidgetFrame(root, master=pager.notebook)
-    ttk.Label(end_frame, text="Thanks for participating").pack()
-    ttk.Button(end_frame, text="Quit", command=lambda: sys.exit(0)).pack()
+    end_frame = WidgetFrame(root, master=pager.notebook, padding=(padx, pady))
+    ttk.Label(end_frame, text="Thanks for participating!", font=Fonts.h1).pack()
+    ttk.Label(end_frame, text="Your responses have been recorded.").pack(pady=pad_l)
+    ttk.Button(end_frame, text="Quit", command=lambda: sys.exit(0), bootstyle="success").pack()
     pager.add_page(end_frame, "")
 
     pager.select_page(0)

@@ -242,7 +242,7 @@ class ResponseFrame(WidgetFrame):
             len_rd_frame,
             text=f"Your response must be at least {self._min_response_char_count} characters long.",
             bootstyle="secondary",
-            font=Font(size=7, slant='italic')
+            font=Font(font=Fonts.small, slant='italic')
         ).grid(row=0, column=0, sticky="nsw")
         len_rd_frame.columnconfigure(0, weight=1)
         rd_len_l = ttk.Label(len_rd_frame)
@@ -277,7 +277,7 @@ class ResponseFrame(WidgetFrame):
             len_rc_frame,
             text=f"Your response must be at least {self._min_response_char_count} characters long.",
             bootstyle="secondary",
-            anchor="nw", justify="left", font=Font(size=7, slant='italic')
+            font=Font(font=Fonts.small, slant='italic')
         ).grid(row=0, column=0, sticky="nsew")
         len_rc_frame.columnconfigure(0, weight=1)
         rc_len_l = ttk.Label(len_rc_frame)

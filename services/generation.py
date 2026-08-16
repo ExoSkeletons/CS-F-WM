@@ -6,8 +6,14 @@ from tenacity import retry, stop_after_delay, wait_exponential_jitter, retry_if_
 
 from config import config
 
+def fetch_models(key: str):
+    res = requests.get(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}")
+    res.raise_for_status()
 
 def generation(q: str) -> str:
+    models = [m['name'] for m in res.json().get('models', []) if
+              'generateContent' in m.get('supportedGenerationMethods', [])]
+    return models
     model_config = config['model']
     model = model_config['name']
     temp = model_config['temperature']

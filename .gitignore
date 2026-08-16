@@ -2,7 +2,7 @@
 
 /dist/
 /build/
-/AI-Survey.spec
+/*.spec
 .idea
 
 /data/config.yml

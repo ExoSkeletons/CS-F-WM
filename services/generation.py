@@ -8,7 +8,10 @@ from config import config
 
 
 def generation(q: str) -> str:
-    model = config['model']
+    model_config = config['model']
+    model = model_config['name']
+    temp = model_config['temperature']
+
     key = config['genai_api_key']
 
     # had to downgrade from this to direct http request, due to versions
@@ -21,7 +24,10 @@ def generation(q: str) -> str:
     data = {
         "contents": [
             {"parts": [{"text": q}]}
-        ]
+        ],
+        "generationConfig": {
+            "temperature": temp  # 0.0 to 2.0
+        }
     }
 
     res = requests.post(url, headers=headers, params=params, json=data)

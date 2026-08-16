@@ -15,6 +15,7 @@ def generation(q: str) -> str:
     # return client.models.generate_content(model=model, contents=q).text
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    headers = {"Content-Type": "application/json"}
     params = {"key": key}
 
     data = {
@@ -23,7 +24,7 @@ def generation(q: str) -> str:
         ]
     }
 
-    res = requests.post(url, params=params, json=data)
+    res = requests.post(url, headers=headers, params=params, json=data)
     res.raise_for_status()
 
     d = dict(res.json())
@@ -58,7 +59,7 @@ def threaded_generation(q: str, response_callback: Callable[[str, bool], Any]):
             resp = (f"Retry Timed out, Could not reach Text Generation services ({config['model']}).\n"
                     "Is your Internet OK?\n"
                     f"{e.__repr__()}"
-            )
+                    )
             ok = False
         except Exception as e:
             resp = f"Error Generating response.\n{e.__repr__()}"

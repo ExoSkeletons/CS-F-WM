@@ -10,10 +10,11 @@ def fetch_models(key: str):
     res = requests.get(f"https://generativelanguage.googleapis.com/v1beta/models?key={key}")
     res.raise_for_status()
 
-def generation(q: str) -> str:
     models = [m['name'] for m in res.json().get('models', []) if
               'generateContent' in m.get('supportedGenerationMethods', [])]
     return models
+
+def generation(prompt: str) -> str:
     model_config = config['model']
     model = model_config['name']
     temp = model_config['temperature']
@@ -23,13 +24,18 @@ def generation(q: str) -> str:
     # had to downgrade from this to direct http request, due to versions
     # return client.models.generate_content(model=model, contents=q).text
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    headers = {"Content-Type": "application/json"}
-    params = {"key": key}
+    url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent"
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": key,
+    }
+    params = {
+        "key": key
+    }
 
     data = {
         "contents": [
-            {"parts": [{"text": q}]}
+            {"parts": [{"text": prompt}]}
         ],
         "generationConfig": {
             "temperature": temp  # 0.0 to 2.0

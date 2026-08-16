@@ -1,3 +1,5 @@
+from typing import Any
+
 import ttkbootstrap as ttk
 
 from ui.app import WidgetFrame
@@ -6,6 +8,19 @@ from ui.theme import pady, Fonts, padx, pad_l
 
 
 class DemoPage(WidgetFrame, DataCollector):
+    def decline_button(self, master: Any, var: ttk.StringVar) -> ttk.Radiobutton:
+        decline_text = "Decline to State"
+        decline_style = "secondary" + self.r_style_b
+
+        b = ttk.Radiobutton(
+            master=master,
+            text=decline_text, value=None,
+            variable=var,
+            bootstyle=decline_style
+        )
+        b.pack(side="left", padx=padx)
+        return b
+
     def _create_widgets(self):
         self.title_font = Fonts.h1
         self.subtitle_font = Fonts.small
@@ -21,10 +36,10 @@ class DemoPage(WidgetFrame, DataCollector):
             title_frame,
             text="Demographic Information", font=self.title_font
         ).grid(row=0, column=0)
-        ttk.Label(
-            title_frame,
-            text="(This page is optional)", font=self.subtitle_font
-        ).grid(row=0, column=1, padx=padx, sticky="sw")
+        # ttk.Label(
+        #     title_frame,
+        #     text="(This page is optional)", font=self.subtitle_font
+        # ).grid(row=0, column=1, padx=padx, sticky="sw")
 
         self.gender_var = ttk.StringVar(value=None)
         self.deg_level_var = ttk.StringVar(value=None)
@@ -40,6 +55,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ttk.Label(gender_frame, text="Gender", font=self.q_font).pack(anchor="w", pady=pady)
         gender_opts = ttk.Frame(gender_frame)
         gender_opts.pack(anchor="w", padx=padx)
+        self.decline_button(gender_opts, self.gender_var)
         for text, value in [
             ("Male", "m"),
             ("Female", "f"),
@@ -64,6 +80,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ar.insert(0, f"18 or below")
         ar.insert(1, f"18-{min_age}")
         ar.append(f"{max_age + 1} or above")
+        self.decline_button(age_opts, self.age_var)
         for r in ar:
             ttk.Radiobutton(
                 age_opts,
@@ -83,6 +100,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ).pack(anchor="w", pady=pady)
         edu_opts = ttk.Frame(edu_level)
         edu_opts.pack(anchor="w", padx=padx)
+        self.decline_button(edu_opts, self.deg_level_var)
         for text, value, color in [
             ("BSc", "bsc", "success"),
             ("MSc", "msc", "warning"),
@@ -107,10 +125,14 @@ class DemoPage(WidgetFrame, DataCollector):
 
         ai_use_frame = ttk.Frame(answers_frame)
         ai_use_frame.pack(fill="x", pady=pady)
-        ttk.Label(ai_use_frame, text="Do you use AI tools? If so, how often?", font=self.q_font).pack(anchor="w",
-                                                                                                      pady=pady)
+        ttk.Label(
+            ai_use_frame,
+            text="Do you use AI tools? If so, how often?",
+            font=self.q_font
+        ).pack(anchor="w", pady=pady)
         ai_opts = ttk.Frame(ai_use_frame)
         ai_opts.pack(anchor="w", padx=padx)
+        self.decline_button(ai_opts, self.ai_use_var)
         for text, value, color in [
             ("No", False, "danger"),
             ("Several times a Day", "several times a day", "success"),

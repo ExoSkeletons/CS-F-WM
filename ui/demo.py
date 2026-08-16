@@ -44,6 +44,7 @@ class DemoPage(WidgetFrame, DataCollector):
         self.gender_var = ttk.StringVar(value=None)
         self.deg_level_var = ttk.StringVar(value=None)
         self.deg_field_var = ttk.StringVar(value=None)
+        self.eng_level_var = ttk.StringVar(value=None)
         self.age_var = ttk.StringVar(value=None)
         self.ai_use_var = ttk.StringVar(value=None)
 
@@ -123,6 +124,28 @@ class DemoPage(WidgetFrame, DataCollector):
         edu_field_text = ttk.Entry(edu_field_frame, textvariable=self.deg_field_var, bootstyle="info")
         edu_field_text.pack(anchor="w", padx=padx)
 
+        eng_frame = ttk.Frame(answers_frame)
+        eng_frame.pack(fill="x", pady=pady)
+        eng_level = ttk.Frame(eng_frame)
+        eng_level.grid(row=0, column=0)
+        ttk.Label(
+            eng_level,
+            text="How would you rate your English comprehension?",
+            font=self.q_font
+        ).pack(anchor="w", pady=pady)
+        eng_opts = ttk.Frame(eng_level)
+        eng_opts.pack(anchor="w", padx=padx)
+        self.decline_button(eng_opts, self.eng_level_var)
+        c_range = ['danger', 'warning', 'info', 'success']
+        n = 6
+        for i in range(1, n):
+            ttk.Radiobutton(
+                eng_opts,
+                text=str(i), value=str(i),
+                variable=self.eng_level_var,
+                bootstyle=c_range[int((float(i) / n) * len(c_range))] + self.r_style_b
+            ).pack(side="left", padx=padx)
+
         ai_use_frame = ttk.Frame(answers_frame)
         ai_use_frame.pack(fill="x", pady=pady)
         ttk.Label(
@@ -158,3 +181,13 @@ class DemoPage(WidgetFrame, DataCollector):
             "age": self.age_var.get() or None,
             "ai_use_freq": self.ai_use_var.get() or None,
         }
+
+    def is_valid(self) -> bool:
+        return (
+                self.gender_var.get() is not None and
+                self.deg_level_var.get() is not None and
+                self.eng_level_var.get() is not None and
+                self.age_var.get() is not None and
+                self.ai_use_var.get() is not None and
+                True
+        )

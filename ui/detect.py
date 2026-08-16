@@ -256,8 +256,8 @@ class ResponseFrame(WidgetFrame):
         WrappingLabel(
             reasoning_change_frame,
             text=
-            "• Whether you think there is a watermark or not, try removing the potential watermark by editing the text response.\n"
-            "Do your best to remove only the watermark and keep the original text intact as much as possible.",
+            "• Whether you think there is a watermark or not, try to remove the potential watermark by editing the response in the AI assistant panel on the right." +
+            "Do your best to remove only the watermark and preserve the meaning and quality of the original response.",
             justify="left"
         ).pack(anchor="nw", fill="x", pady=pady)
         WrappingLabel(

@@ -14,7 +14,7 @@ class DemoPage(WidgetFrame, DataCollector):
 
         b = ttk.Radiobutton(
             master=master,
-            text=decline_text, value=None,
+            text=decline_text, value="-",
             variable=var,
             bootstyle=decline_style
         )
@@ -29,6 +29,8 @@ class DemoPage(WidgetFrame, DataCollector):
         self.r_style = "info" + self.r_style_b
 
         self.config(padding=(padx, pady))
+
+        self.bind_all("<ButtonRelease>", lambda event: self.event_generate("<<PageValidityChanged>>"))
 
         title_frame = ttk.Frame(self)
         title_frame.pack(fill="x", pady=pady)
@@ -183,11 +185,11 @@ class DemoPage(WidgetFrame, DataCollector):
         }
 
     def is_valid(self) -> bool:
-        return (
-                self.gender_var.get() is not None and
-                self.deg_level_var.get() is not None and
-                self.eng_level_var.get() is not None and
-                self.age_var.get() is not None and
-                self.ai_use_var.get() is not None and
+        return bool(
+                self.gender_var.get() and
+                self.deg_level_var.get() and
+                self.eng_level_var.get() and
+                self.age_var.get() and
+                self.ai_use_var.get() and
                 True
         )

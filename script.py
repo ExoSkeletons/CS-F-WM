@@ -121,6 +121,7 @@ def start_survey_ui(session: SurveySession, wm: Watermark):
     demo_survey_page = DemoPage(root, master=pager.notebook)
     pager.add_page(
         demo_survey_page, "",
+        validator=demo_survey_page.is_valid,
         on_next=lambda _, p: conclude_session(p.get_data())
     )
 

@@ -191,8 +191,13 @@ class PagedFrame(WidgetFrame):
                     self.notebook.tab(self._current_index, state="normal")
             self.notebook.select(index)
 
-    def add_page(self, frame: WidgetFrame, title: str = None, validator: Optional[Callable[[], bool]] = None,
-                 on_next: Optional[Callable[[int, WidgetFrame], None]] = None):
+    def add_page(
+            self,
+            frame: WidgetFrame,
+            title: str = None,
+            validator: Optional[Callable[[], bool]] = None,
+            on_next: Optional[Callable[[int, WidgetFrame], None]] = None
+    ):
         index = len(self._pages)
         self._pages.append(frame)
         if validator: self._validators[frame] = validator

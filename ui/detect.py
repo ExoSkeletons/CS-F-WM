@@ -342,8 +342,6 @@ class ResponseFrame(WidgetFrame):
 class DetectPage(WidgetFrame, DataCollector):
     on_submit: Optional[Callable[[str], None]] = None
 
-    _model_min_word_count = 100
-
     _pane_ratio = (3, 2)
     _response_cell: Optional[str] = None
 
@@ -451,9 +449,10 @@ class DetectPage(WidgetFrame, DataCollector):
         # clear responses
         self.set_response_text("Generating Response... (This can take a while)")
 
+        model_min_word_count = config.get("min_word_count", 100)
         wrapped_q = (
                 q + "\n" +
-                f"Your answer must be at least {self._model_min_word_count} words long." +
+                f"Your answer must be at least {model_min_word_count} words long." +
                 "Your answer must be entirely plaintext and contain NO highlights or formatting (no bold, italic or any markdown)."
         )
 

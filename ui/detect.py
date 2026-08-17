@@ -191,7 +191,7 @@ class ResponseFrame(WidgetFrame):
 
         # yes/no
         yes_or_no_frame = ttk.Frame(user_response_frame)
-        yes_or_no_frame.pack(fill='x')
+        yes_or_no_frame.pack(fill='x', pady=pady)
         (WrappingLabel(
             yes_or_no_frame,
             text="• Do you believe it has been watermarked? You may use any external resource.",
@@ -200,29 +200,49 @@ class ResponseFrame(WidgetFrame):
         # yes/no radios
         self.is_wm_yes_var = ttk.BooleanVar()
         self.is_wm_no_var = ttk.BooleanVar()
-        radio_frame = ttk.Frame(yes_or_no_frame)
-        radio_frame.grid(row=0, column=1, sticky="nse")
+        yn_radio_frame = ttk.Frame(yes_or_no_frame)
+        yn_radio_frame.grid(row=0, column=1, sticky="nse")
         yes_or_no_frame.grid_columnconfigure(0, weight=1)
         self.b_wm_yes = ttk.Radiobutton(
-            radio_frame, text="Yes",
+            yn_radio_frame, text="Yes",
             variable=self.is_wm_yes_var,
             bootstyle="success-outline-toolbutton",
             command=lambda: self.is_wm_no_var.set(not self.is_wm_yes_var.get())
         )
         self.b_wm_no = ttk.Radiobutton(
-            radio_frame, text="No",
+            yn_radio_frame, text="No",
             variable=self.is_wm_no_var,
             bootstyle="danger-outline-toolbutton",
             command=lambda: self.is_wm_yes_var.set(not self.is_wm_no_var.get())
         )
-        self.b_wm_yes.grid(row=0, column=0)
-        self.b_wm_no.grid(row=0, column=1)
+        self.b_wm_yes.grid(row=0, column=0, padx=padx)
+        self.b_wm_no.grid(row=0, column=1, padx=padx)
         self.is_wm_yes_var.trace_add("write", lambda v, i, m: self.on_validity_changed())
         self.is_wm_no_var.trace_add("write", lambda v, i, m: self.on_validity_changed())
+        # confidence
+        confidence_yn_frame = ttk.Frame(user_response_frame)
+        confidence_yn_frame.pack(fill='x', pady=pady)
+        (WrappingLabel(
+            confidence_yn_frame,
+            text="How confident are you with your choice?",
+            justify="left"
+        ).grid(row=0, column=0, sticky="nsew"))
+        self.conf_is_wm_var = ttk.IntVar(value=-1)
+        yn_conf_radio_frame = ttk.Frame(confidence_yn_frame)
+        yn_conf_radio_frame.grid(row=0, column=1, sticky="nsew")
+        confidence_yn_frame.grid_columnconfigure(0, weight=1)
+        conf_levels = list(range(1, 5 + 1))
+        for i, v in enumerate(conf_levels):
+            ttk.Radiobutton(
+                yn_conf_radio_frame,
+                value=v, text=str(v),
+                variable=self.conf_is_wm_var,
+                bootstyle="info-outline-toolbutton"
+            ).grid(row=0, column=i, padx=padx)
 
         # reasoning
         reasoning_frame = ttk.Frame(user_response_frame)
-        reasoning_frame.pack(fill="x")
+        reasoning_frame.pack(fill="x", pady=pady)
         reasoning_detect_frame = ttk.Frame(reasoning_frame)
         reasoning_detect_frame.pack(fill="x")
         WrappingLabel(
@@ -286,6 +306,26 @@ class ResponseFrame(WidgetFrame):
         self.len_rc_var.trace_add("write", lambda m, l, c: rc_len_l.config(
             text=f"{self.len_rc_var.get()}/{self._min_response_char_count}"
         ))
+        # confidence
+        confidence_c_frame = ttk.Frame(user_response_frame)
+        confidence_c_frame.pack(fill='x', pady=pady)
+        (WrappingLabel(
+            confidence_c_frame,
+            text="How confident are you that you removed the watermark?",
+            justify="left"
+        ).grid(row=0, column=0, sticky="nsew"))
+        self.conf_c_var = ttk.IntVar(value=-1)
+        c_conf_radio_frame = ttk.Frame(confidence_c_frame)
+        c_conf_radio_frame.grid(row=0, column=1, sticky="nsew")
+        confidence_c_frame.grid_columnconfigure(0, weight=1)
+        for i, v in enumerate(conf_levels):
+            ttk.Radiobutton(
+                c_conf_radio_frame,
+                value=v, text=str(v),
+                variable=self.conf_c_var,
+                bootstyle="info-outline-toolbutton"
+            ).grid(row=0, column=i, padx=padx)
+
         # confirm
         answer_frame = ttk.Frame(user_response_frame)
         answer_frame.pack(expand=True, fill="x")
@@ -295,7 +335,9 @@ class ResponseFrame(WidgetFrame):
         ttk.Label(answer_frame, textvariable=self.response_correctness_var).grid(row=0, column=1)
 
         def update_user_response():
-            is_w: bool = self.is_wm_yes_var.get()
+            is_w = bool(self.is_wm_yes_var.get())
+            set_is_w = bool(self.is_wm_yes_var.get() or self.is_wm_no_var.get())
+            set_conf_is_w = bool(self.conf_is_wm_var.get() >= 0)
 
             self.len_rd_var.set(len(self.reasoning_detect_entry.get("1.0", END).strip()))
             self.len_rc_var.set(len(self.reasoning_change_entry.get("1.0", END).strip()))
@@ -303,16 +345,17 @@ class ResponseFrame(WidgetFrame):
             is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
             is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
 
-            config_enable(reasoning_frame, True)
+            config_enable(confidence_yn_frame, set_is_w)
+            config_enable(reasoning_frame, set_conf_is_w)
             config_enable(reasoning_change_frame, is_rd_over_min)
             self.model_frame.set_text_editable(is_rd_over_min)
+            config_enable(confidence_c_frame, is_rc_over_min)
 
             self.on_validity_changed()
 
-        self.is_wm_yes_var.trace_add(
-            "write",
-            lambda var, index, mode: update_user_response()
-        )
+        self.is_wm_yes_var.trace_add("write", lambda v, i, m: update_user_response())
+        self.conf_is_wm_var.trace_add("write", lambda v, i, m: update_user_response())
+        self.conf_c_var.trace_add("write", lambda v, i, m: update_user_response())
         self.reasoning_detect_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
         self.reasoning_change_entry.bind("<Any-KeyPress>", lambda e: update_user_response(), add="+")
         self.reasoning_detect_entry.bind("<Any-KeyRelease>", lambda e: update_user_response(), add="+")
@@ -332,10 +375,17 @@ class ResponseFrame(WidgetFrame):
             return False
         # if self.is_wm_no_var.get():
         #     return True
+
         is_rd_over_min = self.len_rd_var.get() >= self._min_response_char_count
         is_rc_over_min = self.len_rc_var.get() >= self._min_response_char_count
         if not (is_rd_over_min and is_rc_over_min):
             return False
+
+        set_conf_is_wm = self.conf_is_wm_var.get() >= 0
+        set_conf_c = self.conf_c_var.get() >= 0
+        if not (set_conf_is_wm and set_conf_c):
+            return False
+
         return True
 
 
@@ -563,15 +613,13 @@ class DetectPage(WidgetFrame, DataCollector):
             "watermark": {
                 "name": self.mark[0],
                 "watermarked_model_response": self.wmr.get(),
-            } if self.mark is not None
-            else False,
-            "user_survey":
-                {
-                    "is_wm": True,
-                    "reasoning": self.resp_frame.reasoning_detect_entry.get("1.0", END).strip(),
-                    "text_edited": self.model_frame.tt.get("1.0", END).strip(),
-                    "edited_action": self.resp_frame.reasoning_change_entry.get("1.0", END).strip()
-                }
-                if self.resp_frame.is_wm_yes_var.get()
-                else {"is_wm": False}
+            } if self.mark is not None else False,
+            "user_survey": {
+                "is_wm": self.resp_frame.is_wm_yes_var.get(),
+                "detect_confidence": self.resp_frame.conf_is_wm_var.get(),
+                "reasoning": self.resp_frame.reasoning_detect_entry.get("1.0", END).strip(),
+                "text_edited": self.model_frame.tt.get("1.0", END).strip(),
+                "edited_action": self.resp_frame.reasoning_change_entry.get("1.0", END).strip(),
+                "edit_confidence": self.resp_frame.conf_c_var.get(),
+            }
         }

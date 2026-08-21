@@ -65,7 +65,7 @@ def poll_job(job_url: str, interval: float = 0.5, timeout: int = 300):
 def request_wm_and_await(text: str, wm: str, ip: str, port: int):
     job_id, location = submit_job(text=text, wm=wm, ip=ip, port=port)
     # todo: interval etc. from config
-    res = poll_job(job_id, interval=1, timeout=600)
+    res = poll_job(location, interval=1, timeout=600)
     return res
 
 

@@ -3,7 +3,7 @@ from typing import Callable, Any
 
 import requests
 from requests import HTTPError
-from tenacity import retry, stop_after_delay, wait_exponential_jitter, retry_if_exception_message, RetryError
+from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message, RetryError
 
 from config import config
 
@@ -59,8 +59,8 @@ def generation(prompt: str) -> str:
 
 
 @retry(
-    stop=stop_after_delay(max_delay=10),
-    wait=wait_exponential_jitter(initial=0.5, max=10),
+    stop=stop_after_attempt(6),
+    wait=wait_exponential_jitter(initial=0.5, max=4, jitter=0.5),
     retry=retry_if_exception_message(match=r"overloaded|503|500"),
 )
 def stubborn_generation(q: str) -> str:

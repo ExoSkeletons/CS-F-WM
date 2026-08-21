@@ -542,7 +542,6 @@ class DetectPage(WidgetFrame, DataCollector):
 
         # update model response text
         if not ok or response is None:
-            print("resp errored")
             self.set_response_error(response)
             return
 

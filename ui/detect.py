@@ -552,7 +552,7 @@ class DetectPage(WidgetFrame, DataCollector):
         def watermark_worker():
             try:
                 wm = None if not self.mark else self.mark[1][1] if type(self.mark[1]) == type(tuple) else self.mark[1]
-                wmr = response  # wm(response) if wm is not None else response
+                wmr = wm(response) if wm is not None else response
 
                 # reset user responses
                 self.resp_frame.reset_widgets()

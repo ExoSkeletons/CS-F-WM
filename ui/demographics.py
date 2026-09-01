@@ -188,6 +188,7 @@ class DemoPage(WidgetFrame, DataCollector):
         return bool(
                 self.gender_var.get() and
                 self.deg_level_var.get() and
+                self.deg_field_var.get() and
                 self.eng_level_var.get() and
                 self.age_var.get() and
                 self.ai_use_var.get() and

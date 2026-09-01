@@ -83,7 +83,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ar.insert(0, f"18 or below")
         ar.insert(1, f"18-{min_age}")
         ar.append(f"{max_age + 1} or above")
-        self.decline_button(age_opts, self.age_var)
+        # self.decline_button(age_opts, self.age_var)
         for r in ar:
             ttk.Radiobutton(
                 age_opts,
@@ -103,7 +103,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ).pack(anchor="w", pady=pady)
         edu_opts = ttk.Frame(edu_level)
         edu_opts.pack(anchor="w", padx=padx)
-        self.decline_button(edu_opts, self.deg_level_var)
+        # self.decline_button(edu_opts, self.deg_level_var)
         for text, value, color in [
             ("BSc", "bsc", "success"),
             ("MSc", "msc", "warning"),
@@ -137,7 +137,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ).pack(anchor="w", pady=pady)
         eng_opts = ttk.Frame(eng_level)
         eng_opts.pack(anchor="w", padx=padx)
-        self.decline_button(eng_opts, self.eng_level_var)
+        # self.decline_button(eng_opts, self.eng_level_var)
         c_range = ['danger', 'warning', 'info', 'success']
         n = 6
         for i in range(1, n):
@@ -157,7 +157,7 @@ class DemoPage(WidgetFrame, DataCollector):
         ).pack(anchor="w", pady=pady)
         ai_opts = ttk.Frame(ai_use_frame)
         ai_opts.pack(anchor="w", padx=padx)
-        self.decline_button(ai_opts, self.ai_use_var)
+        # self.decline_button(ai_opts, self.ai_use_var)
         for text, value, color in [
             ("No", False, "danger"),
             ("Several times a Day", "several times a day", "success"),

@@ -30,7 +30,7 @@ from watermark.types import Watermark
 from ui.app import App, WidgetFrame, config_enable, HeaderWidget
 from config import data_dir_path, img_dir_path
 from ui.auth import TermsPage, AuthPage
-from ui.demo import DemoPage
+from ui.demographics import DemoPage
 from ui.detect import DetectPage
 from ui.survey import PagedFrame, SurveySession
 

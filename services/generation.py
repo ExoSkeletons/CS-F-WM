@@ -66,7 +66,6 @@ def google_generation(prompt: str) -> str:
     reraise=True,
 )
 def stubborn_generation(q: str) -> str:
-    print(f"querying:\n\"{q}\"")
     return google_generation(q)
 
 
@@ -74,7 +73,9 @@ def threaded_generation(q: str, response_callback: Callable[[str, bool], Any]):
     def worker():
         name = "AI Model" # config.get('model', {}).get('name', None)
         try:
+            print(f"querying:\n\"{q}\"")
             resp = stubborn_generation(q)
+            print(f"response OK. generated:\n\"{resp}\"")
             ok = True
         except Exception as e:
             resp = (

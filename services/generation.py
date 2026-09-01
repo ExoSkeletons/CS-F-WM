@@ -1,9 +1,10 @@
+import json
 import threading
 from typing import Callable, Any
 
 import requests
-from requests import HTTPError
-from tenacity import retry, stop_after_attempt, wait_exponential_jitter, retry_if_exception_message, RetryError
+from requests import HTTPError, ConnectionError
+from tenacity import stop_after_attempt, wait_exponential_jitter, retry_if_exception_message, retry
 
 from config import config
 
@@ -17,7 +18,7 @@ def fetch_models(key: str):
     return models
 
 
-def generation(prompt: str) -> str:
+def google_generation(prompt: str) -> str:
     model_config = config['model']
     model = str(model_config['name'])
     temp = float(model_config.get('temperature', 1.0))
@@ -62,24 +63,32 @@ def generation(prompt: str) -> str:
     stop=stop_after_attempt(6),
     wait=wait_exponential_jitter(initial=0.5, max=4, jitter=0.5),
     retry=retry_if_exception_message(match=r"overloaded|503|500"),
+    reraise=True,
 )
 def stubborn_generation(q: str) -> str:
     print(f"querying:\n\"{q}\"")
-    return generation(q)
+    return google_generation(q)
 
 
 def threaded_generation(q: str, response_callback: Callable[[str, bool], Any]):
     def worker():
+        name = "AI Model" # config.get('model', {}).get('name', None)
         try:
             resp = stubborn_generation(q)
             ok = True
-        except RetryError as e:
-            resp = (f"{config['model']['name']} is currently experiencing high demand.\n"
-                    "Please try again.\n"
-                    )
-            ok = False
         except Exception as e:
-            resp = f"Error Generating response.\n{e.__repr__()}"
+            resp = (
+                    (
+                        f"Could not connect to {name}. Is your internet ok?" if isinstance(e, ConnectionError) else
+                        (
+                            f"{name} is currently unavailable. ({e.response.reason})\n"
+                            f"\n{dict(json.loads(e.response.text)).get('error', {}).get('message', '-')}"
+                        ) if isinstance(e, HTTPError) else
+                        f"Error Generating response."
+                    ) + "\n"
+                    # + "\nPlease try again later.\n"
+                    + f"\n{e.__repr__()}"
+            )
             ok = False
         response_callback(resp, ok)
 

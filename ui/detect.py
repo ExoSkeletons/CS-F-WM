@@ -59,8 +59,7 @@ class ModelFrame(WidgetFrame):
         self.tt.grid(row=0, column=0, sticky="nsew")
         self.scroll.content.columnconfigure(0, weight=1)
         self.scroll.content.rowconfigure(0, weight=1)
-        # text label (non-editable)
-        # self.tl = tkinter.Label(self.scroll.content, textvariable=self.text_var, anchor="nw", justify="left")
+        # text label (non-editable, but selectable)
         self.tl = ttk.Text(self.scroll.content, wrap="word", font=response_font)
         config_style_as_label(self.tl, self.app)
         config_enable(self.tl, False)
@@ -69,7 +68,7 @@ class ModelFrame(WidgetFrame):
         # self.tl.bind("<Configure>", lambda event: self.tl.configure(wraplength=event.width - 50))
         # query submission
         self.submit_frame = ttk.Frame(model_body)
-        self.submit_frame.pack(fill="x")
+        self.submit_frame.pack(fill="x", expand=True)
         self._query_form = ScrolledText(self.submit_frame, height=1, width=1, wrap="word")
         self.app.set_on_submit(self._query_form, lambda: self.submit_query())
         self._query_form.grid(row=0, column=0, sticky="nsew", padx=padx, pady=pady)
@@ -94,7 +93,7 @@ class ModelFrame(WidgetFrame):
 
         # config query form visibility
         if query_enabled:
-            self.submit_frame.pack()
+            self.submit_frame.pack(expand=True, fill='x')
         else:
             self.submit_frame.pack_forget()
         # config query form enabled

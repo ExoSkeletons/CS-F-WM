@@ -1,7 +1,7 @@
 import random
 
 from config import config
-from services import wtgb
+from services import lbwm
 from services.generation import stubborn_generation
 
 from .types import Watermarks
@@ -16,7 +16,7 @@ def marks() -> Watermarks:
         "space#": lambda s: s.replace(' ', '#'),
         "ab": lambda s: s.replace('A', 'B').replace('a', 'b'),
         "phishing": lambda s: s.replace("m", "rn"),
-        "wtgb": lambda s: wtgb.watermark(s),
+        "wtgb": lambda s: lbwm.watermark(s),
         "space-replace": lambda s: s.replace(' ', space_replace_config.get('char', '\u2004')),
         "acrostic": lambda s: s if not acrostic_config else stubborn_generation(
             "consider the poem technique of \'acrostic\', where the leading letters of sentence in the poem "

@@ -70,13 +70,13 @@ def init_model():
 def watermark(ori_text: str, do_post_process: bool = True) -> str:
     # watermark
     global model
-    print("[wtgb] watermarking...")
+    print("[lbwm] watermarking...")
     tw0 = datetime.now()
     wm_text = model.embed(ori_text)
     if do_post_process: wm_text = fix_spacing(wm_text)
     tw = datetime.now()
 
-    print(f'[wtgb] wm done. took {tw - tw0}s')
+    print(f'[lbwm] wm done. took {tw - tw0}s')
 
     return wm_text
 

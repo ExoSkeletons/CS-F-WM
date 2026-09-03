@@ -8,7 +8,7 @@ from starlette.responses import Response
 
 from config import config
 import config as cfg
-from services import wtgb, firebase
+from services import lbwm, firebase
 from watermark.watermarks import marks
 
 jobs = {}
@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
 
     # init model
     print("init wtgb model")
-    wtgb.init_model()
+    lbwm.init_model()
     print("init wtgb done")
 
     yield  # app runs here

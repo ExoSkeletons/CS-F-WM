@@ -13,9 +13,20 @@ For consistency and better compute one might opt to move the watermarking proces
 
 ---
 
-# Server Deployment
+# Configuration
+
+*TODO*
+
+# Deployment
 
 We deployed our server on an AWS EC2 with Docker.
+
+## Init Docker 
+
+```shell
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+```
 
 ## Build
 

@@ -17,6 +17,15 @@ For consistency and better compute one might opt to move the watermarking proces
 
 *TODO*
 
+```json lines
+{
+  wm_server: {
+    address: "xxx.xxx.xxx.xxx",
+    port: 8000
+  }
+}
+```
+
 # Deployment
 
 We deployed our server on an AWS EC2 with Docker.
@@ -28,11 +37,13 @@ sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
 ```
 
+Be sure to `exit` and relog.
+
 ## Build
 
 ```shell
 cd CS-F-WM
-docker build -f ./web/Dockerfile -t watermark-api .
+docker build -f ./web/Dockerfile -t wm-server .
 ```
 
 ## Run
@@ -43,7 +54,7 @@ CPU mode
 docker run -d \
   -p 8000:8000 \
   --restart unless-stopped \
-  watermark-api
+  wm-server
 ```
 
 GPU mode
@@ -54,5 +65,5 @@ docker run -d \
   -p 8000:8000 \
   --restart unless-stopped \
   --name watermark-api \
-  watermark-api
+  wm-server
 ```

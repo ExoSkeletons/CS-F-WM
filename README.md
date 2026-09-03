@@ -1,18 +1,27 @@
 
 # Identification of AI-Generated Academic Texts Using Watermarks
 
-WIP
+***WIP***
 
+## Instructions
+
+***WIP***
+
+```shell
+git clone https://github.com/ExoSkeletons/CS-F-WM.git
+```
 
 ### Prerequisites
 
 * Firebase Access
-  * Place `serviceAccountKey.json` in `/data`.
+  * Place your `serviceAccountKey.json` in `/data`.
 * OAuth Login
-  * Place `oauth_client.json` in `/data`.
+  * Place your `oauth_client.json` in `/data`.
+
+### Configurations (Optional)
 * Email Sending
-  * Add
-  ```
+  * Add the following to `config.yml` or in the Firestore config collection.
+  ```json lines
   {
     email: {
       app_email: <Sender Email>
@@ -20,4 +29,3 @@ WIP
     }
   }
   ```
-  to `config.yml`, or in the Firestore config collection.

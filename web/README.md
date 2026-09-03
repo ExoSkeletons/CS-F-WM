@@ -19,7 +19,8 @@ We deployed our server on an AWS EC2 with Docker.
 
 ## Build
 
-```
+```shell
+cd CS-F-WM
 docker build -f ./web/Dockerfile -t watermark-api .
 ```
 
@@ -27,7 +28,7 @@ docker build -f ./web/Dockerfile -t watermark-api .
 
 CPU mode
 
-```
+```shell
 docker run -d \
   -p 8000:8000 \
   --restart unless-stopped \
@@ -36,7 +37,7 @@ docker run -d \
 
 GPU mode
 
-```
+```shell
 docker run -d \
   --gpus all \
   -p 8000:8000 \

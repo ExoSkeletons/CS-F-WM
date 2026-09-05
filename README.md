@@ -37,4 +37,4 @@ git clone https://github.com/ExoSkeletons/CS-F-WM.git
 * Watermarking Web Service
   * Webserver `/web/server.py`
   * Test Client `/web/client.py`
-  * *See `/web`*
+  * *For further detailed instructions, see `/web`*

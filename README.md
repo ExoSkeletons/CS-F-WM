@@ -29,3 +29,12 @@ git clone https://github.com/ExoSkeletons/CS-F-WM.git
     }
   }
   ```
+
+### Run
+
+* **Survey App**
+  * Launch Survey UI by running `survey.py`
+* Watermarking Web Service
+  * Webserver `/web/server.py`
+  * Test Client `/web/client.py`
+  * *See `/web`*

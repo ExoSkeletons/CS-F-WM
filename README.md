@@ -18,7 +18,7 @@ git clone https://github.com/ExoSkeletons/CS-F-WM.git
 * Setup Login (OAuth 2.0 Google API)
   * Place your `oauth_client.json` in `/data`.
 * *Setup Email Database \[Optional]*
-  * Add the following to `config.yml` or in the Firestore config collection.
+  * Specify the following in `config.yml` or in the Firestore config collection.
   ```json lines
   {
     email: {

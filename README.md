@@ -13,13 +13,11 @@
 ```shell
 git clone https://github.com/ExoSkeletons/CS-F-WM.git
 ```
-* Firebase Access
+* Setup Database (Firebase Firestore) Access
   * Place your `serviceAccountKey.json` in `/data`.
-* OAuth Login
+* Setup Login (OAuth 2.0 Google API)
   * Place your `oauth_client.json` in `/data`.
-
-### Configurations (Optional)
-* Email Sending
+* *Setup Email Database \[Optional]*
   * Add the following to `config.yml` or in the Firestore config collection.
   ```json lines
   {

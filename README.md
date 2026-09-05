@@ -7,14 +7,12 @@
 
 ***WIP***
 
-### Clone Repo
+### Prerequisites
 
+* Clone Repo
 ```shell
 git clone https://github.com/ExoSkeletons/CS-F-WM.git
 ```
-
-### Prerequisites
-
 * Firebase Access
   * Place your `serviceAccountKey.json` in `/data`.
 * OAuth Login

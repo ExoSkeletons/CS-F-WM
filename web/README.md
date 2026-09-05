@@ -1,6 +1,6 @@
 # Webserver Watermarking
 
-For consistency and better compute one might opt to move the watermarking process to a Cloud-based remote server.
+For performance consistency and better compute when using heavy Watermarking, we built a simple webserver to process watermark requests remotely on the Cloud.
 
 * `server.py`
   * FastAPI webserver.

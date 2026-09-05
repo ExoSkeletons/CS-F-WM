@@ -7,6 +7,8 @@
 
 ***WIP***
 
+### Clone Repo
+
 ```shell
 git clone https://github.com/ExoSkeletons/CS-F-WM.git
 ```

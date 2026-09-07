@@ -43,7 +43,7 @@ Be sure to `exit` and relog.
 
 ```shell
 cd CS-F-WM
-docker build -f ./web/Dockerfile -t wm-server .
+docker build -f ./web/Dockerfile -t wm-server:latest .
 ```
 
 ## Run
@@ -54,7 +54,7 @@ CPU mode
 docker run -d \
   -p 8000:8000 \
   --restart unless-stopped \
-  wm-server
+  wm-server:latest
 ```
 
 GPU mode
@@ -65,5 +65,5 @@ docker run -d \
   -p 8000:8000 \
   --restart unless-stopped \
   --name watermark-api \
-  wm-server
+  wm-server:latest
 ```
